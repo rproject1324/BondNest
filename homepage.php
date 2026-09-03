@@ -1314,39 +1314,10 @@ if (menuTrigger) {
 #createPostModal {
     /* Keep display:none by default - will be set to flex when opened */
     display: none;
-    position: fixed;
-    top: 74px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 74px);
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    z-index: 10000;
     justify-content: center;
     align-items: flex-start;
-    overflow-y: auto;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    box-sizing: border-box;
-    transition: padding-top 0.3s ease;
-}
-
-/* Dynamic padding when image is uploaded */
-#createPostModal.with-image {
-    padding-top: 20px;
-}
-
-/* Ensure modal content matches profile page dimensions */
-#createPostModal .modal-content {
-    max-height: 90vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-#createPostModal .modal-body {
-    flex: 1 !important;
-    overflow-y: auto !important;
+    top: 74px;
+    padding-top: 10px;
 }
 
 #editPostModal, #editCommentModal {
@@ -1375,112 +1346,10 @@ if (menuTrigger) {
 .modal-content {
     background-color: white;
     border-radius: 10px;
-    width: 100%;
+    width: 90%;
     max-width: 500px;
-    max-height: 90vh;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     animation: modal-in 0.3s forwards;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.modal-body {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    padding: 10px 0;
-}
-
-.add-to-post {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 15px;
-    border: none;
-    border-top: 1px solid #eee;
-    border-radius: 0;
-    padding: 15px 0 0 0;
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-.add-to-post .icons i {
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: inline-block;
-    transition: transform 0.2s ease;
-}
-
-.add-to-post .icons i:hover {
-    transform: scale(1.15);
-}
-
-.modal-footer {
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 0 0 0;
-}
-
-.modal-footer .post-button {
-    width: auto;
-    padding: 8px 25px;
-    background-color: #008080;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.image-preview-container {
-    display: none;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-    margin-top: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.image-preview-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%;
-}
-
-.image-preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.remove-image-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 24px;
-    height: 24px;
-    background: #ff4d4f;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
 }
 
 /* Image preview styling improvements */
@@ -2052,7 +1921,6 @@ window.addEventListener('click', function(event) {
         // Check if click is outside the modal content
         if (event.target === createPostModal) {
             createPostModal.style.display = 'none';
-            createPostModal.classList.remove('with-image'); // Reset class
             console.log('Closed create post modal via window click');
         }
     }
@@ -2122,7 +1990,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const createPostModal = document.getElementById('createPostModal');
         if (createPostModal && (createPostModal.style.display === 'block' || createPostModal.style.display === 'flex') && !createPostModal.querySelector('.modal-content').contains(e.target) && e.target === createPostModal) {
             createPostModal.style.display = 'none';
-            createPostModal.classList.remove('with-image'); // Reset class
             console.log('Closed create post modal by global click outside');
         }
         
@@ -2176,7 +2043,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const showCreatePostModal = () => {
         if (modal) {
             modal.style.display = "flex"; // Use flex instead of block for better centering
-            modal.classList.remove('with-image'); // Reset to default state
         }
     };
 
@@ -2200,7 +2066,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeButton) {
         closeButton.addEventListener('click', function() {
             modal.style.display = "none";
-            modal.classList.remove('with-image'); // Reset class
         });
     }
     
@@ -2210,7 +2075,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if click is directly on the modal container but not on the modal content
             if (e.target === modal) {
                 modal.style.display = "none";
-                modal.classList.remove('with-image'); // Reset class
                 console.log('Closed create post modal by clicking outside');
             }
         });
@@ -2220,7 +2084,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Close create post modal when clicking outside
         if (event.target == modal) {
             modal.style.display = "none";
-            modal.classList.remove('with-image'); // Reset class
         }
         
         // Close edit post modal when clicking outside
@@ -2263,18 +2126,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const updatePreviewContainerVisibility = () => {
         if (imagePreviewContainer) {
-            const hasImages = imagePreviewContainer.children.length > 0;
-            imagePreviewContainer.style.display = hasImages ? 'grid' : 'none';
-
-            // Add/remove class when image is present
-            const createPostModal = document.getElementById('createPostModal');
-            if (createPostModal) {
-                if (hasImages) {
-                    createPostModal.classList.add('with-image');
-                } else {
-                    createPostModal.classList.remove('with-image');
-                }
-            }
+            imagePreviewContainer.style.display = 
+                imagePreviewContainer.children.length > 0 ? 'grid' : 'none';
         }
     };
 

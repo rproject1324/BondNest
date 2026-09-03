@@ -1336,6 +1336,19 @@ if (menuTrigger) {
     padding-top: 20px;
 }
 
+/* Ensure modal content matches profile page dimensions */
+#createPostModal .modal-content {
+    max-height: 90vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#createPostModal .modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
 #editPostModal, #editCommentModal {
     display: flex;
     justify-content: center;
@@ -1364,8 +1377,71 @@ if (menuTrigger) {
     border-radius: 10px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     animation: modal-in 0.3s forwards;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.image-preview-container {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.image-preview-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+}
+
+.image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 
 /* Image preview styling improvements */

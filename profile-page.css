@@ -493,6 +493,13 @@ body {
     padding-top: 50px !important;
     padding-bottom: 50px !important;
     box-sizing: border-box !important;
+    transition: padding-top 0.3s ease;
+}
+
+/* Dynamic padding when image is uploaded */
+#createPostModal.modal-container.with-image,
+.modal-container#createPostModal.with-image {
+    padding-top: 20px !important;
 }
 
 #createPostModal #postForm {

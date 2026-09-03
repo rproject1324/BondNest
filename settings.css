@@ -684,7 +684,7 @@ textarea.settings-input {
     max-height: 80px;
     transform: translateY(0);
     margin-top: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
 .custom-success {

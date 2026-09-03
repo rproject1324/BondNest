@@ -217,15 +217,16 @@ display: none;
 
 .login-inline-error {
     display: none;
-    font-size: 0.82rem;
-    color: #c0392b;
-    background: rgba(192, 57, 43, 0.08);
-    border: 1px solid rgba(192, 57, 43, 0.2);
-    border-radius: 6px;
-    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #b84252;
+    background: #fef2f2;
+    border: 1px solid #f8b4bf;
+    border-radius: 8px;
+    padding: 8px 10px;
     margin-top: 6px;
-    margin-bottom: 4px;
-    line-height: 1.4;
+    margin-bottom: 10px;
+    line-height: 1.25;
 }
 
 .login-form-group--error {
@@ -630,20 +631,21 @@ border-color: #7fbf9f;
 box-shadow: 0 0 0 3px rgba(127, 191, 159, 0.1);
 }
 
+/* Inline validation — matches DiariCore reference (login.css .custom-error):
+   one size everywhere (incl. password fields) for visibility + consistency. */
 .signup-form-wrapper .custom-error {
 background: #fef2f2;
 border: 1px solid #f8b4bf;
 color: #b84252;
-padding: 6px 8px;
-border-radius: 6px;
-font-size: 12px;
+padding: 8px 10px;
+border-radius: 8px;
+font-size: 13px;
 font-weight: 500;
-margin-top: 4px;
-line-height: 1.2;
+line-height: 1.25;
 opacity: 0;
 max-height: 0;
 transform: translateY(-4px);
-transition: opacity 0.22s ease, transform 0.22s ease, max-height 0.22s ease, margin-top 0.22s ease;
+transition: opacity 0.22s ease, transform 0.22s ease, max-height 0.22s ease, margin-top 0.22s ease, margin-bottom 0.22s ease;
 pointer-events: none;
 overflow: hidden;
 margin-top: 0;
@@ -655,28 +657,15 @@ opacity: 1;
 max-height: 80px;
 transform: translateY(0);
 margin-top: 6px;
-margin-bottom: 4px;
+margin-bottom: 10px;
 }
 
 /* Password strength meter — DiariCore style adapted for BondNest teal */
 .signup-form-wrapper .pwd-live {
-margin-top: 2px;
+margin-top: 0.45rem;
 }
 .signup-form-wrapper .pwd-live[hidden] {
 display: none !important;
-}
-/* Password per-field errors are deduplicated into the shared policy message
-   (see signup.php refresh()); keep them compact so they never push the
-   strength meter down with a big gap. */
-.signup-form-wrapper #createPassword-error,
-.signup-form-wrapper #confirmPassword-error {
-padding: 4px 8px;
-font-size: 11px;
-}
-.signup-form-wrapper #createPassword-error.show,
-.signup-form-wrapper #confirmPassword-error.show {
-margin-top: 4px;
-margin-bottom: 0;
 }
 .signup-form-wrapper .pwd-checklist {
 display: none !important;
@@ -688,7 +677,7 @@ padding: 0;
 display: flex;
 align-items: center;
 gap: 0.55rem;
-margin-top: 4px;
+margin-top: 0.5rem;
 width: 100%;
 }
 .signup-form-wrapper .pwd-strength__track {
@@ -715,15 +704,10 @@ text-align: right;
 .signup-form-wrapper .form-group--pwd-full {
 grid-column: 1 / -1;
 margin-top: 0;
-margin-bottom: 2px;
+margin-bottom: 0.5rem;
 }
 .signup-form-wrapper .form-group--pwd-full:empty {
 display: none;
-}
-/* Shared password-policy message sits directly under the meter — keep it tight */
-.signup-form-wrapper #signUpPassword-common-error.show {
-margin-top: 4px;
-margin-bottom: 2px;
 }
 
 .profile-picture-group {

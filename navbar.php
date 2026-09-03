@@ -123,21 +123,7 @@ if (!function_exists('getInitialsHtml')) {
                     $unread_message_count = $row['count'];
                 }
 
-                // Fetch recent notifications for dropdown (all 4 types, paginated)
-                $notif_per_page = 5;
-                $notif_page = isset($_GET['notif_page']) ? max(1, intval($_GET['notif_page'])) : 1;
-                $notif_offset = ($notif_page - 1) * $notif_per_page;
-
-                // Count total notifications
-                $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND type IN ('post_warning','post_deleted','post_on_hold','post_approved')");
-                $stmt->execute([$user_id]);
-                $notif_total = $stmt->fetch()['count'];
-                $notif_total_pages = max(1, ceil($notif_total / $notif_per_page));
-
-                // Fetch page of notifications
-                $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? AND type IN ('post_warning','post_deleted','post_on_hold','post_approved') ORDER BY created_at DESC LIMIT ? OFFSET ?");
-                $stmt->execute([$user_id, $notif_per_page, $notif_offset]);
-                $recent_notifications = $stmt->fetchAll();
+                // Recent notifications will be fetched via JavaScript when dropdown opens
             }
             ?>
             
@@ -156,74 +142,14 @@ if (!function_exists('getInitialsHtml')) {
                             <span class="notification-count"><?php echo $notification_count; ?> new</span>
                         <?php endif; ?>
                     </div>
-                    
+
                     <div class="notification-body">
-                        <?php if (!empty($recent_notifications)): ?>
-                            <?php foreach ($recent_notifications as $notif): ?>
-                                <?php
-                                $type = $notif['type'];
-                                $type_url = match($type) {
-                                    'post_warning' => 'warnings.php?mark_read=' . $notif['id'],
-                                    'post_deleted' => 'deleted_posts.php?mark_read=' . $notif['id'],
-                                    'post_on_hold' => 'held_posts.php?mark_read=' . $notif['id'],
-                                    'post_approved' => 'approved_posts.php?mark_read=' . $notif['id'],
-                                    default => '#'
-                                };
-                                $type_class = match($type) {
-                                    'post_warning' => 'warning',
-                                    'post_deleted' => 'deleted',
-                                    'post_on_hold' => 'hold',
-                                    'post_approved' => 'approved',
-                                    default => ''
-                                };
-                                $type_icon = match($type) {
-                                    'post_warning' => 'bi-exclamation-triangle-fill',
-                                    'post_deleted' => 'bi-trash-fill',
-                                    'post_on_hold' => 'bi-pause-circle-fill',
-                                    'post_approved' => 'bi-check-circle-fill',
-                                    default => 'bi-bell'
-                                };
-                                // Strip JSON data from message for clean display
-                                $clean_msg = preg_replace('/Post data: \{.*\}/s', '', $notif['message']);
-                                $clean_msg = trim($clean_msg);
-                                ?>
-                                <a href="<?php echo $type_url; ?>?notification_id=<?php echo $notif['id']; ?>" class="notification-item <?php echo $type_class; ?>">
-                                    <div class="notification-icon">
-                                        <i class="bi <?php echo $type_icon; ?>"></i>
-                                    </div>
-                                    <div class="notification-text">
-                                        <p><?php echo htmlspecialchars($clean_msg); ?></p>
-                                        <span class="notification-time"><?php
-                                            $nz = new DateTimeZone('UTC');
-                                            $nn = new DateTime('now', $nz);
-                                            $na = new DateTime($notif['created_at'], $nz);
-                                            $nd = $nn->diff($na);
-                                            if ($nd->d > 0) echo $nd->d . ' day' . ($nd->d > 1 ? 's' : '') . ' ago';
-                                            elseif ($nd->h > 0) echo $nd->h . ' hour' . ($nd->h > 1 ? 's' : '') . ' ago';
-                                            elseif ($nd->i > 0) echo $nd->i . ' min' . ($nd->i > 1 ? 's' : '') . ' ago';
-                                            else echo 'just now';
-                                        ?></span>
-                                    </div>
-                                </a>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="notification-empty">
-                                <p>No new notifications</p>
-                            </div>
-                        <?php endif; ?>
+                        <div class="notification-empty">
+                            <p>Loading notifications...</p>
+                        </div>
                     </div>
-                    
-                    <?php if ($notif_total_pages > 1): ?>
-                    <div class="notification-pagination">
-                        <button class="notif-page-btn" onclick="notifGotoPage(<?php echo max(1, $notif_page - 1); ?>)" <?php echo $notif_page <= 1 ? 'disabled' : ''; ?>>
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="notif-page-info">Page <?php echo $notif_page; ?> of <?php echo $notif_total_pages; ?></span>
-                        <button class="notif-page-btn" onclick="notifGotoPage(<?php echo min($notif_total_pages, $notif_page + 1); ?>)" <?php echo $notif_page >= $notif_total_pages ? 'disabled' : ''; ?>>
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                    <?php endif; ?>
+
+                    <div class="notification-pagination" style="display: none;"></div>
                 </div>
             </div>
             
@@ -1173,11 +1099,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Notification dropdown functionality
     const notificationToggle = document.getElementById('notificationDropdownToggle');
     const notificationContent = document.getElementById('notificationDropdownContent');
-    
+
     if (notificationToggle && notificationContent) {
         notificationToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+
+            // Fetch fresh notifications when opening dropdown
+            if (!notificationContent.classList.contains('show')) {
+                fetchFreshNotifications();
+            }
+
             notificationContent.classList.toggle('show');
             // Close profile dropdown if open
             if (profileContent) profileContent.classList.remove('show');
@@ -1194,12 +1126,111 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Notification pagination - notif_page param persists across refreshes naturally via URL
-    function notifGotoPage(page) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('notif_page', page);
-        window.location.href = url.toString();
+    // Function to fetch fresh notifications
+    function fetchFreshNotifications(page = 1) {
+        fetch('get_notifications.php?page=' + page, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateNotificationDropdown(data);
+            }
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
     }
+
+    // Function to update notification dropdown with fresh data
+    function updateNotificationDropdown(data) {
+        const notificationBody = document.querySelector('.notification-body');
+        const notificationHeader = document.querySelector('.notification-header');
+        const notificationPagination = document.querySelector('.notification-pagination');
+
+        if (!notificationBody) return;
+
+        // Update header count
+        const headerCount = notificationHeader.querySelector('.notification-count');
+        if (headerCount) {
+            if (data.unread_count > 0) {
+                headerCount.textContent = data.unread_count + ' new';
+                headerCount.style.display = 'inline';
+            } else {
+                headerCount.style.display = 'none';
+            }
+        }
+
+        // Update notification body
+        if (data.notifications.length > 0) {
+            notificationBody.innerHTML = data.notifications.map(notif => `
+                <a href="${notif.type_url}" class="notification-item ${notif.type_class}">
+                    <div class="notification-icon">
+                        <i class="bi ${notif.type_icon}"></i>
+                    </div>
+                    <div class="notification-text">
+                        <p>${notif.message}</p>
+                        <span class="notification-time">${notif.time}</span>
+                    </div>
+                </a>
+            `).join('');
+        } else {
+            notificationBody.innerHTML = `
+                <div class="notification-empty">
+                    <p>No new notifications</p>
+                </div>
+            `;
+        }
+
+        // Update pagination
+        if (notificationPagination) {
+            if (data.total_pages > 1) {
+                notificationPagination.innerHTML = `
+                    <button class="notif-page-btn" onclick="fetchFreshNotifications(${Math.max(1, data.current_page - 1)})" ${data.current_page <= 1 ? 'disabled' : ''}>
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <span class="notif-page-info">Page ${data.current_page} of ${data.total_pages}</span>
+                    <button class="notif-page-btn" onclick="fetchFreshNotifications(${Math.min(data.total_pages, data.current_page + 1)})" ${data.current_page >= data.total_pages ? 'disabled' : ''}>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                `;
+                notificationPagination.style.display = 'flex';
+            } else {
+                notificationPagination.style.display = 'none';
+            }
+        }
+
+        // Mark displayed notifications as read
+        markNotificationsAsRead(data.notifications);
+    }
+
+    // Function to mark notifications as read
+    function markNotificationsAsRead(notifications) {
+        const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+        if (unreadIds.length === 0) return;
+
+        fetch('mark_notifications_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ notification_ids: unreadIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update badge count
+                const notificationIcon = document.querySelector('.notification-icon');
+                const existingBadge = notificationIcon?.querySelector('.notification-badge');
+                const newCount = Math.max(0, parseInt(existingBadge?.textContent || 0) - unreadIds.length);
+
+                if (newCount > 0) {
+                    existingBadge.textContent = newCount > 99 ? '99+' : newCount;
+                } else {
+                    existingBadge?.remove();
+                }
+            }
+        })
+        .catch(error => console.error('Error marking notifications as read:', error));
+    }
+
+
 
     // Close both dropdowns when clicking outside
     document.addEventListener('click', function(e) {

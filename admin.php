@@ -17,6 +17,46 @@ if (!function_exists('getInitialsHtml')) {
     }
 }
 
+// Snapshot of a post + author for embedding in hold/approve notifications,
+// so the detail modals can render avatar + image even if the post row is
+// gone later (same role as the warnings / deleted_posts snapshot tables).
+if (!function_exists('getPostSnapshotForNotification')) {
+    function getPostSnapshotForNotification($pdo, $post_id) {
+        try {
+            $snap_stmt = $pdo->prepare("
+                SELECT p.*, u.first_name, u.last_name, u.profile_picture,
+                       COUNT(DISTINCT c.id) AS comment_count
+                FROM posts p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN comments c ON p.id = c.post_id
+                WHERE p.id = ?
+                GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
+            ");
+            $snap_stmt->execute([$post_id]);
+            $row = $snap_stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ?: null;
+        } catch (Exception $e) { return null; }
+    }
+}
+
+if (!function_exists('buildPostSnapshotSuffix')) {
+    function buildPostSnapshotSuffix($snapshot_row) {
+        if (!$snapshot_row) return '';
+        $excerpt = trim(preg_replace('/\s+/', ' ', (string)($snapshot_row['content'] ?? '')));
+        if (mb_strlen($excerpt) > 300) $excerpt = mb_substr($excerpt, 0, 300) . '...';
+        $excerpt = str_replace('"', "'", $excerpt);
+        $data = [
+            'image_path' => $snapshot_row['image_path'] ?? '',
+            'likes' => intval($snapshot_row['likes'] ?? 0),
+            'comment_count' => intval($snapshot_row['comment_count'] ?? 0),
+            'profile_picture' => $snapshot_row['profile_picture'] ?? '',
+            'first_name' => $snapshot_row['first_name'] ?? '',
+            'last_name' => $snapshot_row['last_name'] ?? '',
+        ];
+        return ' Post content: "' . $excerpt . '" Post data: ' . json_encode($data);
+    }
+}
+
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
@@ -120,42 +160,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $delete_stmt->execute([$post_id]);
             }             elseif ($action === 'hold') {
                             // If action is "hold", update the post status to "on-hold" and update timestamp
+                // Snapshot post + author first so the notification carries its own copy
+                // (avatar + image keep rendering even if the post row is gone later).
+                $hold_snapshot = getPostSnapshotForNotification($pdo, $post_id);
             $update_stmt = $pdo->prepare("UPDATE posts SET status = 'on-hold', updated_at = NOW() WHERE id = ?");
                 $update_stmt->execute([$post_id]);
-                
+
                 // Get post owner to send notification
-                $get_owner_stmt = $pdo->prepare("SELECT user_id FROM posts WHERE id = ?");
-                $get_owner_stmt->execute([$post_id]);
-                
-                if ($owner_row = $get_owner_stmt->fetch()) {
-                    $post_owner_id = $owner_row['user_id'];
-                    
+                $post_owner_id = $hold_snapshot['user_id'] ?? null;
+                if (!$post_owner_id) {
+                    $get_owner_stmt = $pdo->prepare("SELECT user_id FROM posts WHERE id = ?");
+                    $get_owner_stmt->execute([$post_id]);
+                    $owner_row = $get_owner_stmt->fetch();
+                    $post_owner_id = $owner_row ? $owner_row['user_id'] : null;
+                }
+
+                if ($post_owner_id) {
                     // Create notification
-                    $notification_message = "Your post has been placed on hold. Reason: " . substr($comment, 0, 100) . 
+                    $notification_message = "Your post has been placed on hold. Reason: " . substr($comment, 0, 100) .
                                         (strlen($comment) > 100 ? "..." : "");
-                
-                    $notification_stmt = $pdo->prepare("INSERT INTO notifications 
-                        (user_id, type, message, reference_id, is_read) 
+                    $notification_message .= buildPostSnapshotSuffix($hold_snapshot);
+
+                    $notification_stmt = $pdo->prepare("INSERT INTO notifications
+                        (user_id, type, message, reference_id, is_read)
                         VALUES (?, 'post_on_hold', ?, ?, 0)");
                     $notification_stmt->execute([$post_owner_id, $notification_message, $post_id]);
                 }
             } elseif ($action === 'approve') {
                 // If action is "approve", update the post status to "approved" and update timestamp
+                // Snapshot post + author first so the notification carries its own copy
+                // (avatar + image keep rendering even if the post row is gone later).
+                $approve_snapshot = getPostSnapshotForNotification($pdo, $post_id);
                 $update_stmt = $pdo->prepare("UPDATE posts SET status = 'approved', updated_at = NOW() WHERE id = ?");
                 $update_stmt->execute([$post_id]);
-                
+
                 // Get post owner to send notification
-                $get_owner_stmt = $pdo->prepare("SELECT user_id FROM posts WHERE id = ?");
-                $get_owner_stmt->execute([$post_id]);
-                
-                if ($owner_row = $get_owner_stmt->fetch()) {
-                    $post_owner_id = $owner_row['user_id'];
-                    
+                $post_owner_id = $approve_snapshot['user_id'] ?? null;
+                if (!$post_owner_id) {
+                    $get_owner_stmt = $pdo->prepare("SELECT user_id FROM posts WHERE id = ?");
+                    $get_owner_stmt->execute([$post_id]);
+                    $owner_row = $get_owner_stmt->fetch();
+                    $post_owner_id = $owner_row ? $owner_row['user_id'] : null;
+                }
+
+                if ($post_owner_id) {
                     // Create notification
                     $notification_message = "Your post has been approved.";
-                    
-                    $notification_stmt = $pdo->prepare("INSERT INTO notifications 
-                        (user_id, type, message, reference_id, is_read) 
+                    $notification_message .= buildPostSnapshotSuffix($approve_snapshot);
+
+                    $notification_stmt = $pdo->prepare("INSERT INTO notifications
+                        (user_id, type, message, reference_id, is_read)
                         VALUES (?, 'post_approved', ?, ?, 0)");
                     $notification_stmt->execute([$post_owner_id, $notification_message, $post_id]);
                 }

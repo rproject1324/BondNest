@@ -172,19 +172,29 @@ if (isset($_GET['notification_id'])) {
         if (!empty($selected_notification['reference_id'])) {
             $post_id = $selected_notification['reference_id'];
             $post_stmt = $pdo->prepare("
-                SELECT p.*, u.first_name, u.last_name, u.profile_picture, 
+                SELECT p.*, u.first_name, u.last_name, u.profile_picture,
                        COUNT(DISTINCT c.id) AS comment_count
-                FROM posts p 
-                JOIN users u ON p.user_id = u.id 
-                LEFT JOIN comments c ON p.id = c.post_id 
+                FROM posts p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN comments c ON p.id = c.post_id
                 WHERE p.id = ?
                 GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
             ");
             $post_stmt->execute([$post_id]);
-            if ($post_stmt->rowCount() > 0) {
-                $hold_data = $post_stmt->fetch();
+            $fetched_post = $post_stmt->fetch();
+            if ($fetched_post) {
+                $hold_data = $fetched_post;
             }
         }
+
+        // Owner fallback so avatar + name still render when the post row is
+        // gone (these pages only ever show your own notifications).
+        $owner_info = null;
+        try {
+            $owner_stmt = $pdo->prepare("SELECT first_name, last_name, profile_picture FROM users WHERE id = ?");
+            $owner_stmt->execute([$user_id]);
+            $owner_info = $owner_stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (Exception $e) { $owner_info = null; }
     }
 }
 ?>
@@ -844,6 +854,25 @@ if (isset($_GET['notification_id'])) {
                                 'first_name' => 'Your',
                                 'last_name' => 'Post'
                             ];
+                        }
+
+                        // Owner fallback — hold notifications always belong to the
+                        // viewer, so prefer their real identity over placeholders.
+                        if ($owner_info) {
+                            $pd_first = trim($post_data['first_name'] ?? '');
+                            $pd_last = trim($post_data['last_name'] ?? '');
+                            if ($pd_first === '' || $pd_first === 'Your') {
+                                $post_data['first_name'] = $owner_info['first_name'] ?? $post_data['first_name'];
+                            }
+                            if ($pd_last === '' || $pd_last === 'Post') {
+                                $post_data['last_name'] = $owner_info['last_name'] ?? $post_data['last_name'];
+                            }
+                            $pd_pfp = trim($post_data['profile_picture'] ?? '');
+                            if ($pd_pfp === '' || $pd_pfp === './web-images/default_profile.png') {
+                                // Real photo when available, otherwise clear it so the
+                                // initials avatar (e.g. LT) renders instead of a logo.
+                                $post_data['profile_picture'] = $owner_info['profile_picture'] ?? '';
+                            }
                         }
                         
                         // Debug data

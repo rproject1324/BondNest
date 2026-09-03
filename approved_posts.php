@@ -173,19 +173,29 @@ if (isset($_GET['notification_id'])) {
         if (!empty($selected_notification['reference_id'])) {
             $post_id = $selected_notification['reference_id'];
             $post_stmt = $pdo->prepare("
-                SELECT p.*, u.first_name, u.last_name, u.profile_picture, 
+                SELECT p.*, u.first_name, u.last_name, u.profile_picture,
                        COUNT(DISTINCT c.id) AS comment_count
-                FROM posts p 
-                JOIN users u ON p.user_id = u.id 
-                LEFT JOIN comments c ON p.id = c.post_id 
+                FROM posts p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN comments c ON p.id = c.post_id
                 WHERE p.id = ?
                 GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
             ");
             $post_stmt->execute([$post_id]);
-            if ($post_stmt->rowCount() > 0) {
-                $approved_post_data = $post_stmt->fetch();
+            $fetched_post = $post_stmt->fetch();
+            if ($fetched_post) {
+                $approved_post_data = $fetched_post;
             }
         }
+
+        // Owner fallback so avatar + name still render when the post row is
+        // gone (these pages only ever show your own notifications).
+        $owner_info = null;
+        try {
+            $owner_stmt = $pdo->prepare("SELECT first_name, last_name, profile_picture FROM users WHERE id = ?");
+            $owner_stmt->execute([$user_id]);
+            $owner_info = $owner_stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (Exception $e) { $owner_info = null; }
     }
 }
 ?>
@@ -759,17 +769,60 @@ if (isset($_GET['notification_id'])) {
                                     $post_comments = $approved_post_data['comment_count'] ?? 0;
                                     $post_created = $approved_post_data['created_at'] ?? $selected_notification['created_at'];
                                 } else {
-                                    // Fallback to parsing from notification message
-                                    $has_profile_pic = false;
-                                    $profile_pic = '';
-                                    
-                                    $author_first = '';
-                                    $author_last = '';
-                                    $author_name = 'Your Post';
-                                    
-                                    $post_image = '';
-                                    $post_likes = 0;
-                                    $post_comments = 0;
+                                    // Fallback: parse the snapshot embedded in the notification
+                                    // message (same format as hold/warning notifications),
+                                    // then fall back to the owner's own profile.
+                                    $parsed_content = '';
+                                    if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $pc_match)) {
+                                        $parsed_content = $pc_match[1];
+                                    }
+                                    $parsed_json = null;
+                                    if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $pd_match)) {
+                                        $js = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $pd_match[1]));
+                                        $parsed_json = json_decode($js, true);
+                                        if (json_last_error() !== JSON_ERROR_NONE) {
+                                            preg_match('/\"image_path\":\"(.*?)\"/s', $js, $im);
+                                            preg_match('/\"likes\":(\d+)/s', $js, $lm);
+                                            preg_match('/\"comment_count\":(\d+)/s', $js, $cm);
+                                            preg_match('/\"profile_picture\":\"(.*?)\"/s', $js, $pm);
+                                            preg_match('/\"first_name\":\"(.*?)\"/s', $js, $fm);
+                                            preg_match('/\"last_name\":\"(.*?)\"/s', $js, $lm2);
+                                            $parsed_json = [
+                                                'image_path' => $im[1] ?? '',
+                                                'likes' => (int)($lm[1] ?? 0),
+                                                'comment_count' => (int)($cm[1] ?? 0),
+                                                'profile_picture' => $pm[1] ?? '',
+                                                'first_name' => $fm[1] ?? '',
+                                                'last_name' => $lm2[1] ?? '',
+                                            ];
+                                        }
+                                    }
+                                    $parsed_first = is_array($parsed_json) ? ($parsed_json['first_name'] ?? '') : '';
+                                    $parsed_last = is_array($parsed_json) ? ($parsed_json['last_name'] ?? '') : '';
+                                    $parsed_pfp = is_array($parsed_json) ? ($parsed_json['profile_picture'] ?? '') : '';
+                                    if (empty($parsed_first) && empty($parsed_last) && $owner_info) {
+                                        $parsed_first = $owner_info['first_name'] ?? '';
+                                        $parsed_last = $owner_info['last_name'] ?? '';
+                                    }
+                                    if (empty($parsed_pfp) && $owner_info) {
+                                        $parsed_pfp = $owner_info['profile_picture'] ?? '';
+                                    }
+
+                                    $has_profile_pic = !empty($parsed_pfp);
+                                    $profile_pic = $has_profile_pic
+                                        ? htmlspecialchars($parsed_pfp)
+                                        : '';
+
+                                    $author_first = $parsed_first;
+                                    $author_last = $parsed_last;
+                                    $author_name = (!empty($parsed_first) && !empty($parsed_last))
+                                        ? htmlspecialchars($parsed_first . ' ' . $parsed_last)
+                                        : 'Your Post';
+
+                                    $post_content = $parsed_content;
+                                    $post_image = is_array($parsed_json) ? ($parsed_json['image_path'] ?? '') : '';
+                                    $post_likes = is_array($parsed_json) ? intval($parsed_json['likes'] ?? 0) : 0;
+                                    $post_comments = is_array($parsed_json) ? intval($parsed_json['comment_count'] ?? 0) : 0;
                                     $post_created = $selected_notification['created_at'];
                                 }
                                 ?>
@@ -799,11 +852,11 @@ if (isset($_GET['notification_id'])) {
                                 <?php endif; ?>
                             </div>
                             
-                            <?php 
-                            // Check for image in posts table first
-                            $image_src = $approved_post_data && !empty($approved_post_data['image_path']) 
-                                ? $approved_post_data['image_path'] 
-                                : '';
+                            <?php
+                            // Check for image in posts table first, then the fallback snapshot
+                            $image_src = $approved_post_data && !empty($approved_post_data['image_path'])
+                                ? $approved_post_data['image_path']
+                                : ($post_image ?? '');
                                 
                             if (!empty($image_src)): 
                             ?>
@@ -814,9 +867,9 @@ if (isset($_GET['notification_id'])) {
                             
                             <div class="post-actions-bar">
                                 <div class="post-action">
-                                    <?php 
+                                    <?php
                                     // Get like count
-                                    $likes_count = $approved_post_data ? intval($approved_post_data['likes']) : 0;
+                                    $likes_count = $approved_post_data ? intval($approved_post_data['likes']) : intval($post_likes ?? 0);
                                     
                                     // Display filled heart icon if there are likes, empty heart if zero
                                     if ($likes_count > 0): 
@@ -833,7 +886,7 @@ if (isset($_GET['notification_id'])) {
                                 <div class="post-action">
                                     <i class="bi bi-chat"></i> Comment
                                     <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $approved_post_data ? intval($approved_post_data['comment_count']) : '0'; ?>
+                                        <?php echo $approved_post_data ? intval($approved_post_data['comment_count']) : intval($post_comments ?? 0); ?>
                                     </small>
                                 </div>
                             </div>

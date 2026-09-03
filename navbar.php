@@ -1139,6 +1139,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching notifications:', error));
     }
+    // Expose globally: pagination buttons are rendered via inline onclick and
+    // can't reach functions scoped inside the DOMContentLoaded closure.
+    window.fetchFreshNotifications = fetchFreshNotifications;
 
     // Function to update notification dropdown with fresh data
     function updateNotificationDropdown(data) {

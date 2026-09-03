@@ -51,9 +51,10 @@ try {
             default => 'bi-bell'
         };
 
-        // Strip JSON data from message for clean display
-        $clean_msg = preg_replace('/Post data: \{.*\}/s', '', $notif['message']);
-        $clean_msg = trim($clean_msg);
+        // Strip embedded snapshot data from message for clean display
+        $clean_msg = preg_replace('/Post content: ".*?"/s', '', $notif['message']);
+        $clean_msg = preg_replace('/Post data: \{.*\}/s', '', $clean_msg);
+        $clean_msg = trim(preg_replace('/\s+/', ' ', $clean_msg));
 
         // Format time
         $nz = new DateTimeZone('UTC');

@@ -710,20 +710,22 @@ if (!function_exists('getInitialsHtml')) {
     
     .notification-badge {
         position: absolute;
-        top: -5px;
-        right: -5px;
-        background-color: #f59f0b;
+        top: -4px;
+        right: -4px;
+        background-color: #e63946;
         color: white;
         font-size: 0.7rem;
         font-weight: bold;
         border-radius: 50%;
-        width: 18px;
+        min-width: 18px;
         height: 18px;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 0 4px;
+        box-shadow: 0 2px 6px rgba(230, 57, 70, 0.4);
         animation: pulse 1.5s infinite;
+        border: 2px solid white;
     }
 
     .navbar-message-link:hover i {
@@ -741,15 +743,15 @@ if (!function_exists('getInitialsHtml')) {
     @keyframes pulse {
         0% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(245, 159, 11, 0.7);
+            box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
         }
         70% {
             transform: scale(1.1);
-            box-shadow: 0 0 0 10px rgba(245, 159, 11, 0);
+            box-shadow: 0 0 0 10px rgba(230, 57, 70, 0);
         }
         100% {
             transform: scale(1);
-            box-shadow: 0 0 0 0 rgba(245, 159, 11, 0);
+            box-shadow: 0 0 0 0 rgba(230, 57, 70, 0);
         }
     }
     
@@ -758,12 +760,14 @@ if (!function_exists('getInitialsHtml')) {
         right: 0;
         top: 100%;
         width: 350px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(0, 0, 0, 0.1);
         display: none;
         z-index: 1000;
         overflow: hidden;
+        margin-top: 12px;
     }
     
     .notification-dropdown-content.show {
@@ -777,27 +781,29 @@ if (!function_exists('getInitialsHtml')) {
     }
     
     .notification-header {
-        background-color: #f8f9fa;
+        background-color: #f0f4f8;
         padding: 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #d0d7de;
     }
-    
+
     .notification-header h3 {
         margin: 0;
         font-size: 1.1rem;
-        color: #333;
+        color: #1a1a1a;
+        font-weight: 600;
     }
     
     .notification-count {
-        background-color: #f59f0b;
+        background-color: #e63946;
         color: white;
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 12px;
         font-size: 0.8rem;
         font-weight: 600;
+        box-shadow: 0 2px 4px rgba(230, 57, 70, 0.3);
     }
     
     .notification-body {
@@ -808,14 +814,14 @@ if (!function_exists('getInitialsHtml')) {
     .notification-item {
         display: flex;
         padding: 15px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #e8e8e8;
         text-decoration: none;
-        color: #333;
+        color: #2d3748;
         transition: background-color 0.2s ease;
     }
-    
+
     .notification-item:hover {
-        background-color: #f8f9fa;
+        background-color: #f0f4f8;
     }
     
     .notification-item.warning .notification-icon i {
@@ -843,17 +849,21 @@ if (!function_exists('getInitialsHtml')) {
     .notification-text p {
         margin: 0 0 5px 0;
         font-size: 0.9rem;
+        color: #1a1a1a;
+        line-height: 1.4;
     }
-    
+
     .notification-time {
         font-size: 0.8rem;
-        color: #777;
+        color: #666;
+        font-weight: 500;
     }
     
     .notification-empty {
-        padding: 20px;
+        padding: 30px 20px;
         text-align: center;
-        color: #777;
+        color: #666;
+        font-size: 0.95rem;
     }
     
     .notification-footer {
@@ -880,35 +890,39 @@ if (!function_exists('getInitialsHtml')) {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 8px 12px;
-        background-color: #f8f9fa;
-        border-top: 1px solid #eee;
+        padding: 10px 12px;
+        background-color: #f0f4f8;
+        border-top: 1px solid #d0d7de;
         gap: 12px;
     }
-    
+
     .notif-page-btn {
-        background: none;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 4px 8px;
+        background: white;
+        border: 1px solid #c0c4c8;
+        border-radius: 6px;
+        padding: 6px 10px;
         cursor: pointer;
-        font-size: 0.8rem;
-        color: #333;
-        transition: background-color 0.2s;
+        font-size: 0.85rem;
+        color: #1a1a1a;
+        transition: background-color 0.2s, border-color 0.2s;
+        font-weight: 500;
     }
-    
+
     .notif-page-btn:hover:not(:disabled) {
-        background-color: #e9ecef;
+        background-color: #e6e8eb;
+        border-color: #a0a4a8;
     }
-    
+
     .notif-page-btn:disabled {
         opacity: 0.4;
         cursor: not-allowed;
+        background-color: #f5f5f5;
     }
-    
+
     .notif-page-info {
-        font-size: 0.8rem;
-        color: #666;
+        font-size: 0.85rem;
+        color: #4a5568;
+        font-weight: 500;
     }
     
     /* Navbar search results styles */
@@ -1031,7 +1045,7 @@ if (!function_exists('getInitialsHtml')) {
         transition: color 0.18s;
     }
     .mobile-menu-item .notification-badge {
-        background: #f59f0b;
+        background: #e63946;
         color: #fff;
         border-radius: 50%;
         font-size: 1rem;
@@ -1042,6 +1056,8 @@ if (!function_exists('getInitialsHtml')) {
         right: 1.5rem;
         top: 50%;
         transform: translateY(-50%);
+        box-shadow: 0 2px 6px rgba(230, 57, 70, 0.4);
+        border: 2px solid white;
     }
     .mobile-menu-item:hover, .mobile-menu-item:active {
         background: #e6f7f7;
@@ -1318,6 +1334,64 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.open('POST', 'update_activity.php', false);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify({ status: 'offline' }));
+        });
+    })();
+
+    // Real-time notification badge updates
+    (function() {
+        let lastNotificationCount = <?php echo $notification_count; ?>;
+
+        function updateNotificationBadge() {
+            fetch('get_stats.php', {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.notification_count !== undefined) {
+                    const notificationIcon = document.querySelector('.notification-icon');
+                    const existingBadge = notificationIcon?.querySelector('.notification-badge');
+
+                    if (data.notification_count > 0) {
+                        if (!existingBadge) {
+                            const badge = document.createElement('span');
+                            badge.className = 'notification-badge';
+                            badge.textContent = data.notification_count > 99 ? '99+' : data.notification_count;
+                            notificationIcon.appendChild(badge);
+                        } else {
+                            existingBadge.textContent = data.notification_count > 99 ? '99+' : data.notification_count;
+                        }
+
+                        // Update header count if exists
+                        const headerCount = document.querySelector('.notification-count');
+                        if (headerCount) {
+                            headerCount.textContent = data.notification_count + ' new';
+                            headerCount.style.display = 'inline';
+                        }
+                    } else {
+                        if (existingBadge) {
+                            existingBadge.remove();
+                        }
+                        const headerCount = document.querySelector('.notification-count');
+                        if (headerCount) {
+                            headerCount.style.display = 'none';
+                        }
+                    }
+
+                    lastNotificationCount = data.notification_count;
+                }
+            })
+            .catch(error => console.error('Error updating notification badge:', error));
+        }
+
+        // Check for new notifications every 15 seconds
+        setInterval(updateNotificationBadge, 15000);
+
+        // Also check when tab becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                updateNotificationBadge();
+            }
         });
     })();
 });

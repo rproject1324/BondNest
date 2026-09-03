@@ -740,6 +740,7 @@ if (!function_exists('getInitialsHtml')) {
     .notification-body {
         max-height: 400px;
         overflow-y: auto;
+        overflow-x: hidden;
     }
     
     .notification-item {
@@ -775,13 +776,29 @@ if (!function_exists('getInitialsHtml')) {
         margin-right: 15px;
         font-size: 1.2rem;
         color: #777;
+        flex-shrink: 0;
     }
-    
+
+    /* Allow the text column to shrink inside the flex row so long,
+       unbroken strings (e.g. lengthy hold/warning reasons) can't force
+       the dropdown into horizontal scrolling. */
+    .notification-text {
+        flex: 1;
+        min-width: 0;
+    }
+
     .notification-text p {
         margin: 0 0 5px 0;
         font-size: 0.9rem;
         color: #1a1a1a;
         line-height: 1.4;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        /* Preview only — clamp to 3 lines with "..."; click opens full details */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .notification-time {
@@ -1165,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update notification body
         if (data.notifications.length > 0) {
             notificationBody.innerHTML = data.notifications.map(notif => `
-                <a href="${notif.type_url}" class="notification-item ${notif.type_class}">
+                <a href="${notif.type_url}" class="notification-item ${notif.type_class}" title="${notif.message}">
                     <div class="notification-icon">
                         <i class="bi ${notif.type_icon}"></i>
                     </div>

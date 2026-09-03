@@ -20,7 +20,7 @@ function runMigration($pdo) {
             email VARCHAR(100) DEFAULT NULL,
             age INTEGER DEFAULT NULL,
             birthday DATE NOT NULL,
-            gender VARCHAR(10) NOT NULL,
+            gender VARCHAR(20) NOT NULL,
             password VARCHAR(255) NOT NULL,
             profile_picture VARCHAR(255) DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -42,7 +42,7 @@ function runMigration($pdo) {
             email VARCHAR(100) DEFAULT NULL,
             age INT(11) DEFAULT NULL,
             birthday DATE NOT NULL,
-            gender VARCHAR(10) NOT NULL,
+            gender VARCHAR(20) NOT NULL,
             password VARCHAR(255) NOT NULL,
             profile_picture VARCHAR(255) DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -240,7 +240,7 @@ function runMigration($pdo) {
             password_hash VARCHAR(256) NOT NULL,
             first_name VARCHAR(64),
             last_name VARCHAR(64),
-            gender VARCHAR(32),
+            gender VARCHAR(20),
             birthday DATE,
             otp_code VARCHAR(6) NOT NULL,
             otp_expires_at TIMESTAMP NOT NULL,
@@ -253,7 +253,7 @@ function runMigration($pdo) {
             password_hash VARCHAR(256) NOT NULL,
             first_name VARCHAR(64),
             last_name VARCHAR(64),
-            gender VARCHAR(32),
+            gender VARCHAR(20),
             birthday DATE,
             otp_code VARCHAR(6) NOT NULL,
             otp_expires_at TIMESTAMP NOT NULL,
@@ -313,6 +313,8 @@ function runMigration($pdo) {
             $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(100)");
             $pdo->exec("ALTER TABLE users ALTER COLUMN age DROP NOT NULL");
             $pdo->exec("ALTER TABLE users ALTER COLUMN age DROP DEFAULT");
+            // Fix gender column length to accommodate longer values
+            $pdo->exec("ALTER TABLE users ALTER COLUMN gender TYPE VARCHAR(20)");
         } else {
             $check = $pdo->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='users' AND COLUMN_NAME='email'");
             $exists = $check && $check->fetch();
@@ -321,6 +323,8 @@ function runMigration($pdo) {
             }
             // Make age nullable (ignore error if already nullable)
             try { $pdo->exec("ALTER TABLE users MODIFY age INT(11) DEFAULT NULL"); } catch (PDOException $e) {}
+            // Fix gender column length to accommodate longer values
+            try { $pdo->exec("ALTER TABLE users MODIFY gender VARCHAR(20) NOT NULL"); } catch (PDOException $e) {}
         }
     } catch (PDOException $e) {
         error_log("Migration email/age: " . $e->getMessage());
@@ -364,6 +368,17 @@ function runMigration($pdo) {
         $pdo->exec("UPDATE posts SET image_path = REPLACE(image_path, '/data/uploads/', 'uploads/') WHERE image_path LIKE '/data/uploads/%'");
     } catch (PDOException $e) {
         // Ignore if columns don't exist yet
+    }
+
+    // Fix gender column length in pending_registrations table
+    try {
+        if ($isPg) {
+            $pdo->exec("ALTER TABLE pending_registrations ALTER COLUMN gender TYPE VARCHAR(20)");
+        } else {
+            try { $pdo->exec("ALTER TABLE pending_registrations MODIFY gender VARCHAR(20)"); } catch (PDOException $e) {}
+        }
+    } catch (PDOException $e) {
+        error_log("Migration pending_registrations gender: " . $e->getMessage());
     }
 
     // Add image_path column to messages table if missing

@@ -3021,13 +3021,22 @@ unset($_SESSION['form_data']);
 
 <script>
 // TIME AGO - same as homepage.php
+// Server-client clock sync: prevents "14s -> 9s" jump on refresh (server clock vs client clock skew).
+(function initServerClockSync() {
+    if (window.__serverNow) return;
+    var serverNowStr = "<?php echo gmdate('Y-m-d H:i:s'); ?>";
+    var serverNowMs = new Date(serverNowStr.replace(' ', 'T') + 'Z').getTime();
+    var clientLoadMs = Date.now();
+    window.__clockOffsetMs = (serverNowMs && isFinite(serverNowMs)) ? (serverNowMs - clientLoadMs) : 0;
+    window.__serverNow = function () { return new Date(Date.now() + window.__clockOffsetMs); };
+})();
 function formatTimeAgo(dateString) {
     let dStr = dateString;
     if (dStr && !dStr.includes('Z') && !dStr.includes('+') && !dStr.match(/T.*[+-]/)) {
         dStr = dStr.replace(' ', 'T') + 'Z';
     }
     const date = new Date(dStr);
-    const now = new Date();
+    const now = window.__serverNow ? window.__serverNow() : new Date();
     const secondsPast = (now - date) / 1000;
 
     if (secondsPast < 1) return 'just now';
@@ -3049,7 +3058,7 @@ function updateAllTimeAgo() {
 
 document.addEventListener('DOMContentLoaded', function() {
     updateAllTimeAgo();
-    setInterval(updateAllTimeAgo, 60000);
+    setInterval(updateAllTimeAgo, 1000);
 });
 
 // ==================== LOGOUT ====================
@@ -3883,6 +3892,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Post Status Updates Scripts -->
 <script>
+// Note: updateAllTimeAgo/formatTimeAgo are already defined (server-clock-synced) in the
+// script block above; this re-declaration is kept for compatibility and reuses them.
 function updateAllTimeAgo() {
     document.querySelectorAll('.time-ago').forEach(element => {
         const dateString = element.getAttribute('data-timestamp') || element.dataset.originalDate;
@@ -3900,9 +3911,9 @@ function timeElapsedString(dateString) {
 
 // ==================== DOM READY INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Initial dynamic timestamp update
+    // 1. Initial dynamic timestamp update (uses server-synced clock from above)
     updateAllTimeAgo();
-    setInterval(updateAllTimeAgo, 60000);
+    setInterval(updateAllTimeAgo, 1000);
 
     // 2. Sidebar active navigation
     const menuItems = document.querySelectorAll('.left .sidebar .menu-item');

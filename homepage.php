@@ -1947,6 +1947,18 @@ window.addEventListener('click', function(event) {
 });
 
 // TIME AGO FUNCTIONS - Moved to the top for better organization
+// Server-client clock sync: PHP renders time with the SERVER clock, but JS `new Date()`
+// uses the CLIENT clock. If they differ by a few seconds, the page shows the right
+// time on first paint (e.g. "14 seconds ago") then jumps backwards (e.g. "9 seconds
+// ago") as soon as this JS runs. We capture the offset once and reuse it.
+(function initServerClockSync() {
+    if (window.__serverNow) return; // already initialised (e.g. duplicate script block)
+    var serverNowStr = "<?php echo gmdate('Y-m-d H:i:s'); ?>";
+    var serverNowMs = new Date(serverNowStr.replace(' ', 'T') + 'Z').getTime();
+    var clientLoadMs = Date.now();
+    window.__clockOffsetMs = (serverNowMs && isFinite(serverNowMs)) ? (serverNowMs - clientLoadMs) : 0;
+    window.__serverNow = function () { return new Date(Date.now() + window.__clockOffsetMs); };
+})();
 function updateAllTimeAgo() {
     document.querySelectorAll('.time-ago').forEach(element => {
         const dateString = element.getAttribute('data-timestamp');
@@ -1964,7 +1976,7 @@ function formatTimeAgo(dateString) {
         dateStr = dateStr.replace(' ', 'T') + 'Z';
     }
     const date = new Date(dateStr);
-    const now = new Date();
+    const now = window.__serverNow ? window.__serverNow() : new Date();
     const secondsPast = (now - date) / 1000;
 
     if (secondsPast < 1) return 'just now';
@@ -1978,11 +1990,11 @@ function formatTimeAgo(dateString) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initial time update
+    // Initial time update (now matches server-rendered value thanks to clock sync)
     updateAllTimeAgo();
-    
-    // Update every minute
-    setInterval(updateAllTimeAgo, 60000);
+
+    // Update every second so "N seconds ago" ticks forward instead of going stale/backwards
+    setInterval(updateAllTimeAgo, 1000);
     
     // Add global click handler to close modals when clicking outside
     document.body.addEventListener('click', function(e) {
@@ -2728,25 +2740,10 @@ function createCommentElement(comment) {
     return div;
 }
 
-// Helper function to format time
-function formatTimeAgo(dateString) {
-    // DB stores UTC without timezone — force UTC parsing to avoid 8h Manila offset
-    let dStr = dateString;
-    if (dStr && !dStr.includes('Z') && !dStr.includes('+') && !dStr.match(/T.*[+-]/)) {
-        dStr = dStr.replace(' ', 'T') + 'Z';
-    }
-    const date = new Date(dStr);
-    const now = new Date();
-    const secondsPast = (now - date) / 1000;
-
-    if (secondsPast < 1) return 'just now';
-    if (secondsPast < 60) return `${Math.floor(secondsPast)} seconds ago`;
-    if (secondsPast < 3600) return `${Math.floor(secondsPast / 60)} minutes ago`;
-    if (secondsPast < 86400) return `${Math.floor(secondsPast / 3600)} hours ago`;
-    if (secondsPast < 604800) return `${Math.floor(secondsPast / 86400)} days ago`;
-    if (secondsPast < 2419200) return `${Math.floor(secondsPast / 604800)} weeks ago`;
-    if (secondsPast < 29030400) return `${Math.floor(secondsPast / 2419200)} months ago`;
-    return `${Math.floor(secondsPast / 29030400)} years ago`;
+// Helper function to format time (reuses the server-synced formatTimeAgo defined above;
+// kept as a guarded alias so the duplicate definition can't overwrite the synced version)
+if (typeof formatTimeAgoComment === 'undefined' && typeof formatTimeAgo !== 'undefined') {
+    var formatTimeAgoComment = formatTimeAgo;
 }
 
 document.addEventListener('click', async function(e) {

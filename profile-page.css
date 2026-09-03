@@ -481,15 +481,6 @@ body {
     position: fixed !important;
     top: 74px !important;
     left: 0 !important;
-    transition: top 0.3s ease, padding-top 0.3s ease;
-}
-
-/* Dynamic positioning when image is uploaded */
-#createPostModal.modal-container.with-image,
-.modal-container#createPostModal.with-image {
-    top: 20px !important;
-    padding-top: 5px !important;
-}
     width: 100% !important;
     height: calc(100% - 74px) !important;
     background-color: rgba(0, 0, 0, 0.7) !important;

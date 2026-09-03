@@ -1318,13 +1318,6 @@ if (menuTrigger) {
     align-items: flex-start;
     top: 74px;
     padding-top: 10px;
-    transition: top 0.3s ease, padding-top 0.3s ease;
-}
-
-/* Dynamic positioning when image is uploaded */
-#createPostModal.with-image {
-    top: 20px;
-    padding-top: 5px;
 }
 
 #editPostModal, #editCommentModal {
@@ -1928,7 +1921,6 @@ window.addEventListener('click', function(event) {
         // Check if click is outside the modal content
         if (event.target === createPostModal) {
             createPostModal.style.display = 'none';
-            createPostModal.classList.remove('with-image');
             console.log('Closed create post modal via window click');
         }
     }
@@ -1998,7 +1990,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const createPostModal = document.getElementById('createPostModal');
         if (createPostModal && (createPostModal.style.display === 'block' || createPostModal.style.display === 'flex') && !createPostModal.querySelector('.modal-content').contains(e.target) && e.target === createPostModal) {
             createPostModal.style.display = 'none';
-            createPostModal.classList.remove('with-image');
             console.log('Closed create post modal by global click outside');
         }
         
@@ -2075,8 +2066,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (closeButton) {
         closeButton.addEventListener('click', function() {
             modal.style.display = "none";
-            // Reset modal position when closing
-            modal.classList.remove('with-image');
         });
     }
     
@@ -2086,7 +2075,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if click is directly on the modal container but not on the modal content
             if (e.target === modal) {
                 modal.style.display = "none";
-                modal.classList.remove('with-image');
                 console.log('Closed create post modal by clicking outside');
             }
         });
@@ -2096,7 +2084,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Close create post modal when clicking outside
         if (event.target == modal) {
             modal.style.display = "none";
-            modal.classList.remove('with-image');
         }
         
         // Close edit post modal when clicking outside
@@ -2139,18 +2126,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const updatePreviewContainerVisibility = () => {
         if (imagePreviewContainer) {
-            const hasImages = imagePreviewContainer.children.length > 0;
-            imagePreviewContainer.style.display = hasImages ? 'grid' : 'none';
-
-            // Adjust modal position when image is uploaded
-            const createPostModal = document.getElementById('createPostModal');
-            if (createPostModal) {
-                if (hasImages) {
-                    createPostModal.classList.add('with-image');
-                } else {
-                    createPostModal.classList.remove('with-image');
-                }
-            }
+            imagePreviewContainer.style.display = 
+                imagePreviewContainer.children.length > 0 ? 'grid' : 'none';
         }
     };
 

@@ -1722,17 +1722,7 @@ function formatDate($date) {
                             <span><?php echo abs($percent_changes['today_actions'] ?? 0); ?>% from yesterday</span>
                         </div>
                         </div>
-                    
-                    <!-- Admin Tools Section -->
-                    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                        <h4 style="font-size: 1rem; margin-bottom: 12px;"><i class="bi bi-gear"></i> Admin Tools</h4>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <a href="migrate_deleted_posts.php" target="_blank" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #4361ee; font-size: 0.9rem; padding: 8px; border-radius: 5px; background: #eef2ff;">
-                                <i class="bi bi-arrow-repeat"></i>
-                                Migrate Deleted Posts
-                            </a>
-                        </div>
-                        </div>
+
                     </div>
                 </div>
                 

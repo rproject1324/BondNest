@@ -5276,6 +5276,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modal) {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            modal.style.top = '74px'; // Reset position
         }
     }
 
@@ -5305,8 +5306,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.src = e.target.result;
                     img.style.cssText = 'max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;display:block;';
                     imagePreview.appendChild(img);
+
+                    // Reduce space when image is uploaded
+                    if (modal) {
+                        modal.style.top = '20px';
+                    }
                 };
                 reader.readAsDataURL(this.files[0]);
+            } else {
+                // Restore original position when no image
+                if (modal) {
+                    modal.style.top = '74px';
+                }
             }
         });
     }

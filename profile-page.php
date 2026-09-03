@@ -5276,6 +5276,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modal) {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            // Reset modal position when closing
+            modal.classList.remove('with-image');
         }
     }
 
@@ -5305,8 +5307,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     img.src = e.target.result;
                     img.style.cssText = 'max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;display:block;';
                     imagePreview.appendChild(img);
+
+                    // Adjust modal position when image is uploaded
+                    if (modal) {
+                        modal.classList.add('with-image');
+                    }
                 };
                 reader.readAsDataURL(this.files[0]);
+            } else {
+                // Restore original position when no image
+                if (modal) {
+                    modal.classList.remove('with-image');
+                }
             }
         });
     }

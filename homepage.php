@@ -1375,7 +1375,7 @@ if (menuTrigger) {
 .modal-content {
     background-color: white;
     border-radius: 10px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     max-height: 90vh;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);

@@ -400,7 +400,7 @@ margin-bottom: 0;
 }
 
 .signup-form-wrapper .form-row .form-group {
-margin-bottom: 0.2rem;
+margin-bottom: 0.1rem;
 }
 
 .form-group {
@@ -634,12 +634,12 @@ box-shadow: 0 0 0 3px rgba(127, 191, 159, 0.1);
 background: #fef2f2;
 border: 1px solid #f8b4bf;
 color: #b84252;
-padding: 8px 10px;
-border-radius: 8px;
-font-size: 13px;
+padding: 6px 8px;
+border-radius: 6px;
+font-size: 12px;
 font-weight: 500;
-margin-top: 6px;
-line-height: 1.25;
+margin-top: 4px;
+line-height: 1.2;
 opacity: 0;
 max-height: 0;
 transform: translateY(-4px);
@@ -660,7 +660,7 @@ margin-bottom: 4px;
 
 /* Password strength meter — DiariCore style adapted for BondNest teal */
 .signup-form-wrapper .pwd-live {
-margin-top: 0.45rem;
+margin-top: 0.25rem;
 }
 .signup-form-wrapper .pwd-live[hidden] {
 display: none !important;
@@ -701,6 +701,8 @@ text-align: right;
 }
 .signup-form-wrapper .form-group--pwd-full {
 grid-column: 1 / -1;
+margin-top: 4px;
+margin-bottom: 4px;
 }
 
 .profile-picture-group {

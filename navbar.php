@@ -138,22 +138,6 @@ if (!function_exists('getInitialsHtml')) {
                 $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? AND type IN ('post_warning','post_deleted','post_on_hold','post_approved') ORDER BY created_at DESC LIMIT ? OFFSET ?");
                 $stmt->execute([$user_id, $notif_per_page, $notif_offset]);
                 $recent_notifications = $stmt->fetchAll();
-
-                // Mark displayed notifications as read
-                if (!empty($recent_notifications)) {
-                    $n_ids = array_map(fn($n) => $n['id'], $recent_notifications);
-                    $unread_ids = array_filter($n_ids, function($id) use ($pdo) {
-                        $s = $pdo->prepare("SELECT is_read FROM notifications WHERE id = ?");
-                        $s->execute([$id]);
-                        return $s->fetch()['is_read'] == 0;
-                    });
-                    if (!empty($unread_ids)) {
-                        $ph = implode(',', array_fill(0, count($unread_ids), '?'));
-                        $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE id IN ($ph)")->execute(array_values($unread_ids));
-                        // Update counts after marking as read
-                        $notification_count = max(0, $notification_count - count($unread_ids));
-                    }
-                }
             }
             ?>
             
@@ -179,10 +163,10 @@ if (!function_exists('getInitialsHtml')) {
                                 <?php
                                 $type = $notif['type'];
                                 $type_url = match($type) {
-                                    'post_warning' => 'warnings.php',
-                                    'post_deleted' => 'deleted_posts.php',
-                                    'post_on_hold' => 'held_posts.php',
-                                    'post_approved' => 'approved_posts.php',
+                                    'post_warning' => 'warnings.php?mark_read=' . $notif['id'],
+                                    'post_deleted' => 'deleted_posts.php?mark_read=' . $notif['id'],
+                                    'post_on_hold' => 'held_posts.php?mark_read=' . $notif['id'],
+                                    'post_approved' => 'approved_posts.php?mark_read=' . $notif['id'],
                                     default => '#'
                                 };
                                 $type_class = match($type) {
@@ -728,6 +712,27 @@ if (!function_exists('getInitialsHtml')) {
         border: 2px solid white;
     }
 
+    .navbar-message-link .notification-badge {
+        background-color: #2B9E9E;
+        box-shadow: 0 2px 6px rgba(43, 158, 158, 0.4);
+        animation: pulse-teal 1.5s infinite;
+    }
+
+    @keyframes pulse-teal {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(43, 158, 158, 0.7);
+        }
+        70% {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 10px rgba(43, 158, 158, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(43, 158, 158, 0);
+        }
+    }
+
     .navbar-message-link:hover i {
         color: var(--color-primary, #008080) !important;
     }
@@ -762,8 +767,8 @@ if (!function_exists('getInitialsHtml')) {
         width: 350px;
         background-color: #ffffff;
         border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 2px solid #2B9E9E;
         display: none;
         z-index: 1000;
         overflow: hidden;

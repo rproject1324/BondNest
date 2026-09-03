@@ -10,10 +10,19 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-
-
 // Get user ID
 $user_id = $_SESSION['user_id'];
+
+// Mark notification as read if specified
+if (isset($_GET['mark_read']) && is_numeric($_GET['mark_read'])) {
+    $notification_id = intval($_GET['mark_read']);
+    try {
+        $stmt = $pdo->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
+        $stmt->execute([$notification_id, $user_id]);
+    } catch (PDOException $e) {
+        // Ignore errors
+    }
+}
 
 // Handle "Clear All" action
 if (isset($_POST['clear_all'])) {

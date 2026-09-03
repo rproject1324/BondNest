@@ -1,6 +1,39 @@
 <?php
 // Database connection — PostgreSQL (Railway) or MySQL (local XAMPP)
 
+/**
+ * Get configured admin email(s) from environment variables.
+ * Checks DIARI_ADMIN_EMAIL (used in reference project/Railway), BONDNEST_ADMIN_EMAIL, and ADMIN_EMAIL.
+ */
+if (!function_exists('getConfiguredAdminEmail')) {
+    function getConfiguredAdminEmail() {
+        $email = getenv('DIARI_ADMIN_EMAIL') ?: getenv('BONDNEST_ADMIN_EMAIL') ?: getenv('ADMIN_EMAIL');
+        if (!$email && isset($_ENV['DIARI_ADMIN_EMAIL'])) $email = $_ENV['DIARI_ADMIN_EMAIL'];
+        if (!$email && isset($_ENV['BONDNEST_ADMIN_EMAIL'])) $email = $_ENV['BONDNEST_ADMIN_EMAIL'];
+        if (!$email && isset($_ENV['ADMIN_EMAIL'])) $email = $_ENV['ADMIN_EMAIL'];
+        if (!$email && isset($_SERVER['DIARI_ADMIN_EMAIL'])) $email = $_SERVER['DIARI_ADMIN_EMAIL'];
+        if (!$email && isset($_SERVER['BONDNEST_ADMIN_EMAIL'])) $email = $_SERVER['BONDNEST_ADMIN_EMAIL'];
+        if (!$email && isset($_SERVER['ADMIN_EMAIL'])) $email = $_SERVER['ADMIN_EMAIL'];
+        return strtolower(trim((string)$email));
+    }
+}
+
+/**
+ * Check if the given email matches the configured admin email.
+ * Supports comma-separated list of emails and is case-insensitive.
+ */
+if (!function_exists('isConfiguredAdminEmail')) {
+    function isConfiguredAdminEmail($email) {
+        $adminEmailStr = getConfiguredAdminEmail();
+        if (!$adminEmailStr || !$email) {
+            return false;
+        }
+        $target = strtolower(trim((string)$email));
+        $configured = array_filter(array_map('trim', explode(',', strtolower($adminEmailStr))));
+        return in_array($target, $configured, true);
+    }
+}
+
 // Upload directory from environment variable
 $upload_dir = getenv('UPLOADS_DIR') ?: (__DIR__ . '/uploads');
 
@@ -61,3 +94,4 @@ if ($upload_dir !== $local_uploads && !is_link($local_uploads)) {
 
 // Backward-compatible alias
 $connection = $pdo;
+

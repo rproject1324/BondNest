@@ -276,6 +276,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $del = $pdo->prepare("DELETE FROM email_change_challenges WHERE user_id = ?");
         $del->execute([$user_id]);
 
+        // Auto-detect admin status if new email is configured admin
+        if (isConfiguredAdminEmail($pending['email'])) {
+            try {
+                $pdo->prepare("UPDATE users SET is_admin = 1 WHERE id = ?")->execute([$user_id]);
+                $_SESSION['is_admin'] = true;
+            } catch (Exception $e) {}
+        }
+
         echo json_encode(['success' => true, 'message' => 'Email verified and personal information updated successfully!']);
         exit;
     }

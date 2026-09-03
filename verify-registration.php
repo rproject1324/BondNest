@@ -120,9 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->beginTransaction();
 
+        $isAdmin = isConfiguredAdminEmail($email) ? 1 : 0;
+
         $insert = $pdo->prepare("INSERT INTO users 
-            (first_name, last_name, username, email, age, birthday, gender, password, profile_picture, recovery_code) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            (first_name, last_name, username, email, age, birthday, gender, password, profile_picture, recovery_code, is_admin) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $recoveryCode = bin2hex(random_bytes(5));
         $insert->execute([
             $pending['first_name'],
@@ -134,7 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pending['gender'],
             $pending['password_hash'],
             null,
-            $recoveryCode
+            $recoveryCode,
+            $isAdmin
         ]);
 
         $userId = $pdo->lastInsertId();
@@ -147,9 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_start();
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $pending['username'];
-        $_SESSION['is_admin'] = false;
+        $_SESSION['is_admin'] = ($isAdmin === 1);
 
-        echo json_encode(['success' => true, 'redirect' => 'homepage.php']);
+        $redirect = ($isAdmin === 1) ? 'admin.php' : 'homepage.php';
+        echo json_encode(['success' => true, 'redirect' => $redirect]);
         exit;
     } catch (PDOException $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();

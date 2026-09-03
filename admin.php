@@ -17,10 +17,28 @@ if (!function_exists('getInitialsHtml')) {
     }
 }
 
-// Redirect if not logged in or not an admin
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+// Redirect if not logged in
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
+}
+
+// Verify admin status or auto-detect from configured admin email
+if (empty($_SESSION['is_admin'])) {
+    $adminCheck = $pdo->prepare("SELECT email, is_admin FROM users WHERE id = ?");
+    $adminCheck->execute([$_SESSION['user_id']]);
+    $userRow = $adminCheck->fetch(PDO::FETCH_ASSOC);
+    if ($userRow && (isConfiguredAdminEmail($userRow['email'] ?? '') || (int)($userRow['is_admin'] ?? 0) === 1)) {
+        $_SESSION['is_admin'] = true;
+        if ((int)($userRow['is_admin'] ?? 0) !== 1) {
+            try {
+                $pdo->prepare("UPDATE users SET is_admin = 1 WHERE id = ?")->execute([$_SESSION['user_id']]);
+            } catch (Exception $e) {}
+        }
+    } else {
+        header("Location: homepage.php");
+        exit();
+    }
 }
 
 // Database connection

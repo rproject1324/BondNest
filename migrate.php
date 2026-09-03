@@ -326,6 +326,38 @@ function runMigration($pdo) {
         error_log("Migration email/age: " . $e->getMessage());
     }
 
+    // Ensure is_admin column exists on users table
+    try {
+        if ($isPg) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin SMALLINT DEFAULT 0");
+        } else {
+            $checkAdmin = $pdo->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='users' AND COLUMN_NAME='is_admin'");
+            $adminColExists = $checkAdmin && $checkAdmin->fetch();
+            if (!$adminColExists) {
+                $pdo->exec("ALTER TABLE users ADD COLUMN is_admin TINYINT(1) DEFAULT 0");
+            }
+        }
+    } catch (PDOException $e) {
+        error_log("Migration is_admin: " . $e->getMessage());
+    }
+
+    // Auto-promote any existing user matching configured admin email
+    if (function_exists('getConfiguredAdminEmail')) {
+        $adminEmailStr = getConfiguredAdminEmail();
+        if (!empty($adminEmailStr)) {
+            try {
+                $emails = array_filter(array_map('trim', explode(',', strtolower($adminEmailStr))));
+                if (!empty($emails)) {
+                    $placeholders = implode(',', array_fill(0, count($emails), '?'));
+                    $promoteStmt = $pdo->prepare("UPDATE users SET is_admin = 1 WHERE LOWER(email) IN ($placeholders) AND (is_admin IS NULL OR is_admin != 1)");
+                    $promoteStmt->execute($emails);
+                }
+            } catch (Exception $e) {
+                error_log("Migration auto-promote admin: " . $e->getMessage());
+            }
+        }
+    }
+
     // Fix any absolute paths stored in database (convert /data/uploads/ to uploads/)
     try {
         $pdo->exec("UPDATE users SET profile_picture = REPLACE(profile_picture, '/data/uploads/', 'uploads/') WHERE profile_picture LIKE '/data/uploads/%'");

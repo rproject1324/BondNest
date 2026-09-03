@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
             try {
-                $stmt = $pdo->prepare("SELECT id, username, password, is_admin FROM users WHERE username = ?");
-                $stmt->execute([$input_username]);
+                $stmt = $pdo->prepare("SELECT id, username, email, password, is_admin FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)");
+                $stmt->execute([$input_username, $input_username]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (!$user) {
                     echo json_encode(['success' => false, 'error' => 'Incorrect username or password.']);
@@ -79,7 +79,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     session_start();
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
-                    if (isset($user['is_admin']) && $user['is_admin'] == 1) {
+
+                    $isAdmin = false;
+                    if (isset($user['is_admin']) && (int)$user['is_admin'] === 1) {
+                        $isAdmin = true;
+                    }
+                    if (!empty($user['email']) && isConfiguredAdminEmail($user['email'])) {
+                        $isAdmin = true;
+                        // Synchronize is_admin in database if not already set
+                        if (!isset($user['is_admin']) || (int)$user['is_admin'] !== 1) {
+                            try {
+                                $promote = $pdo->prepare("UPDATE users SET is_admin = 1 WHERE id = ?");
+                                $promote->execute([$user['id']]);
+                            } catch (Exception $e) {}
+                        }
+                    }
+
+                    if ($isAdmin) {
                         $_SESSION['is_admin'] = true;
                         echo json_encode(['success' => true, 'redirect' => 'admin.php']);
                     } else {

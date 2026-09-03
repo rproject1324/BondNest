@@ -12,9 +12,9 @@ $profile_picture = '';
 if (isset($_SESSION['user_id'])) {
         include 'db_connection.php';
     
-    // Get updated user profile picture
+    // Get updated user profile picture and role
     $user_id = $_SESSION['user_id'];
-    $sql = "SELECT profile_picture, first_name, last_name FROM users WHERE id = ?";
+    $sql = "SELECT profile_picture, first_name, last_name, email, is_admin FROM users WHERE id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$user_id]);
     $row = $stmt->fetch();
@@ -24,6 +24,14 @@ if (isset($_SESSION['user_id'])) {
         $_SESSION['profile_picture'] = $profile_picture;
         $_SESSION['first_name'] = $row['first_name'] ?? '';
         $_SESSION['last_name'] = $row['last_name'] ?? '';
+        if ((isset($row['is_admin']) && (int)$row['is_admin'] === 1) || (!empty($row['email']) && isConfiguredAdminEmail($row['email']))) {
+            $_SESSION['is_admin'] = true;
+            if (!isset($row['is_admin']) || (int)$row['is_admin'] !== 1) {
+                try {
+                    $pdo->prepare("UPDATE users SET is_admin = 1 WHERE id = ?")->execute([$user_id]);
+                } catch (Exception $e) {}
+            }
+        }
     }
 }
 
@@ -262,6 +270,12 @@ if (!function_exists('getInitialsHtml')) {
                         <i class="bi bi-gear"></i>
                         <span>Settings</span>
                     </a>
+                    <?php if (!empty($_SESSION['is_admin'])): ?>
+                    <a href="admin.php" class="profile-dropdown-item" style="font-weight: 600;">
+                        <i class="bi bi-shield-lock-fill" style="color: #2B9E9E;"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                    <?php endif; ?>
                     <div class="profile-dropdown-divider"></div>
                     <a href="index.php" class="profile-dropdown-item profile-dropdown-logout" id="dropdownLogoutBtn">
                         <i class="bi bi-box-arrow-right"></i>
@@ -290,6 +304,12 @@ if (!function_exists('getInitialsHtml')) {
             <span class="notification-badge"><?php echo $unread_message_count > 99 ? '99+' : $unread_message_count; ?></span>
         <?php endif; ?>
     </a>
+    <?php if (!empty($_SESSION['is_admin'])): ?>
+    <a href="admin.php" class="mobile-menu-item" style="font-weight: 600;">
+        <i class="bi bi-shield-lock-fill" style="color: #2B9E9E;"></i>
+        <span>Admin Panel</span>
+    </a>
+    <?php endif; ?>
     <a href="#" class="mobile-menu-item" id="mobileNotificationToggle">
         <i class="bi bi-bell-fill"></i>
         <span>Notification</span>

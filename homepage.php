@@ -1383,22 +1383,61 @@ if (menuTrigger) {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .modal-body {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
     display: flex;
     flex-direction: column;
+    padding: 10px 0;
+}
+
+.add-to-post {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    border: none;
+    border-top: 1px solid #eee;
+    border-radius: 0;
+    padding: 15px 0 0 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.add-to-post .icons i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.add-to-post .icons i:hover {
+    transform: scale(1.15);
 }
 
 .modal-footer {
-    padding: 15px 20px;
+    padding-top: 15px;
     border-top: 1px solid #eee;
-    flex-shrink: 0;
     display: flex;
     justify-content: flex-end;
+    padding: 15px 0 0 0;
+}
+
+.modal-footer .post-button {
+    width: auto;
+    padding: 8px 25px;
+    background-color: #008080;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .image-preview-container {

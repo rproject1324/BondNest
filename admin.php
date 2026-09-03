@@ -2336,26 +2336,26 @@ function formatDate($date) {
                 const date = new Date(dateString);
                 const now = new Date();
                 const secondsPast = (now.getTime() - date.getTime()) / 1000;
-                
+
                 if (secondsPast < 60) {
-                    return `${Math.round(secondsPast)} seconds ago`;
+                    return `${Math.floor(secondsPast)} seconds ago`;
                 }
                 if (secondsPast < 3600) {
-                    return `${Math.round(secondsPast / 60)} minutes ago`;
+                    return `${Math.floor(secondsPast / 60)} minutes ago`;
                 }
                 if (secondsPast < 86400) {
-                    return `${Math.round(secondsPast / 3600)} hours ago`;
+                    return `${Math.floor(secondsPast / 3600)} hours ago`;
                 }
                 if (secondsPast < 604800) {
-                    return `${Math.round(secondsPast / 86400)} days ago`;
+                    return `${Math.floor(secondsPast / 86400)} days ago`;
                 }
                 if (secondsPast < 2419200) {
-                    return `${Math.round(secondsPast / 604800)} weeks ago`;
+                    return `${Math.floor(secondsPast / 604800)} weeks ago`;
                 }
                 if (secondsPast < 29030400) {
-                    return `${Math.round(secondsPast / 2419200)} months ago`;
+                    return `${Math.floor(secondsPast / 2419200)} months ago`;
                 }
-                return `${Math.round(secondsPast / 29030400)} years ago`;
+                return `${Math.floor(secondsPast / 29030400)} years ago`;
             }
             
             // Open modal when view button is clicked

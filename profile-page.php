@@ -3031,13 +3031,13 @@ function formatTimeAgo(dateString) {
     const secondsPast = (now - date) / 1000;
 
     if (secondsPast < 1) return 'just now';
-    if (secondsPast < 60) return `${Math.round(secondsPast)} seconds ago`;
-    if (secondsPast < 3600) return `${Math.round(secondsPast / 60)} minutes ago`;
-    if (secondsPast < 86400) return `${Math.round(secondsPast / 3600)} hours ago`;
-    if (secondsPast < 604800) return `${Math.round(secondsPast / 86400)} days ago`;
-    if (secondsPast < 2419200) return `${Math.round(secondsPast / 604800)} weeks ago`;
-    if (secondsPast < 29030400) return `${Math.round(secondsPast / 2419200)} months ago`;
-    return `${Math.round(secondsPast / 29030400)} years ago`;
+    if (secondsPast < 60) return `${Math.floor(secondsPast)} seconds ago`;
+    if (secondsPast < 3600) return `${Math.floor(secondsPast / 60)} minutes ago`;
+    if (secondsPast < 86400) return `${Math.floor(secondsPast / 3600)} hours ago`;
+    if (secondsPast < 604800) return `${Math.floor(secondsPast / 86400)} days ago`;
+    if (secondsPast < 2419200) return `${Math.floor(secondsPast / 604800)} weeks ago`;
+    if (secondsPast < 29030400) return `${Math.floor(secondsPast / 2419200)} months ago`;
+    return `${Math.floor(secondsPast / 29030400)} years ago`;
 }
 
 function updateAllTimeAgo() {

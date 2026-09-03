@@ -1293,13 +1293,13 @@ if (menuTrigger) {
 }
 
 
-/* Create Post Modal position adjustment */
+/* Create Post Modal position adjustment (matches profile-page look) */
 .modal-container {
     position: fixed;
     top: 74px; /* Start below navbar (adjust based on navbar height) */
     left: 0;
     width: 100%;
-    height: calc(100% - 70px); /* Full height minus navbar height */
+    height: calc(100% - 74px); /* Full height minus navbar height */
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     display: none;
@@ -1308,6 +1308,8 @@ if (menuTrigger) {
     align-items: flex-start; /* Changed from center to align at top */
     overflow-y: auto;
     padding-top: 50px; /* Add padding instead of margin */
+    padding-bottom: 50px;
+    box-sizing: border-box;
 }
 
 /* Modal styles to ensure clicking outside works from all directions */
@@ -1318,6 +1320,8 @@ if (menuTrigger) {
     align-items: flex-start;
     top: 74px;
     padding-top: 10px;
+    padding-bottom: 50px;
+    box-sizing: border-box;
 }
 
 #editPostModal, #editCommentModal {
@@ -1329,7 +1333,7 @@ if (menuTrigger) {
 #postForm {
     position: relative;
     z-index: 1001;
-    margin: 0 auto;
+    margin: auto;
     width: 90%;
     max-width: 500px;
 }
@@ -1343,24 +1347,32 @@ if (menuTrigger) {
     cursor: pointer !important;
 }
 
-.modal-content {
+#createPostModal .modal-content {
     background-color: white;
     border-radius: 10px;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    margin: 0 auto;
+    box-sizing: border-box;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     animation: modal-in 0.3s forwards;
 }
 
-/* Image preview styling improvements */
+/* Image preview styling improvements (same 300px cap as profile page) */
 .image-preview-wrapper {
     position: relative;
-    margin: 10px 0;
+    margin: 10px 0 0 0;
     max-width: 100%;
 }
 
 .image-preview {
+    width: 100%;
     max-width: 100%;
+    max-height: 300px;
+    object-fit: cover;
     border-radius: 8px;
     display: block;
 }

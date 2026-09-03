@@ -5302,10 +5302,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const previewWrapper = document.createElement('div');
+                    previewWrapper.className = 'image-preview-wrapper';
+
                     const img = document.createElement('img');
+                    img.className = 'image-preview';
                     img.src = e.target.result;
-                    img.style.cssText = 'max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;display:block;';
-                    imagePreview.appendChild(img);
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-image-btn';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.addEventListener('click', () => {
+                        previewWrapper.remove();
+                        if (imagePreview.children.length === 0) {
+                            modal.classList.remove('with-image');
+                        }
+                    });
+
+                    previewWrapper.appendChild(img);
+                    previewWrapper.appendChild(removeBtn);
+                    imagePreview.appendChild(previewWrapper);
 
                     // Add class when image is uploaded
                     if (modal) {
@@ -5320,6 +5336,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+    }
+
+    // Make image preview display as grid when images are present
+    if (imagePreview) {
+        const observer = new MutationObserver(() => {
+            if (imagePreview.children.length > 0) {
+                imagePreview.style.display = 'grid';
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+        observer.observe(imagePreview, { childList: true });
     }
 
     // AJAX form submission for create post (matches homepage.php)

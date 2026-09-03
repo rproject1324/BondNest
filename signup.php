@@ -689,6 +689,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if(msg){ commonErr.textContent=msg; commonErr.classList.add('show'); } else commonErr.classList.remove('show');
                 } else commonErr.classList.remove('show');
             }
+            // Deduplicate: the shared policy message above already explains password/
+            // confirm issues, so hide the per-field boxes while it is visible. This
+            // stops two stacked pink boxes from pushing the meter down with a big gap.
+            if(commonErr && commonErr.classList.contains('show')){
+                ['createPassword-error','confirmPassword-error'].forEach(function(id){
+                    const perField=document.getElementById(id);
+                    if(perField) perField.classList.remove('show');
+                });
+            }
             if(typeof updateSignupButton==='function') updateSignupButton();
         }
         pwdEl.addEventListener('input', refresh);
@@ -794,7 +803,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if(fieldId==='confirmPassword'){
             const p=document.getElementById('createPassword')?.value||'';
             if(!v){ showErrorBond(el,'Password confirmation is required.'); return false; }
-            if(v!==p){ showErrorBond(el,'Passwords do not match.'); return false; }
+            if(window._bondRefreshPwd) window._bondRefreshPwd();
+            if(v!==p){
+                // If the shared policy message already covers the mismatch, skip the
+                // per-field box to avoid a duplicate message + extra vertical space.
+                const common=document.getElementById('signUpPassword-common-error');
+                if(common && common.classList.contains('show')){ clearValidationBond(el); el.classList.add('error'); const cont=el.closest('.input-container'); if(cont) cont.classList.add('error'); return false; }
+                showErrorBond(el,'Passwords do not match.'); return false;
+            }
             showSuccessBond(el); return true;
         }
         return true;

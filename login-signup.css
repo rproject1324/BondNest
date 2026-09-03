@@ -660,10 +660,23 @@ margin-bottom: 4px;
 
 /* Password strength meter — DiariCore style adapted for BondNest teal */
 .signup-form-wrapper .pwd-live {
-margin-top: 0.25rem;
+margin-top: 2px;
 }
 .signup-form-wrapper .pwd-live[hidden] {
 display: none !important;
+}
+/* Password per-field errors are deduplicated into the shared policy message
+   (see signup.php refresh()); keep them compact so they never push the
+   strength meter down with a big gap. */
+.signup-form-wrapper #createPassword-error,
+.signup-form-wrapper #confirmPassword-error {
+padding: 4px 8px;
+font-size: 11px;
+}
+.signup-form-wrapper #createPassword-error.show,
+.signup-form-wrapper #confirmPassword-error.show {
+margin-top: 4px;
+margin-bottom: 0;
 }
 .signup-form-wrapper .pwd-checklist {
 display: none !important;
@@ -675,7 +688,7 @@ padding: 0;
 display: flex;
 align-items: center;
 gap: 0.55rem;
-margin-top: 0.5rem;
+margin-top: 4px;
 width: 100%;
 }
 .signup-form-wrapper .pwd-strength__track {
@@ -701,8 +714,16 @@ text-align: right;
 }
 .signup-form-wrapper .form-group--pwd-full {
 grid-column: 1 / -1;
+margin-top: 0;
+margin-bottom: 2px;
+}
+.signup-form-wrapper .form-group--pwd-full:empty {
+display: none;
+}
+/* Shared password-policy message sits directly under the meter — keep it tight */
+.signup-form-wrapper #signUpPassword-common-error.show {
 margin-top: 4px;
-margin-bottom: 4px;
+margin-bottom: 2px;
 }
 
 .profile-picture-group {

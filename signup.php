@@ -538,6 +538,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if(!checkbox || !checkbox.checked) return;
             hasAgreedToTerms = true;
             closeModal();
+            // Fallback: validate the whole form so empty/partial inputs show
+            // their inline errors instead of silently exiting to a blank form.
+            // Only proceeds to submit when every field is valid.
+            if(typeof window.BondValidateSignupForm === 'function'){
+                const valid = window.BondValidateSignupForm();
+                if(!valid) return;
+            }
             if(signUpBtn && !signUpBtn.disabled) signUpBtn.click();
         });
 
@@ -830,6 +837,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const noInlineErrors = !document.querySelector('#createAccountForm .custom-error.show');
         if(signupSubmitBtn) signupSubmitBtn.disabled = !(otherValid && pwReady && noInlineErrors);
     }
+
+    // Full-form fallback used by the Terms modal's "I Agree & Continue" button:
+    // agreeing with an empty/partial form must surface every inline error
+    // instead of silently closing the modal back to a blank form.
+    function validateAllSignupFields(){
+        let ok = true;
+        signupIds.forEach(id=>{ if(!validateSignupField(id)) ok=false; });
+        if(window._bondRefreshPwd) window._bondRefreshPwd();
+        updateSignupButton();
+        if(!ok){
+            const firstErr = document.querySelector('#createAccountForm .custom-error.show');
+            if(firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }
+        return ok;
+    }
+    window.BondValidateSignupForm = validateAllSignupFields;
 
     signupIds.forEach(fid=>{
         const el=document.getElementById(fid);

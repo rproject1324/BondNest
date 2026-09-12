@@ -3,6 +3,7 @@
 
 require_once 'db_connection.php';
 require_once 'migrate.php';
+require_once 'email_template.php';
 runMigration($pdo);
 
 function bondGenerateOtp() {
@@ -20,7 +21,7 @@ function bondSendPasswordResetOtp($email, $code, $name) {
         'sender' => ['name' => $senderName, 'email' => $senderEmail],
         'to' => [['email' => $email, 'name' => $name ?: $email]],
         'subject' => 'BondNest password reset code',
-        'htmlContent' => "<html><body style='font-family: Arial, sans-serif; color: #2F3E36;'><h2>Reset your BondNest password</h2><p>Hello " . htmlspecialchars($name) . ",</p><p>Your password reset code is:</p><p style='font-size:28px;font-weight:bold;letter-spacing:6px;'>$code</p><p>This code expires in 10 minutes.</p><p>If you did not request this, please ignore this email.</p></body></html>",
+        'htmlContent' => bondOtpEmailHtml('Reset your BondNest password', $name, 'Your password reset code is:', $code, ['This code expires in 10 minutes.', 'If you did not request this, please ignore this email.']),
         'textContent' => "Your BondNest password reset code is $code. It expires in 10 minutes.",
     ];
     $ch = curl_init('https://api.brevo.com/v3/smtp/email');

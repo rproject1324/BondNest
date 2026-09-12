@@ -1,6 +1,7 @@
 <?php
 require_once 'db_connection.php';
 require_once 'migrate.php';
+require_once 'email_template.php';
 runMigration($pdo);
 
 function generateOtp() {
@@ -21,13 +22,7 @@ function sendOtpEmail($email, $otpCode, $username) {
         'sender' => ['name' => $senderName, 'email' => $senderEmail],
         'to' => [['email' => $email, 'name' => $username ?: $email]],
         'subject' => 'BondNest verification code',
-        'htmlContent' => "<html><body style='font-family: Arial, sans-serif; color: #2F3E36;'>
-            <h2>Verify your BondNest account</h2>
-            <p>Hello " . htmlspecialchars($username) . ",</p>
-            <p>Your verification code is:</p>
-            <p style='font-size: 28px; font-weight: bold; letter-spacing: 6px;'>$otpCode</p>
-            <p>This code expires in 10 minutes.</p>
-        </body></html>",
+        'htmlContent' => bondOtpEmailHtml('Verify your BondNest account', $username, 'Your verification code is:', $otpCode, ['This code expires in 10 minutes.']),
         'textContent' => "Your BondNest verification code is $otpCode. It expires in 10 minutes.",
     ];
 

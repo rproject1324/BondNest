@@ -2,6 +2,7 @@
 session_start();
 require_once 'db_connection.php';
 require_once 'migrate.php';
+require_once 'email_template.php';
 runMigration($pdo);
 
 date_default_timezone_set('Asia/Manila');
@@ -34,13 +35,7 @@ function sendOtpEmail($email, $otpCode, $username) {
         'sender' => ['name' => $senderName, 'email' => $senderEmail],
         'to' => [['email' => $email, 'name' => $username ?: $email]],
         'subject' => 'BondNest - Verify your new email address',
-        'htmlContent' => "<html><body style='font-family: Arial, sans-serif; color: #2F3E36;'>
-            <h2>Verify your new email address</h2>
-            <p>Hello " . htmlspecialchars($username) . ",</p>
-            <p>You requested to update your email address on BondNest. Your verification code is:</p>
-            <p style='font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #008080;'>$otpCode</p>
-            <p>This code expires in 10 minutes. If you did not request this change, you can safely ignore this email.</p>
-        </body></html>",
+        'htmlContent' => bondOtpEmailHtml('Verify your new email address', $username, 'You requested to update your email address on BondNest. Your verification code is:', $otpCode, ['This code expires in 10 minutes. If you did not request this change, you can safely ignore this email.']),
         'textContent' => "Your BondNest email verification code is $otpCode. It expires in 10 minutes.",
     ];
 

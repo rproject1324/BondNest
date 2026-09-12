@@ -100,6 +100,25 @@ Live app: **https://bondnest.up.railway.app/**
 
 ---
 
+## Quick Testing Accounts
+
+For quick testing of the system, you may use the following pre-configured accounts:
+
+**User Accounts:**
+- Username: `Guest1`
+- Password: `GvestUser2026@`
+
+- Username: `Guest2`
+- Password: `GvestUser2026@`
+
+**Admin Account:**
+- Username: `Admin`
+- Password: `Adm1nUser2026@`
+
+> **Note:** These accounts are for testing purposes only. In a production environment, always use strong, unique credentials and enable OTP verification.
+
+---
+
 ## Author
 
 Tolentino, Lawrence Dave P.

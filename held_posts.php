@@ -465,6 +465,35 @@ if (isset($_GET['notification_id'])) {
         .notification-message {
             position: relative;
         }
+
+        /* Flash toast (cleared-notifications confirmation) */
+        #notification-message {
+            position: fixed;
+            top: 80px;
+            right: 25px;
+            z-index: 100001;
+            background: #d97706;
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 0.92rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: min(360px, 90vw);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            margin-bottom: 0;
+        }
+
+        #notification-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
         
         .view-details-btn {
             display: inline-flex;

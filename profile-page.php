@@ -293,13 +293,12 @@ $viewing_own_profile = ($user_id == $profile_user_id);
 // Show all posts for the user's own profile (including on-hold ones), but only approved and posted posts when viewing someone else's profile
 $status_condition = $viewing_own_profile ? "" : "AND (p.status = 'approved' OR p.status = 'posted' OR p.status IS NULL)";
 
-$freshApprovalSince = gmdate('Y-m-d H:i:s', time() - 48 * 3600);
 $sql = "SELECT p.*,
         u.first_name, u.last_name, u.profile_picture,
         COUNT(DISTINCT c.id) AS comment_count,
         p.likes,
         EXISTS(SELECT 1 FROM likes l WHERE l.user_id = ? AND l.post_id = p.id) AS user_has_liked,
-        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0 AND n.created_at >= ?) AS has_fresh_approval
+        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0) AS has_fresh_approval
         FROM posts p
         JOIN users u ON p.user_id = u.id
         LEFT JOIN comments c ON p.id = c.post_id
@@ -307,7 +306,7 @@ $sql = "SELECT p.*,
         GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
         ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$user_id, $user_id, $freshApprovalSince, $profile_user_id]);
+$stmt->execute([$user_id, $user_id, $profile_user_id]);
 $posts = $stmt->fetchAll();
 
 // Helper function to format time
@@ -2784,6 +2783,7 @@ unset($_SESSION['form_data']);
                                 <p>You haven't posted anything yet.</p>
                             </div>
                         <?php else: ?>
+                            <?php $seenApprovalIds = []; ?>
                             <?php foreach ($posts as $post): ?>
                             <div class="feed post-item" data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo htmlspecialchars($post['status'] ?? 'posted'); ?>">
                                 <div class="post-header">
@@ -2797,7 +2797,8 @@ unset($_SESSION['form_data']);
                                     <div>
                                         <div class="post-user"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></div>
                                         <div class="post-meta">
-                                            <?php $showFreshApproval = (isset($post['status']) && $post['status'] === 'approved' && !empty($post['has_fresh_approval'])); ?>
+                                            <?php $showFreshApproval = (isset($post['status']) && $post['status'] === 'approved' && !empty($post['has_fresh_approval']) && empty($post['approval_badge_seen'])); ?>
+                                            <?php if ($showFreshApproval) { $seenApprovalIds[] = (int)$post['id']; } ?>
                                             <?php if ($showFreshApproval || (isset($post['status']) && $post['status'] === 'on-hold')): ?>
                                                 <span class="status-indicator <?php echo htmlspecialchars($post['status']); ?>"
                                                     title="<?php echo ($post['status'] === 'approved') ? 'Approved by admin' : 'On hold'; ?>"></span>
@@ -2872,6 +2873,19 @@ unset($_SESSION['form_data']);
                                 </div>
                             </div> <!-- Closing feed div -->
                             <?php endforeach; ?>
+                            <?php
+                            // Show-once: consume the approval badge for posts displayed above,
+                            // independent of the notification read state (bell badge untouched).
+                            if (!empty($seenApprovalIds)) {
+                                try {
+                                    $seenApprovalIds = array_values(array_unique(array_map('intval', $seenApprovalIds)));
+                                    $placeholders = implode(',', array_fill(0, count($seenApprovalIds), '?'));
+                                    $pdo->prepare("UPDATE posts SET approval_badge_seen = 1 WHERE id IN ($placeholders)")->execute($seenApprovalIds);
+                                } catch (PDOException $e) {
+                                    error_log("Approval badge consume failed: " . $e->getMessage());
+                                }
+                            }
+                            ?>
                         <?php endif; ?>
                     </div> <!-- Closing feeds div -->
                 </div> <!-- Closing activity-feed div -->

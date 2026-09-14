@@ -1,7 +1,11 @@
 <?php
 session_start();
 require_once 'db_connection.php';
+require_once 'migrate.php';
 date_default_timezone_set('Asia/Manila');
+if (isset($pdo)) {
+    runMigration($pdo);
+}
 
 if (!function_exists('getInitialsHtml')) {
     function getInitialsHtml($first, $last, $size = 44) {
@@ -191,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Snapshot post + author first so the notification carries its own copy
                 // (avatar + image keep rendering even if the post row is gone later).
                 $approve_snapshot = getPostSnapshotForNotification($pdo, $post_id);
-                $update_stmt = $pdo->prepare("UPDATE posts SET status = 'approved', updated_at = NOW() WHERE id = ?");
+                $update_stmt = $pdo->prepare("UPDATE posts SET status = 'approved', updated_at = NOW(), approval_badge_seen = 0 WHERE id = ?");
                 $update_stmt->execute([$post_id]);
 
                 // Get post owner to send notification

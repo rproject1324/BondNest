@@ -364,6 +364,23 @@ function runMigration($pdo) {
         error_log("Migration is_admin: " . $e->getMessage());
     }
 
+    // Ensure approval_badge_seen column exists on posts table.
+    // 0 = badge not yet shown (fresh approval), 1 = already shown.
+    // Defaults to 1 so posts approved before this deploys don't flash the badge once.
+    try {
+        if ($isPg) {
+            $pdo->exec("ALTER TABLE posts ADD COLUMN IF NOT EXISTS approval_badge_seen SMALLINT NOT NULL DEFAULT 1");
+        } else {
+            $checkSeen = $pdo->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='posts' AND COLUMN_NAME='approval_badge_seen'");
+            $seenColExists = $checkSeen && $checkSeen->fetch();
+            if (!$seenColExists) {
+                $pdo->exec("ALTER TABLE posts ADD COLUMN approval_badge_seen TINYINT(1) NOT NULL DEFAULT 1");
+            }
+        }
+    } catch (PDOException $e) {
+        error_log("Migration approval_badge_seen: " . $e->getMessage());
+    }
+
     // Auto-promote any existing user matching configured admin email
     if (function_exists('getConfiguredAdminEmail')) {
         $adminEmailStr = getConfiguredAdminEmail();

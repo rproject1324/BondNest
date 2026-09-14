@@ -31,19 +31,20 @@ if (!$user) {
 // Get posts with comment counts and like information
 $posts = [];
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT p.*, 
+$sql = "SELECT p.*,
         u.first_name, u.last_name, u.profile_picture,
         COUNT(DISTINCT c.id) AS comment_count,
         p.likes,
-        EXISTS(SELECT 1 FROM likes l WHERE l.user_id = ? AND l.post_id = p.id) AS user_has_liked
-        FROM posts p 
-        JOIN users u ON p.user_id = u.id 
+        EXISTS(SELECT 1 FROM likes l WHERE l.user_id = ? AND l.post_id = p.id) AS user_has_liked,
+        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0) AS has_fresh_approval
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
         LEFT JOIN comments c ON p.id = c.post_id
         WHERE p.status = 'approved' OR p.status = 'posted' OR p.status IS NULL
         GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
         ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$user_id]);
+$stmt->execute([$user_id, $user_id]);
 $posts = $stmt->fetchAll();
 
 
@@ -1669,15 +1670,16 @@ if (menuTrigger) {
     <div>
         <div class="post-user"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></div>
         <div class="post-meta">
-            <?php if (isset($post['status']) && $post['status'] !== 'posted'): ?>
-                <span class="status-indicator <?php echo htmlspecialchars($post['status']); ?>" 
+            <?php $showFreshApproval = (isset($post['status']) && $post['status'] === 'approved' && !empty($post['has_fresh_approval'])); ?>
+            <?php if ($showFreshApproval || (isset($post['status']) && $post['status'] === 'on-hold')): ?>
+                <span class="status-indicator <?php echo htmlspecialchars($post['status']); ?>"
                       title="<?php echo ($post['status'] === 'approved') ? 'Approved by admin' : 'On hold'; ?>"></span>
             <?php endif; ?>
-            <i class="bi bi-globe"></i> BondNest · 
+            <i class="bi bi-globe"></i> BondNest ·
             <span class="time-ago" data-timestamp="<?php echo htmlspecialchars($post['created_at']); ?>">
                 <?php echo time_elapsed_string($post['created_at']); ?>
             </span>
-            <?php if (isset($post['status']) && $post['status'] !== 'posted'): ?>
+            <?php if ($showFreshApproval || (isset($post['status']) && $post['status'] === 'on-hold')): ?>
                 <span class="status-badge <?php echo htmlspecialchars($post['status']); ?>">
                     <?php echo ucfirst(htmlspecialchars($post['status'])); ?>
                 </span>

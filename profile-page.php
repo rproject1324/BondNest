@@ -293,12 +293,13 @@ $viewing_own_profile = ($user_id == $profile_user_id);
 // Show all posts for the user's own profile (including on-hold ones), but only approved and posted posts when viewing someone else's profile
 $status_condition = $viewing_own_profile ? "" : "AND (p.status = 'approved' OR p.status = 'posted' OR p.status IS NULL)";
 
+$freshApprovalSince = gmdate('Y-m-d H:i:s', time() - 48 * 3600);
 $sql = "SELECT p.*,
         u.first_name, u.last_name, u.profile_picture,
         COUNT(DISTINCT c.id) AS comment_count,
         p.likes,
         EXISTS(SELECT 1 FROM likes l WHERE l.user_id = ? AND l.post_id = p.id) AS user_has_liked,
-        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0) AS has_fresh_approval
+        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0 AND n.created_at >= ?) AS has_fresh_approval
         FROM posts p
         JOIN users u ON p.user_id = u.id
         LEFT JOIN comments c ON p.id = c.post_id
@@ -306,7 +307,7 @@ $sql = "SELECT p.*,
         GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
         ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$user_id, $user_id, $profile_user_id]);
+$stmt->execute([$user_id, $user_id, $freshApprovalSince, $profile_user_id]);
 $posts = $stmt->fetchAll();
 
 // Helper function to format time

@@ -31,12 +31,16 @@ if (!$user) {
 // Get posts with comment counts and like information
 $posts = [];
 $user_id = $_SESSION['user_id'];
+// Approval badge window: show only for approvals from the last 48h that are
+// still unread — opening the bell marks them read, the time bound guarantees
+// the badge expires on its own even if the bell is never opened.
+$freshApprovalSince = gmdate('Y-m-d H:i:s', time() - 48 * 3600);
 $sql = "SELECT p.*,
         u.first_name, u.last_name, u.profile_picture,
         COUNT(DISTINCT c.id) AS comment_count,
         p.likes,
         EXISTS(SELECT 1 FROM likes l WHERE l.user_id = ? AND l.post_id = p.id) AS user_has_liked,
-        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0) AS has_fresh_approval
+        EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ? AND n.type = 'post_approved' AND n.reference_id = p.id AND n.is_read = 0 AND n.created_at >= ?) AS has_fresh_approval
         FROM posts p
         JOIN users u ON p.user_id = u.id
         LEFT JOIN comments c ON p.id = c.post_id
@@ -44,7 +48,7 @@ $sql = "SELECT p.*,
         GROUP BY p.id, u.first_name, u.last_name, u.profile_picture
         ORDER BY p.created_at DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$user_id, $user_id]);
+$stmt->execute([$user_id, $user_id, $freshApprovalSince]);
 $posts = $stmt->fetchAll();
 
 

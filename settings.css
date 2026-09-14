@@ -616,6 +616,19 @@ textarea.settings-input {
     color: var(--color-dark);
 }
 
+.delete-photo-icon-wrap {
+    background: #fdeeed;
+    color: #c0392b;
+}
+
+.otp-verify-btn.otp-danger-btn {
+    background: #c0392b;
+}
+
+.otp-verify-btn.otp-danger-btn:hover {
+    background: #a93226;
+}
+
 /* Toast Notifications */
 .settings-toast {
     position: fixed;

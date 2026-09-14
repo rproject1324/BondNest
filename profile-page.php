@@ -2589,7 +2589,7 @@ unset($_SESSION['form_data']);
                 </div>
 
 <!-- EDIT DETAILS DISPLAY              -->
-<div class="profile-card">
+<div class="profile-card profile-card-clickable" id="bioCard" role="button" tabindex="0" title="Click to view full details">
     <h2 class="card-title"><i class="fas fa-info-circle"></i> Bio</h2>
     <div class="card-content">
         <ul class="info-list">
@@ -2598,7 +2598,15 @@ unset($_SESSION['form_data']);
                 <i class="fas fa-align-left info-icon"></i>
                 <div class="info-text">
                     <?php if (!empty($user['bio'])): ?>
-                        <?php echo nl2br(htmlspecialchars($user['bio'])); ?>
+                        <?php
+                        $bioPreviewLimit = 160;
+                        $bioFull = $user['bio'];
+                        if (mb_strlen($bioFull) > $bioPreviewLimit):
+                            echo nl2br(htmlspecialchars(mb_substr($bioFull, 0, $bioPreviewLimit)));
+                        ?>&hellip; <span class="see-more-hint">See more</span>
+                        <?php else: ?>
+                            <?php echo nl2br(htmlspecialchars($bioFull)); ?>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="empty-info">Add your bio (minimum 10 characters)</span>
                     <?php endif; ?>
@@ -2955,6 +2963,43 @@ unset($_SESSION['form_data']);
         <div class="logout-actions">
             <button class="btn-cancel logout-cancel-button" id="cancelDeleteComment">Cancel</button>
             <button class="btn-save logout-confirm-button delete-btn" id="confirmDeleteComment">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bio Details Modal -->
+<div class="bio-details-overlay" id="bioDetailsModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="bioDetailsTitle">
+    <div class="bio-details-card">
+        <button type="button" class="bio-details-close" id="closeBioDetailsModal" aria-label="Close">&times;</button>
+        <div class="bio-details-header">
+            <?php if (!empty($user['profile_picture'])): ?>
+                <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Profile Picture" class="bio-details-avatar">
+            <?php else: ?>
+                <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 64); ?>
+            <?php endif; ?>
+            <div class="bio-details-identity">
+                <h3 id="bioDetailsTitle"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h3>
+                <span class="bio-details-handle">@<?php echo htmlspecialchars($user['username']); ?></span>
+            </div>
+        </div>
+        <div class="bio-details-body">
+            <h4 class="bio-details-section"><i class="fas fa-align-left"></i> Bio</h4>
+            <p class="bio-details-bio">
+                <?php if (!empty($user['bio'])): ?>
+                    <?php echo nl2br(htmlspecialchars($user['bio'])); ?>
+                <?php else: ?>
+                    <span class="empty-info">No bio yet.</span>
+                <?php endif; ?>
+            </p>
+            <h4 class="bio-details-section"><i class="fas fa-id-card"></i> Details</h4>
+            <ul class="bio-details-list">
+                <li><i class="fas fa-user"></i><span><?php echo htmlspecialchars($user['age']); ?> years old</span></li>
+                <li><i class="fas fa-venus-mars"></i><span><?php echo htmlspecialchars($user['gender']); ?></span></li>
+                <li><i class="fas fa-birthday-cake"></i><span>Born on <?php echo date('F j, Y', strtotime($user['birthday'])); ?></span></li>
+                <li><i class="fas fa-home"></i><span><?php echo !empty($user['location']) ? 'Lives in ' . htmlspecialchars($user['location']) : 'Location not set'; ?></span></li>
+                <li><i class="fas fa-heart"></i><span><?php echo !empty($user['interests']) ? 'Interested in ' . htmlspecialchars($user['interests']) : 'Interests not set'; ?></span></li>
+                <li><i class="fas fa-link"></i><span><?php if (!empty($user['website'])): ?><a href="<?php echo htmlspecialchars($user['website']); ?>" target="_blank" rel="noopener noreferrer"><?php echo htmlspecialchars($user['website']); ?></a><?php else: ?>Website not set<?php endif; ?></span></li>
+            </ul>
         </div>
     </div>
 </div>
@@ -3472,6 +3517,43 @@ document.addEventListener('click', function(e) {
         }, 300);
     }
 });
+
+// ── Bio card → full details modal ──
+(function() {
+    const bioCard = document.getElementById('bioCard');
+    const bioModal = document.getElementById('bioDetailsModal');
+    if (!bioCard || !bioModal) return;
+
+    function openBioModal() {
+        bioModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeBioModal() {
+        bioModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    bioCard.addEventListener('click', function(e) {
+        // Let in-card links (e.g. website) work normally
+        if (e.target.closest('a')) return;
+        openBioModal();
+    });
+    bioCard.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openBioModal();
+        }
+    });
+
+    const closeBtn = document.getElementById('closeBioDetailsModal');
+    if (closeBtn) closeBtn.addEventListener('click', closeBioModal);
+    bioModal.addEventListener('click', function(e) {
+        if (e.target === bioModal) closeBioModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && bioModal.style.display === 'flex') closeBioModal();
+    });
+})();
 
 // Reply state
 let currentReplyToId = null;

@@ -248,6 +248,149 @@ body {
 
 /* No hover effect on profile-card; hover only on edit buttons */
 
+/* Clickable bio card → opens full details modal */
+.profile-card-clickable {
+    cursor: pointer;
+}
+
+.profile-card-clickable:hover {
+    box-shadow: 0 8px 26px rgba(0, 128, 128, 0.16);
+}
+
+.profile-card-clickable:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.see-more-hint {
+    color: var(--primary);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Bio details modal */
+.bio-details-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.25s ease;
+}
+
+.bio-details-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px 26px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+.bio-details-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--text-medium);
+    cursor: pointer;
+}
+
+.bio-details-close:hover {
+    color: var(--text-dark, #222);
+}
+
+.bio-details-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.bio-details-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.bio-details-identity h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: var(--text-dark, #222);
+}
+
+.bio-details-handle {
+    font-size: 0.88rem;
+    color: var(--text-medium);
+}
+
+.bio-details-body {
+    font-size: 0.92rem;
+    color: var(--text-medium);
+    line-height: 1.65;
+    word-break: break-word;
+}
+
+.bio-details-section {
+    font-size: 0.95rem;
+    color: var(--primary);
+    margin: 16px 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bio-details-section:first-child {
+    margin-top: 0;
+}
+
+.bio-details-bio {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.bio-details-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bio-details-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.bio-details-list li i {
+    color: var(--primary);
+    margin-top: 3px;
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.bio-details-list a {
+    color: var(--primary);
+    word-break: break-all;
+}
+
 .card-title {
     font-size: 1.2rem;
     color: var(--primary);

@@ -717,6 +717,24 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
         </div>
     </div>
 
+    <!-- Delete Profile Picture Confirm Modal -->
+    <div class="settings-modal-overlay" id="deletePhotoModal" style="display: none;">
+        <div class="settings-modal-card">
+            <button type="button" class="settings-modal-close" id="closeDeletePhotoModal">&times;</button>
+            <div class="otp-icon-wrap delete-photo-icon-wrap">
+                <i class="bi bi-trash"></i>
+            </div>
+            <h3 class="otp-modal-title">Remove profile picture?</h3>
+            <p class="otp-modal-lead">Are you sure you want to remove your profile picture? Your initials will be shown instead.</p>
+            <div class="otp-actions">
+                <button type="button" class="otp-verify-btn otp-danger-btn" id="confirmDeletePhotoBtn">
+                    <i class="bi bi-trash"></i> Yes, remove it
+                </button>
+                <button type="button" class="otp-cancel-btn" id="cancelDeletePhotoBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript logic -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -868,46 +886,79 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
         }
 
         // ── Delete Profile Picture ──
+        const deletePhotoModal = document.getElementById('deletePhotoModal');
+        const confirmDeletePhotoBtn = document.getElementById('confirmDeletePhotoBtn');
+        const cancelDeletePhotoBtn = document.getElementById('cancelDeletePhotoBtn');
+        const closeDeletePhotoModalBtn = document.getElementById('closeDeletePhotoModal');
+
+        function openDeletePhotoModal() {
+            if (deletePhotoModal) {
+                deletePhotoModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeDeletePhotoModal() {
+            if (deletePhotoModal) {
+                deletePhotoModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (closeDeletePhotoModalBtn) closeDeletePhotoModalBtn.addEventListener('click', closeDeletePhotoModal);
+        if (cancelDeletePhotoBtn) cancelDeletePhotoBtn.addEventListener('click', closeDeletePhotoModal);
+        if (deletePhotoModal) deletePhotoModal.addEventListener('click', function(e) {
+            if (e.target === deletePhotoModal) closeDeletePhotoModal();
+        });
+
+        function doDeletePhoto() {
+            const btn = document.getElementById('deletePhotoBtn');
+            if (!btn || btn.disabled) return;
+            closeDeletePhotoModal();
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+
+            const fd = new FormData();
+            fd.append('action', 'delete_photo');
+
+            fetch('settings.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-trash"></i> Delete';
+                    if (data.success) {
+                        const firstName = document.getElementById('firstName').value.trim();
+                        const lastName = document.getElementById('lastName').value.trim();
+                        const initials = (firstName[0] || '').toUpperCase() + (lastName[0] || '').toUpperCase();
+                        const colors = ['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50'];
+                        let hash = 0;
+                        const name = firstName + lastName;
+                        for (let i = 0; i < name.length; i++) { hash = (hash * 31 + name.charCodeAt(i)) & 0x7FFFFFFF; }
+                        const bg = colors[hash % colors.length];
+                        avatarPreviewContainer.innerHTML = `<div class="initials-avatar" style="width:100px;height:100px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:2.2rem;font-family:Poppins,sans-serif;">${initials}</div>`;
+                        showToast(data.message, 'success');
+                        btn.remove();
+                        // Update navbar and sidebar avatars
+                        updateNavAvatars(firstName, lastName);
+                    } else {
+                        showToast(data.error || 'Failed to remove picture.', 'error');
+                    }
+                })
+                .catch(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-trash"></i> Delete';
+                    showToast('Error removing profile picture.', 'error');
+                });
+        }
+
+        if (confirmDeletePhotoBtn) confirmDeletePhotoBtn.addEventListener('click', doDeletePhoto);
+
         function setupDeletePhotoBtn() {
             const btn = document.getElementById('deletePhotoBtn');
             if (!btn) return;
             btn.onclick = function() {
-                if (!confirm('Are you sure you want to remove your profile picture?')) return;
-
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
-
-                const fd = new FormData();
-                fd.append('action', 'delete_photo');
-
-                fetch('settings.php', { method: 'POST', body: fd })
-                    .then(r => r.json())
-                    .then(data => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-trash"></i> Delete';
-                        if (data.success) {
-                            const firstName = document.getElementById('firstName').value.trim();
-                            const lastName = document.getElementById('lastName').value.trim();
-                            const initials = (firstName[0] || '').toUpperCase() + (lastName[0] || '').toUpperCase();
-                            const colors = ['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50'];
-                            let hash = 0;
-                            const name = firstName + lastName;
-                            for (let i = 0; i < name.length; i++) { hash = (hash * 31 + name.charCodeAt(i)) & 0x7FFFFFFF; }
-                            const bg = colors[hash % colors.length];
-                            avatarPreviewContainer.innerHTML = `<div class="initials-avatar" style="width:100px;height:100px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:2.2rem;font-family:Poppins,sans-serif;">${initials}</div>`;
-                            showToast(data.message, 'success');
-                            btn.remove();
-                            // Update navbar and sidebar avatars
-                            updateNavAvatars(firstName, lastName);
-                        } else {
-                            showToast(data.error || 'Failed to remove picture.', 'error');
-                        }
-                    })
-                    .catch(() => {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-trash"></i> Delete';
-                        showToast('Error removing profile picture.', 'error');
-                    });
+                openDeletePhotoModal();
             };
         }
 

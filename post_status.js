@@ -66,16 +66,17 @@ function applyStatusIndicator(postElement, status, isCurrentUserPost) {
     
     // Apply status-specific styling and notifications
     if (status === 'approved') {
-        // Check if we've already shown this notification
-        const postId = postElement.getAttribute('data-post-id');
-        const shownApprovals = JSON.parse(localStorage.getItem('shown_approvals') || '[]');
-        
-        if (shownApprovals.includes(postId)) {
-            // If we've already shown this approval, update the status to 'posted'
+        // Show-once is server-driven: PHP stamps data-fresh-approval="1" only on
+        // the first render after an approval (consumed server-side on display),
+        // so re-approvals behave exactly like first approvals.
+        const isFreshApproval = postElement.getAttribute('data-fresh-approval') === '1';
+
+        if (!isFreshApproval) {
+            // Not a fresh approval: hide any approval indicators
             postElement.setAttribute('data-status', 'posted');
             return;
         }
-        
+
         postElement.classList.add('post-approved');
         
         // Only show approval notification to the post owner temporarily
@@ -121,19 +122,13 @@ function applyStatusIndicator(postElement, status, isCurrentUserPost) {
                 
                 // Remove the approved class from the post
                 postElement.classList.remove('post-approved');
-                
+
                 // Update the post's data-status attribute to 'posted'
                 postElement.setAttribute('data-status', 'posted');
-                
-                // Store the post ID in localStorage to prevent showing again on refresh
-                const postId = postElement.getAttribute('data-post-id');
-                if (postId) {
-                    const shownApprovals = JSON.parse(localStorage.getItem('shown_approvals') || '[]');
-                    if (!shownApprovals.includes(postId)) {
-                        shownApprovals.push(postId);
-                        localStorage.setItem('shown_approvals', JSON.stringify(shownApprovals));
-                    }
-                }
+
+                // Drop the fresh flag so this banner never shows again for this render
+                // (server already consumed its show-once flag on display)
+                postElement.removeAttribute('data-fresh-approval');
             }, 5000);
         }
     } 
@@ -472,21 +467,12 @@ function showStatusChangeToast(postId, status) {
 }
 
 /**
- * Check for posts that have already been shown approval notifications
+ * One-time cleanup of the obsolete client-side approval history.
+ * Show-once is now server-driven via data-fresh-approval.
  */
 function checkApprovalHistory() {
     try {
-        const shownApprovals = JSON.parse(localStorage.getItem('shown_approvals') || '[]');
-        if (shownApprovals.length === 0) return;
-        
-        // Update all posts that have already had approval notifications shown
-        shownApprovals.forEach(postId => {
-            const post = document.querySelector(`.post-item[data-post-id="${postId}"]`);
-            if (post && post.getAttribute('data-status') === 'approved') {
-                // Update status to 'posted' so no approval indicators show
-                post.setAttribute('data-status', 'posted');
-            }
-        });
+        localStorage.removeItem('shown_approvals');
     } catch (error) {
         console.error('Error checking approval history:', error);
     }

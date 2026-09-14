@@ -1653,7 +1653,9 @@ if (menuTrigger) {
 <div class="feeds">
     <?php $seenApprovalIds = []; ?>
     <?php foreach ($posts as $post): ?>
-    <div class="feed post-item" data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo htmlspecialchars($post['status'] ?? 'posted'); ?>">
+    <?php $showFreshApproval = (isset($post['status']) && $post['status'] === 'approved' && !empty($post['has_fresh_approval']) && empty($post['approval_badge_seen'])); ?>
+    <?php if ($showFreshApproval) { $seenApprovalIds[] = (int)$post['id']; } ?>
+    <div class="feed post-item" data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo htmlspecialchars($post['status'] ?? 'posted'); ?>"<?php if ($showFreshApproval) echo ' data-fresh-approval="1"'; ?>>
         <?php if (isset($post['status']) && $post['status'] === 'on-hold' && $post['user_id'] == $_SESSION['user_id']): ?>
         <div class="post-pending-notice">
             <i class="bi bi-exclamation-circle-fill"></i> 
@@ -1671,8 +1673,6 @@ if (menuTrigger) {
     <div>
         <div class="post-user"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></div>
         <div class="post-meta">
-            <?php $showFreshApproval = (isset($post['status']) && $post['status'] === 'approved' && !empty($post['has_fresh_approval']) && empty($post['approval_badge_seen'])); ?>
-            <?php if ($showFreshApproval) { $seenApprovalIds[] = (int)$post['id']; } ?>
             <?php if ($showFreshApproval || (isset($post['status']) && $post['status'] === 'on-hold')): ?>
                 <span class="status-indicator <?php echo htmlspecialchars($post['status']); ?>"
                       title="<?php echo ($post['status'] === 'approved') ? 'Approved by admin' : 'On hold'; ?>"></span>
@@ -2008,14 +2008,15 @@ function formatTimeAgo(dateString) {
     const now = window.__serverNow ? window.__serverNow() : new Date();
     const secondsPast = (now - date) / 1000;
 
+    const agoUnit = (n, unit) => `${n} ${unit}${n === 1 ? '' : 's'} ago`;
     if (secondsPast < 1) return 'just now';
-    if (secondsPast < 60) return `${Math.floor(secondsPast)} seconds ago`;
-    if (secondsPast < 3600) return `${Math.floor(secondsPast / 60)} minutes ago`;
-    if (secondsPast < 86400) return `${Math.floor(secondsPast / 3600)} hours ago`;
-    if (secondsPast < 604800) return `${Math.floor(secondsPast / 86400)} days ago`;
-    if (secondsPast < 2419200) return `${Math.floor(secondsPast / 604800)} weeks ago`;
-    if (secondsPast < 29030400) return `${Math.floor(secondsPast / 2419200)} months ago`;
-    return `${Math.floor(secondsPast / 29030400)} years ago`;
+    if (secondsPast < 60) return agoUnit(Math.floor(secondsPast), 'second');
+    if (secondsPast < 3600) return agoUnit(Math.floor(secondsPast / 60), 'minute');
+    if (secondsPast < 86400) return agoUnit(Math.floor(secondsPast / 3600), 'hour');
+    if (secondsPast < 604800) return agoUnit(Math.floor(secondsPast / 86400), 'day');
+    if (secondsPast < 2419200) return agoUnit(Math.floor(secondsPast / 604800), 'week');
+    if (secondsPast < 29030400) return agoUnit(Math.floor(secondsPast / 2419200), 'month');
+    return agoUnit(Math.floor(secondsPast / 29030400), 'year');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

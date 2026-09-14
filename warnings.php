@@ -414,6 +414,95 @@ if (isset($_GET['notification_id'])) {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* Clear-confirm modal */
+        .clear-confirm-dialog {
+            background: #fff;
+            border-radius: 14px;
+            width: 90%;
+            max-width: 420px;
+            padding: 30px 26px 24px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+            position: relative;
+            text-align: center;
+        }
+
+        .clear-confirm-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: #fef3c7;
+            color: #d97706;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto 14px auto;
+        }
+
+        .clear-confirm-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #222;
+            margin: 0 0 8px 0;
+        }
+
+        .clear-confirm-lead {
+            font-size: 0.92rem;
+            color: #666;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        .clear-confirm-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .clear-confirm-go {
+            width: 100%;
+            padding: 12px;
+            background: #d97706;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .clear-confirm-go:hover {
+            background: #b45309;
+        }
+
+        .clear-confirm-cancel {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .clear-confirm-cancel:hover {
+            color: #222;
+        }
+
+        .clear-confirm-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .clear-confirm-close:hover {
+            color: #222;
+        }
         
         .empty-state {
             padding: 40px;
@@ -824,8 +913,8 @@ if (isset($_GET['notification_id'])) {
             
             <div class="notification-buttons">
                 <?php if ($read_count > 0): ?>
-                <form method="post" action="warnings.php" onsubmit="return confirm('Are you sure you want to clear all read notifications?');">
-                    <button type="submit" name="clear_all" class="clear-btn">
+                <form method="post" action="warnings.php" id="clearReadForm">
+                    <button type="button" class="clear-btn" id="openClearConfirmBtn">
                         <i class="bi bi-trash"></i> Clear All Read Notifications
                     </button>
                 </form>
@@ -838,6 +927,24 @@ if (isset($_GET['notification_id'])) {
         </div>
     </div>
     
+    <!-- Clear Read Notifications Confirm Modal -->
+    <div class="modal-overlay" id="clearConfirmModal">
+        <div class="clear-confirm-dialog">
+            <button type="button" class="clear-confirm-close" id="closeClearConfirmBtn" aria-label="Close">&times;</button>
+            <div class="clear-confirm-icon">
+                <i class="bi bi-trash"></i>
+            </div>
+            <h3 class="clear-confirm-title">Clear read notifications?</h3>
+            <p class="clear-confirm-lead">Are you sure you want to clear all read notifications? This cannot be undone.</p>
+            <div class="clear-confirm-actions">
+                <button type="button" class="clear-confirm-go" id="confirmClearBtn">
+                    <i class="bi bi-trash"></i> Yes, clear all
+                </button>
+                <button type="button" class="clear-confirm-cancel" id="cancelClearBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Detail Modal -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-dialog">
@@ -1131,6 +1238,44 @@ if (isset($_GET['notification_id'])) {
             hideModal();
         }
     });
+
+    // Clear-confirm modal: open / confirm (submit) / cancel / outside / Escape
+    (function() {
+        const form = document.getElementById('clearReadForm');
+        const openBtn = document.getElementById('openClearConfirmBtn');
+        const modal = document.getElementById('clearConfirmModal');
+        const confirmBtn = document.getElementById('confirmClearBtn');
+        const cancelBtn = document.getElementById('cancelClearBtn');
+        const closeBtn = document.getElementById('closeClearConfirmBtn');
+        if (!form || !openBtn || !modal) return;
+
+        function openClearModal() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeClearModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        openBtn.addEventListener('click', openClearModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeClearModal);
+        if (cancelBtn) cancelBtn.addEventListener('click', closeClearModal);
+        if (confirmBtn) confirmBtn.addEventListener('click', function() {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'clear_all';
+            hidden.value = '1';
+            form.appendChild(hidden);
+            form.submit();
+        });
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeClearModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) closeClearModal();
+        });
+    })();
     </script>
 </body>
 </html> 

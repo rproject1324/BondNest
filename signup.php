@@ -68,6 +68,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($_POST['check_email'])) {
+        $email = $_POST['email'] ?? '';
+        if (empty($email)) {
+            echo json_encode(['exists' => false]);
+            exit;
+        }
+        try {
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            echo json_encode(['exists' => $stmt->rowCount() > 0]);
+            exit;
+        } catch (PDOException $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+            exit;
+        }
+    }
+
     $errors = [];
     $required = ['firstName', 'lastName', 'username', 'email', 'birthday', 'gender', 'createPassword', 'confirmPassword'];
     foreach ($required as $field) {
@@ -711,7 +728,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Inline validation
     const signupIds = ['username','signupEmail','firstName','lastName','gender','birthday','createPassword','confirmPassword'];
-    let signupAvailability = { username: { val:'', ok:null, pending:null } };
+    let signupAvailability = { username: { val:'', ok:null, pending:null }, signupEmail: { val:'', ok:null, pending:null } };
     let availabilityTimers = {};
 
     function isValidEmailBond(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
@@ -740,29 +757,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     function checkAvailabilityBond(fieldId, value){
         const key = fieldId==='username' ? 'username' : 'signupEmail';
+        const takenMsg = key==='username' ? 'Username already exists.' : 'Email is already registered.';
         const state = signupAvailability[key];
         if(!state) return Promise.resolve(true);
         if(state.val===value && state.ok!==null){
             const el=document.getElementById(fieldId);
-            if(el){ if(state.ok) showSuccessBond(el); else showErrorBond(el, key==='username'?'Username already exists.':'Email already exists.'); }
+            if(el){ if(state.ok) showSuccessBond(el); else showErrorBond(el, takenMsg); }
             return Promise.resolve(state.ok);
         }
         if(state.val===value && state.pending) return state.pending;
         state.val=value; state.ok=null;
-        const body = `check_username=1&username=${encodeURIComponent(value)}`;
+        const body = key==='username'
+            ? `check_username=1&username=${encodeURIComponent(value)}`
+            : `check_email=1&email=${encodeURIComponent(value)}`;
         state.pending = fetch('signup.php',{method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body})
             .then(r=>r.json().then(d=>({ok:r.ok,d})))
             .then(({ok,d})=>{
                 if(!ok) return true;
-                if(key==='username' && d.exists){
+                if(d.exists){
                     state.ok=false;
                     const el=document.getElementById(fieldId);
-                    if(el) showErrorBond(el,'Username already exists.');
+                    if(el) showErrorBond(el, takenMsg);
                     return false;
                 }
                 state.ok=true;
                 const el=document.getElementById(fieldId);
-                if(el && key==='username') showSuccessBond(el);
+                if(el) showSuccessBond(el);
                 return true;
             }).catch(()=>true)
             .finally(()=>{ if(state.val===value) state.pending=null; });
@@ -788,6 +808,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if(fieldId==='signupEmail'){
             if(!v){ showErrorBond(el,'Email is required.'); return false; }
             if(!isValidEmailBond(v)){ showErrorBond(el,'Please enter a valid email.'); return false; }
+            const st=signupAvailability.signupEmail;
+            if(st.val===v && st.ok===false){ showErrorBond(el,'Email is already registered.'); return false; }
+            if(st.val===v && st.ok===true){ showSuccessBond(el); return true; }
+            if(availabilityTimers.signupEmail) clearTimeout(availabilityTimers.signupEmail);
+            availabilityTimers.signupEmail=setTimeout(()=>checkAvailabilityBond('signupEmail',v),300);
             showSuccessBond(el); return true;
         }
         if(fieldId==='firstName'){ if(!v){ showErrorBond(el,'First name is required.'); return false; } if(/[<>\/]/.test(v)){ showErrorBond(el,'Invalid characters.'); return false; } showSuccessBond(el); return true; }
@@ -891,6 +916,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const uname = document.getElementById('username').value.trim();
             const unameOk = await checkAvailabilityBond('username', uname);
             if(!unameOk) return;
+            const emailVal = document.getElementById('signupEmail').value.trim();
+            const emailOk = await checkAvailabilityBond('signupEmail', emailVal);
+            if(!emailOk) return;
 
             const formData = new FormData(this);
             const submitBtn = this.querySelector('button[type="submit"]');

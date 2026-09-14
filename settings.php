@@ -54,7 +54,11 @@ function sendOtpEmail($email, $otpCode, $username) {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    return ($httpCode >= 200 && $httpCode < 300);
+    if (!($httpCode >= 200 && $httpCode < 300)) {
+        error_log("[BREVO SEND FAILED] to=$email HTTP $httpCode: $result");
+        return false;
+    }
+    return true;
 }
 
 // ── AJAX / POST HANDLERS ──
@@ -194,14 +198,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'website' => $website,
             ]);
 
+            // Send first — only store the challenge if the email actually goes out,
+            // so a failed send never opens the OTP modal with an undelivered code.
+            if (!sendOtpEmail($email, $otpCode, $username)) {
+                error_log("[EMAIL CHANGE] Brevo send failed for user $user_id -> $email");
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'We could not send the verification code to that address. Please check the email and try again.',
+                ]);
+                exit;
+            }
+
             // Upsert challenge
             $stmt = $pdo->prepare("DELETE FROM email_change_challenges WHERE user_id = ?");
             $stmt->execute([$user_id]);
 
             $stmt = $pdo->prepare("INSERT INTO email_change_challenges (user_id, new_email, otp_code, otp_expires_at, pending_payload) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$user_id, $email, $otpCode, $otpExpires, $pendingPayload]);
-
-            sendOtpEmail($email, $otpCode, $username);
 
             echo json_encode([
                 'success' => true,
@@ -298,12 +311,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newOtp = generateOtp();
         $newExpires = gmdate('Y-m-d H:i:s', time() + 600);
 
-        $upd = $pdo->prepare("UPDATE email_change_challenges SET otp_code = ?, otp_expires_at = ? WHERE user_id = ?");
-        $upd->execute([$newOtp, $newExpires, $user_id]);
-
         $pending = json_decode($challenge['pending_payload'], true);
         $username = $pending['username'] ?? '';
-        sendOtpEmail($challenge['new_email'], $newOtp, $username);
+
+        // Send first — only rotate the stored code if delivery succeeds,
+        // otherwise the user would be locked out with an undelivered code.
+        if (!sendOtpEmail($challenge['new_email'], $newOtp, $username)) {
+            error_log("[EMAIL CHANGE RESEND] Brevo send failed for user $user_id -> " . $challenge['new_email']);
+            echo json_encode(['success' => false, 'error' => 'We could not resend the verification code. Please try again.']);
+            exit;
+        }
+
+        $upd = $pdo->prepare("UPDATE email_change_challenges SET otp_code = ?, otp_expires_at = ? WHERE user_id = ?");
+        $upd->execute([$newOtp, $newExpires, $user_id]);
 
         echo json_encode(['success' => true, 'message' => 'A new 6-digit verification code has been sent.']);
         exit;

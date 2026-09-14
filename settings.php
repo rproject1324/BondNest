@@ -21,7 +21,7 @@ function generateOtp() {
 }
 
 // Helper to send OTP email via Brevo
-function sendOtpEmail($email, $otpCode, $username) {
+function sendOtpEmail($email, $otpCode, $username, $subject = 'BondNest - Verify your new email address', $mailTitle = 'Verify your new email address', $mailIntro = 'You requested to update your email address on BondNest. Your verification code is:') {
     $apiKey = getenv('BREVO_API_KEY');
     $senderEmail = getenv('BREVO_SENDER_EMAIL');
     $senderName = getenv('BREVO_SENDER_NAME') ?: 'BondNest';
@@ -34,8 +34,8 @@ function sendOtpEmail($email, $otpCode, $username) {
     $payload = [
         'sender' => ['name' => $senderName, 'email' => $senderEmail],
         'to' => [['email' => $email, 'name' => $username ?: $email]],
-        'subject' => 'BondNest - Verify your new email address',
-        'htmlContent' => bondOtpEmailHtml('Verify your new email address', $username, 'You requested to update your email address on BondNest. Your verification code is:', $otpCode, ['This code expires in 10 minutes. If you did not request this change, you can safely ignore this email.']),
+        'subject' => $subject,
+        'htmlContent' => bondOtpEmailHtml($mailTitle, $username, $mailIntro, $otpCode, ['This code expires in 10 minutes. If you did not request this change, you can safely ignore this email.']),
         'textContent' => "Your BondNest email verification code is $otpCode. It expires in 10 minutes.",
     ];
 
@@ -329,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // 6. Change Password
+    // 6. Change Password (step 1: verify + send OTP to current email)
     if ($action === 'change_password') {
         header('Content-Type: application/json');
         $current_password = $_POST['current_password'] ?? '';
@@ -341,7 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT password, email, username FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -371,10 +371,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
+        $otpCode = generateOtp();
+        $otpExpires = gmdate('Y-m-d H:i:s', time() + 600); // 10 mins
+
+        // Send first — only stage the new hash if the code actually goes out.
+        if (!sendOtpEmail($userRow['email'], $otpCode, $userRow['username'] ?? '', 'BondNest - Verify your password change', 'Verify your password change', 'You requested to change your BondNest password. Your verification code is:')) {
+            error_log("[PASSWORD CHANGE] Brevo send failed for user $user_id");
+            echo json_encode(['success' => false, 'error' => 'We could not send the verification code to your email. Please try again.']);
+            exit;
+        }
+
+        $del = $pdo->prepare("DELETE FROM password_change_challenges WHERE user_id = ?");
+        $del->execute([$user_id]);
+        $ins = $pdo->prepare("INSERT INTO password_change_challenges (user_id, otp_code, otp_expires_at, pending_hash) VALUES (?, ?, ?, ?)");
+        $ins->execute([$user_id, $otpCode, $otpExpires, $new_hash]);
+
+        echo json_encode([
+            'success' => true,
+            'password_change_required' => true,
+            'email' => $userRow['email'],
+            'message' => "We've sent a 6-digit verification code to your email. Enter it to confirm your password change.",
+        ]);
+        exit;
+    }
+
+    // 6b. Verify Password OTP (step 2: apply staged password hash)
+    if ($action === 'verify_password_otp') {
+        header('Content-Type: application/json');
+        $code = trim($_POST['otp_code'] ?? '');
+        if (strlen($code) !== 6 || !ctype_digit($code)) {
+            echo json_encode(['success' => false, 'error' => 'Please enter the 6-digit verification code.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM password_change_challenges WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $challenge = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$challenge) {
+            echo json_encode(['success' => false, 'error' => 'No pending password change found. Please submit the form again.']);
+            exit;
+        }
+
+        $expiresAt = strtotime($challenge['otp_expires_at'] . ' UTC');
+        if (time() > $expiresAt || $challenge['otp_code'] !== $code) {
+            echo json_encode(['success' => false, 'error' => 'Invalid or expired verification code.']);
+            exit;
+        }
+
         $upd = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $upd->execute([$new_hash, $user_id]);
+        $upd->execute([$challenge['pending_hash'], $user_id]);
+
+        $del = $pdo->prepare("DELETE FROM password_change_challenges WHERE user_id = ?");
+        $del->execute([$user_id]);
 
         echo json_encode(['success' => true, 'message' => 'Password updated successfully!']);
+        exit;
+    }
+
+    // 6c. Resend Password OTP
+    if ($action === 'resend_password_otp') {
+        header('Content-Type: application/json');
+        $stmt = $pdo->prepare("SELECT * FROM password_change_challenges WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $challenge = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$challenge) {
+            echo json_encode(['success' => false, 'error' => 'No pending password change request found.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT email, username FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $urow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $newOtp = generateOtp();
+        $newExpires = gmdate('Y-m-d H:i:s', time() + 600);
+
+        // Send first — only rotate the stored code if delivery succeeds.
+        if (!sendOtpEmail($urow['email'], $newOtp, $urow['username'] ?? '', 'BondNest - Verify your password change', 'Verify your password change', 'You requested to change your BondNest password. Your verification code is:')) {
+            error_log("[PASSWORD CHANGE RESEND] Brevo send failed for user $user_id");
+            echo json_encode(['success' => false, 'error' => 'We could not resend the verification code. Please try again.']);
+            exit;
+        }
+
+        $upd = $pdo->prepare("UPDATE password_change_challenges SET otp_code = ?, otp_expires_at = ? WHERE user_id = ?");
+        $upd->execute([$newOtp, $newExpires, $user_id]);
+
+        echo json_encode(['success' => true, 'message' => 'A new 6-digit verification code has been sent.']);
         exit;
     }
 }
@@ -686,7 +770,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             <div class="otp-icon-wrap">
                 <i class="bi bi-envelope-check"></i>
             </div>
-            <h3 class="otp-modal-title">Verify new email</h3>
+            <h3 class="otp-modal-title" id="otpModalTitle">Verify new email</h3>
             <p class="otp-modal-lead" id="otpModalLead">We've sent a 6-digit verification code to your new email address. Please enter it below to proceed.</p>
 
             <div class="otp-digits-container" id="otpDigitsGroup">
@@ -1180,8 +1264,11 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             });
         }
 
-        // ── Email Change OTP Modal & Verification ──
+        // ── Email/Password Change OTP Modal & Verification ──
+        // otpMode is 'email' for email changes, 'password' for password changes.
+        let otpMode = 'email';
         const emailOtpModal = document.getElementById('emailOtpModal');
+        const otpModalTitle = document.getElementById('otpModalTitle');
         const otpModalLead = document.getElementById('otpModalLead');
         const otpErrorAlert = document.getElementById('otpErrorAlert');
         const otpErrorText = document.getElementById('otpErrorText');
@@ -1214,7 +1301,21 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
         }
 
         function openEmailOtpModal(newEmail) {
+            otpMode = 'email';
+            if (otpModalTitle) otpModalTitle.textContent = 'Verify new email';
             otpModalLead.textContent = `We've sent a 6-digit verification code to ${newEmail}. Please enter it below to proceed.`;
+            otpErrorAlert.style.display = 'none';
+            digitInputs.forEach(input => input.value = '');
+            emailOtpModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            startResendTimer();
+            if (digitInputs[0]) digitInputs[0].focus();
+        }
+
+        function openPasswordOtpModal(email) {
+            otpMode = 'password';
+            if (otpModalTitle) otpModalTitle.textContent = 'Verify password change';
+            otpModalLead.textContent = `We've sent a 6-digit verification code to ${email}. Please enter it below to confirm your password change.`;
             otpErrorAlert.style.display = 'none';
             digitInputs.forEach(input => input.value = '');
             emailOtpModal.style.display = 'flex';
@@ -1288,7 +1389,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             verifyOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
 
             const fd = new FormData();
-            fd.append('action', 'verify_email_otp');
+            fd.append('action', otpMode === 'password' ? 'verify_password_otp' : 'verify_email_otp');
             fd.append('otp_code', code);
 
             fetch('settings.php', { method: 'POST', body: fd })
@@ -1299,7 +1400,13 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
 
                     if (data.success) {
                         closeModal();
-                        showToast(data.message, 'success');
+                        if (otpMode === 'password') {
+                            const secForm = document.getElementById('securityForm');
+                            if (secForm) { secForm.reset(); if (typeof validatePasswordRules === 'function') validatePasswordRules(); }
+                            openPasswordChangeSuccessThenLogout();
+                        } else {
+                            showToast(data.message, 'success');
+                        }
                     } else {
                         otpErrorText.textContent = data.error || 'Verification failed.';
                         otpErrorAlert.style.display = 'flex';
@@ -1319,7 +1426,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             resendOtpBtn.addEventListener('click', function() {
                 this.disabled = true;
                 const fd = new FormData();
-                fd.append('action', 'resend_email_otp');
+                fd.append('action', otpMode === 'password' ? 'resend_password_otp' : 'resend_email_otp');
 
                 fetch('settings.php', { method: 'POST', body: fd })
                     .then(r => r.json())
@@ -1425,7 +1532,9 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                         savePasswordBtn.disabled = false;
                         savePasswordBtn.innerHTML = '<i class="bi bi-lock-fill"></i> Update Password';
 
-                        if (data.success) {
+                        if (data.password_change_required) {
+                            openPasswordOtpModal(data.email);
+                        } else if (data.success) {
                             securityForm.reset();
                             validatePasswordRules();
                             openPasswordChangeSuccessThenLogout();

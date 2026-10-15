@@ -1794,6 +1794,41 @@ function formatMessageTime($timestamp) {
             setInterval(getSelectedUserStatus, 5000);
             <?php endif; ?>
             
+            // Small non-blocking toast for chat actions (replaces alert()).
+            // Defined at page scope so both the send flow and the
+            // document-level edit/delete handlers can use it.
+            function showChatToast(msg) {
+                let toast = document.getElementById('chatActionToast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'chatActionToast';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '24px';
+                    toast.style.left = '50%';
+                    toast.style.transform = 'translateX(-50%)';
+                    toast.style.background = 'rgba(30, 60, 66, 0.94)';
+                    toast.style.color = '#fff';
+                    toast.style.padding = '10px 18px';
+                    toast.style.borderRadius = '8px';
+                    toast.style.fontSize = '13px';
+                    toast.style.zIndex = '9999';
+                    toast.style.boxShadow = '0 4px 16px rgba(0,0,0,0.25)';
+                    toast.style.display = 'none';
+                    document.body.appendChild(toast);
+                }
+                toast.textContent = msg;
+                toast.style.display = 'block';
+                clearTimeout(toast._hideTimer);
+                toast._hideTimer = setTimeout(function() { toast.style.display = 'none'; }, 3200);
+            }
+
+            // True while the bubble still carries an optimistic temp id,
+            // i.e. the send request has not answered yet.
+            function isMessagePending(container, messageId) {
+                if (container && container.hasAttribute && container.hasAttribute('data-pending')) return true;
+                return !!messageId && String(messageId).indexOf('temp-') === 0;
+            }
+
             if (sendButton && messageInput && chatMessages) {
                 const messageImageInput = document.getElementById('messageImageInput');
                 const imagePreviewBar = document.getElementById('imagePreviewBar');
@@ -1880,6 +1915,7 @@ function formatMessageTime($timestamp) {
                     const messageContainer = document.createElement('div');
                     messageContainer.classList.add('message-container', 'sent');
                     messageContainer.setAttribute('data-message-id', 'temp-' + Date.now());
+                    messageContainer.setAttribute('data-pending', 'true');
                     
                     const messageMenu = document.createElement('div');
                     messageMenu.classList.add('message-menu');
@@ -1975,6 +2011,7 @@ function formatMessageTime($timestamp) {
                                 messageContainer.querySelectorAll('.edit-message, .delete-message').forEach(function(item) {
                                     item.setAttribute('data-message-id', data.message.id);
                                 });
+                                messageContainer.removeAttribute('data-pending');
                             }
                         } else {
                             console.error('Failed to send message');
@@ -2205,6 +2242,11 @@ function formatMessageTime($timestamp) {
                         console.error('Message ID not found', messageContainer);
                         return;
                     }
+
+                    if (isMessagePending(messageContainer, messageId)) {
+                        showChatToast('Message is still sending. Please wait a moment and try again.');
+                        return;
+                    }
                     
                     console.log('Editing message with ID:', messageId, 'Current text:', currentText);
                     
@@ -2367,12 +2409,17 @@ function formatMessageTime($timestamp) {
                     e.stopPropagation();
                     const messageContainer = e.target.closest('.message-container');
                     const messageId = e.target.closest('.delete-message').dataset.messageId || messageContainer.dataset.messageId;
-                    const messageContent = messageContainer.querySelector('.message').textContent;
                     
                     if (!messageId) {
                         console.error('Message ID not found', messageContainer);
                         return;
                     }
+
+                    if (isMessagePending(messageContainer, messageId)) {
+                        showChatToast('Message is still sending. Please wait a moment and try again.');
+                        return;
+                    }
+                    const messageContent = messageContainer.querySelector('.message').textContent;
                     
                     console.log('Preparing to delete message with ID:', messageId);
                     
@@ -2424,12 +2471,12 @@ function formatMessageTime($timestamp) {
                                     editedSpan.style.display = 'none';
                                 }
                             } else {
-                                alert(data.message || 'Failed to delete message');
+                                showChatToast(data.message || 'Failed to delete message');
                             }
                         })
                         .catch(error => {
                             console.error('Error deleting message:', error);
-                            alert('Failed to delete message: ' + error.message);
+                            showChatToast('Failed to delete message: ' + error.message);
                         });
                         
                         // Hide the modal

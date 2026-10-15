@@ -343,6 +343,7 @@ if (isset($_GET['notification_id'])) {
             position: relative;
             cursor: pointer;
             transition: all 0.2s ease;
+            overflow: hidden;
         }
         
         .notification-card:hover {
@@ -356,6 +357,18 @@ if (isset($_GET['notification_id'])) {
             line-height: 1.5;
             color: #333;
             margin-bottom: 10px;
+            overflow-wrap: break-word;
+        }
+
+        /* Single-line ellipsis preview for long warning reasons in the list.
+           The details modal shows the complete note, so the list only previews. */
+        .notif-reason-preview {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
         }
         
         .notification-time {
@@ -665,6 +678,9 @@ if (isset($_GET['notification_id'])) {
             padding: 20px;
             margin-bottom: 30px;
             border-radius: 4px;
+            max-height: 160px;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         .reason-header {
@@ -676,6 +692,9 @@ if (isset($_GET['notification_id'])) {
         .reason-text {
             line-height: 1.6;
             font-size: 1.1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
         
         .post-display {
@@ -908,7 +927,17 @@ if (isset($_GET['notification_id'])) {
                             $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
                             // Also hide any JSON data
                             $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
-                            echo htmlspecialchars($display_message); 
+                            // Split off a trailing "Reason: ..." into its own ellipsis-truncated
+                            // preview span. The full note is shown in the details modal.
+                            $reason_preview = '';
+                            if (preg_match('/^(.*?)Reason:\s*(.+)$/s', $display_message, $rm)) {
+                                $display_message = trim($rm[1]);
+                                $reason_preview = trim($rm[2]);
+                            }
+                            echo htmlspecialchars($display_message);
+                            if ($reason_preview !== '') {
+                                echo ' Reason: <span class="notif-reason-preview">' . htmlspecialchars($reason_preview) . '</span>';
+                            }
                             ?>
                             <a href="?notification_id=<?php echo $notification['id']; ?>" class="view-details-btn">
                                 <i class="bi bi-eye"></i> View Details

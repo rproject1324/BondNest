@@ -365,6 +365,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        if (password_verify($new_password, $userRow['password'])) {
+            echo json_encode(['success' => false, 'error' => 'Please enter a password different from your previous one.', 'field' => 'newPassword']);
+            exit;
+        }
+
         if ($new_password !== $confirm_password) {
             echo json_encode(['success' => false, 'error' => 'Passwords do not match.', 'field' => 'confirmPassword']);
             exit;
@@ -1168,6 +1173,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
         function validatePasswordRules() {
             const val = newPasswordInput ? newPasswordInput.value : '';
             const conf = confirmPasswordInput ? confirmPasswordInput.value : '';
+            const curr = document.getElementById('currentPassword') ? document.getElementById('currentPassword').value : '';
 
             setRule(ruleLength, val.length >= 8);
             setRule(ruleUpper, /[A-Z]/.test(val));
@@ -1175,10 +1181,25 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             setRule(ruleNumber, /[0-9]/.test(val));
             setRule(ruleSpecial, /[\W_]/.test(val));
             setRule(ruleMatch, val.length > 0 && val === conf);
+
+            // Live inline check (same as forgot-password flow): new password must
+            // differ from the current one. Shown as-you-type under New Password.
+            if (newPasswordInput) {
+                if (val.length > 0 && curr.length > 0 && val === curr) {
+                    showErrorInline(newPasswordInput, 'Please enter a password different from your previous one.');
+                } else {
+                    const reuseErr = document.getElementById('newPassword-error');
+                    if (reuseErr && reuseErr.textContent === 'Please enter a password different from your previous one.') {
+                        clearInlineError(newPasswordInput);
+                    }
+                }
+            }
         }
 
         if (newPasswordInput) newPasswordInput.addEventListener('input', validatePasswordRules);
         if (confirmPasswordInput) confirmPasswordInput.addEventListener('input', validatePasswordRules);
+        const currentPasswordInput = document.getElementById('currentPassword');
+        if (currentPasswordInput) currentPasswordInput.addEventListener('input', validatePasswordRules);
 
         // ── Personal Info Form Submission ──
         const personalInfoForm = document.getElementById('personalInfoForm');
@@ -1506,6 +1527,9 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                     hasError = true;
                 } else if (newPw.indexOf(' ') !== -1) {
                     showErrorInline(document.getElementById('newPassword'), 'Password cannot contain spaces.');
+                    hasError = true;
+                } else if (currentPw && newPw === currentPw) {
+                    showErrorInline(document.getElementById('newPassword'), 'Please enter a password different from your previous one.');
                     hasError = true;
                 }
                 if (!confirmPw) {

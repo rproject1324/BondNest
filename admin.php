@@ -180,9 +180,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($post_owner_id) {
-                    // Create notification
-                    $notification_message = "Your post has been placed on hold. Reason: " . substr($comment, 0, 100) .
-                                        (strlen($comment) > 100 ? "..." : "");
+                    // Create notification (store the FULL reason — the list
+                    // preview truncates with ellipsis via CSS, and the Hold
+                    // Details modal shows the complete note in a scroll box).
+                    $notification_message = "Your post has been placed on hold. Reason: " . $comment;
                     $notification_message .= buildPostSnapshotSuffix($hold_snapshot);
 
                     $notification_stmt = $pdo->prepare("INSERT INTO notifications

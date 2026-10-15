@@ -2259,7 +2259,7 @@ function formatMessageTime($timestamp) {
                     const editInput = document.createElement('textarea');
                     editInput.value = currentText; // Set the current text as the input value
                     editInput.classList.add('chat-input');
-                    editInput.style.width = '100%';
+                    editInput.style.width = 'min(420px, 70vw)';
                     editInput.style.height = '0px'; // Start with zero height
                     editInput.style.minHeight = '40px';
                     editInput.style.maxHeight = '200px'; // Add a maximum height but we'll try to avoid needing it
@@ -2317,6 +2317,9 @@ function formatMessageTime($timestamp) {
                     
                     // Auto-resize immediately after creating and appending
                     requestAnimationFrame(() => {
+                        // Sync the measuring clone to the real rendered width
+                        // (it was created while the input was still detached).
+                        clone.style.width = editInput.offsetWidth + 'px';
                         autoResizeTextarea();
                         // Focus and select all text after sizing is done
                         editInput.focus();

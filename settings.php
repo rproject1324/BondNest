@@ -621,8 +621,6 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                                 <option value="" disabled <?php echo empty($gender) ? 'selected' : ''; ?>>Select gender</option>
                                                 <option value="Male" <?php echo $gender === 'Male' ? 'selected' : ''; ?>>Male</option>
                                                 <option value="Female" <?php echo $gender === 'Female' ? 'selected' : ''; ?>>Female</option>
-                                                <option value="Non-binary" <?php echo $gender === 'Non-binary' ? 'selected' : ''; ?>>Non-binary</option>
-                                                <option value="Other" <?php echo $gender === 'Other' ? 'selected' : ''; ?>>Other</option>
                                                 <option value="Prefer not to say" <?php echo $gender === 'Prefer not to say' ? 'selected' : ''; ?>>Prefer not to say</option>
                                             </select>
                                         </div>

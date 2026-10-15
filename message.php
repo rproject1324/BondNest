@@ -409,6 +409,7 @@ function formatMessageTime($timestamp) {
         margin-bottom: 15px;
         max-width: 80%;
         width: fit-content;
+        min-width: 0;
         transition: all 0.3s ease;
         position: relative;
         gap: 4px;
@@ -434,8 +435,9 @@ function formatMessageTime($timestamp) {
     .message-content {
         display: flex;
         flex-direction: column;
-        flex: 0 0 auto;
+        flex: 0 1 auto;
         min-width: 0;
+        max-width: 100%;
         position: relative;
     }
 
@@ -465,6 +467,9 @@ function formatMessageTime($timestamp) {
         max-width: 100%;
         width: fit-content;
         word-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: normal;
         line-height: 1.4;
         position: relative;
     }

@@ -1969,6 +1969,12 @@ function formatMessageTime($timestamp) {
                         if (data.success) {
                             if (data.message && data.message.id) {
                                 lastReceivedMessageId = Math.max(lastReceivedMessageId, data.message.id);
+                                // Swap the optimistic temp ID for the real DB id so
+                                // edit/delete work immediately without a page refresh.
+                                messageContainer.setAttribute('data-message-id', data.message.id);
+                                messageContainer.querySelectorAll('.edit-message, .delete-message').forEach(function(item) {
+                                    item.setAttribute('data-message-id', data.message.id);
+                                });
                             }
                         } else {
                             console.error('Failed to send message');

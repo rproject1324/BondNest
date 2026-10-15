@@ -616,6 +616,9 @@ if (isset($_GET['notification_id'])) {
         .reason-text {
             line-height: 1.6;
             font-size: 1.1rem;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
         
         .post-display {

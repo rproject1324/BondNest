@@ -1,0 +1,245 @@
+/* ==========================================================================
+   BondNest - Edit Comment modal redesign (ID-scoped, loaded last)
+   Covers #editCommentModal on homepage.php & profile-page.php
+   ========================================================================== */
+
+#editCommentModal {
+    --ecm-teal: #0e8b7f;
+    --ecm-teal-dark: #0b6f66;
+    --ecm-teal-soft: #e7f5f2;
+    --ecm-text: #1f2d2d;
+    --ecm-muted: #7c848e;
+    --ecm-border: #e4eceb;
+    box-sizing: border-box !important;
+}
+
+#editCommentModal *,
+#editCommentModal *::before,
+#editCommentModal *::after {
+    box-sizing: border-box !important;
+}
+
+/* Card ------------------------------------------------------------------- */
+#editCommentModal .edit-post-modal-content {
+    position: relative !important;
+    z-index: 1001 !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    border: none !important;
+    border-top: 5px solid var(--ecm-teal) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-shadow: 0 24px 60px rgba(15, 45, 45, 0.22) !important;
+}
+
+/* Header ----------------------------------------------------------------- */
+#editCommentModal .ecm-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    padding: 22px 26px !important;
+    border-bottom: 1px solid var(--ecm-border) !important;
+    background: #ffffff !important;
+}
+
+#editCommentModal .ecm-header-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+}
+
+#editCommentModal .ecm-icon {
+    flex: 0 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: var(--ecm-teal-soft) !important;
+    color: var(--ecm-teal) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+}
+
+#editCommentModal .ecm-header-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+}
+
+#editCommentModal .ecm-header-text h2 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    line-height: 1.15 !important;
+    color: var(--ecm-text) !important;
+    font-family: inherit !important;
+}
+
+#editCommentModal .ecm-subtitle {
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--ecm-muted) !important;
+}
+
+#editCommentModal .ecm-close {
+    flex: 0 0 auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: #f1f4f7 !important;
+    color: #5a6672 !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+#editCommentModal .ecm-close:hover {
+    background: #e6ebef !important;
+    color: var(--ecm-text) !important;
+}
+
+/* Body ------------------------------------------------------------------- */
+#editCommentModal .edit-post-body {
+    padding: 22px 26px 24px !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+}
+
+#editCommentModal .ecm-label {
+    display: block !important;
+    margin: 0 0 10px 2px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--ecm-text) !important;
+}
+
+#editCommentModal .ecm-textarea-wrap {
+    position: relative !important;
+}
+
+#editCommentModal #editCommentContent,
+#editCommentModal .edit-post-body textarea {
+    display: block !important;
+    width: 100% !important;
+    min-height: 150px !important;
+    margin: 0 !important;
+    padding: 14px 16px 32px !important;
+    border: 1.5px solid var(--ecm-teal) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: var(--ecm-text) !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.08) !important;
+}
+
+#editCommentModal #editCommentContent:focus {
+    border-color: var(--ecm-teal) !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.16) !important;
+}
+
+#editCommentModal #editCommentContent::placeholder {
+    color: var(--ecm-muted) !important;
+    opacity: 0.75 !important;
+}
+
+#editCommentModal .ecm-counter {
+    position: absolute !important;
+    right: 16px !important;
+    bottom: 12px !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--ecm-muted) !important;
+    pointer-events: none !important;
+}
+
+/* Footer ----------------------------------------------------------------- */
+#editCommentModal .edit-post-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 18px 26px !important;
+    border-top: 1px solid var(--ecm-border) !important;
+    background: #ffffff !important;
+}
+
+#editCommentModal .edit-post-actions .cancel-button {
+    padding: 11px 24px !important;
+    border: 1px solid #dbe6e4 !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: var(--ecm-text) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+#editCommentModal .edit-post-actions .cancel-button:hover {
+    background: #f4f8f7 !important;
+}
+
+#editCommentModal .edit-post-actions .save-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 11px 24px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--ecm-teal) !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 16px rgba(14, 139, 127, 0.22) !important;
+    transition: background 0.2s ease !important;
+}
+
+#editCommentModal .edit-post-actions .save-button:hover {
+    background: var(--ecm-teal-dark) !important;
+}
+
+#editCommentModal .edit-post-actions .save-button::before {
+    content: '\2713';
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Mobile ----------------------------------------------------------------- */
+@media (max-width: 560px) {
+    #editCommentModal .edit-post-modal-content {
+        max-width: 100% !important;
+        border-radius: 16px !important;
+    }
+
+    #editCommentModal .ecm-header,
+    #editCommentModal .edit-post-body,
+    #editCommentModal .edit-post-actions {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+}

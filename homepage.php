@@ -1524,7 +1524,8 @@ if (menuTrigger) {
 </style>
   <link rel="stylesheet" href="create-post-modal.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="comments-modal.css?v=<?php echo time(); ?>">
-  <link rel="stylesheet" href="edit-post-modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="edit-post-modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="edit-comment-modal.css?v=<?php echo time(); ?>">
   </head>
 
 <body class="homepage">
@@ -1564,20 +1565,56 @@ if (menuTrigger) {
     <!-- Edit Comment Modal -->
     <div class="edit-post-modal" id="editCommentModal">
         <div class="modal-backdrop" style="position:fixed; top:0; left:0; width:100vw; height:100vh; cursor:pointer; z-index:1000;" onclick="document.getElementById('editCommentModal').style.display='none';"></div>
-        <div class="edit-post-modal-content" style="position:relative; z-index:1001;">
-            <div class="edit-post-header">
-                <h2>Edit Comment</h2>
-                <span class="edit-post-close" id="closeEditComment">&times;</span>
+        <div class="edit-post-modal-content">
+            <div class="ecm-header">
+                <div class="ecm-header-main">
+                    <span class="ecm-icon"><i class="bi bi-pencil-fill"></i></span>
+                    <div class="ecm-header-text">
+                        <h2>Edit Comment</h2>
+                        <p class="ecm-subtitle">Update what you wrote below</p>
+                    </div>
+                </div>
+                <button type="button" class="ecm-close" id="closeEditComment" aria-label="Close">&times;</button>
             </div>
             <div class="edit-post-body">
-                <textarea id="editCommentContent" placeholder="Edit your comment..."></textarea>
+                <label class="ecm-label" for="editCommentContent">Your comment</label>
+                <div class="ecm-textarea-wrap">
+                    <textarea id="editCommentContent" maxlength="500" placeholder="Edit your comment..."></textarea>
+                    <span class="ecm-counter" id="editCommentCounter">0 / 500</span>
+                </div>
             </div>
             <div class="edit-post-actions">
-                <button class="btn btn-secondary" id="cancelEditComment">Cancel</button>
-                <button class="btn btn-primary" id="saveEditComment">Save Changes</button>
+                <button class="btn btn-secondary cancel-button" id="cancelEditComment">Cancel</button>
+                <button class="btn btn-primary save-button" id="saveEditComment">Save Changes</button>
             </div>
         </div>
     </div>
+
+    <script>
+    (function () {
+        function setupEditCommentCounter() {
+            var ta = document.getElementById('editCommentContent');
+            var counter = document.getElementById('editCommentCounter');
+            var modal = document.getElementById('editCommentModal');
+            if (!ta || !counter) { return; }
+            var max = parseInt(ta.getAttribute('maxlength'), 10) || 500;
+            function update() {
+                var len = ta.value ? ta.value.length : 0;
+                counter.textContent = len + ' / ' + max;
+            }
+            ta.addEventListener('input', update);
+            if (modal) {
+                new MutationObserver(update).observe(modal, { attributes: true, attributeFilter: ['style'] });
+            }
+            update();
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupEditCommentCounter);
+        } else {
+            setupEditCommentCounter();
+        }
+    })();
+    </script>
 
     <!--------------------------------------------------------------MAIN ----------------------------------------------------->
     <main>

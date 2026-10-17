@@ -2999,9 +2999,15 @@ unset($_SESSION['form_data']);
 <div class="comment-modal" id="commentModal" style="display:none;">
     <div class="comment-modal-content">
         <div class="comment-header">
-            <div class="comment-header-left">
-                <h3>Comments</h3>
-                <span class="comment-count-badge" id="commentCountBadge">0</span>
+            <div class="comment-header-main">
+                <span class="comment-header-icon"><i class="bi bi-chat-fill"></i></span>
+                <div class="comment-header-text">
+                    <div class="comment-header-left">
+                        <h3>Comments</h3>
+                        <span class="comment-count-badge" id="commentCountBadge">0</span>
+                    </div>
+                    <p class="comment-subtitle">Join the conversation</p>
+                </div>
             </div>
             <button type="button" class="close-comment" id="closeCommentModal" aria-label="Close">&times;</button>
         </div>
@@ -3924,6 +3930,7 @@ function createCommentElement(comment) {
                 toggleBtn.textContent = expanded
                     ? `Hide ${comment.replies.length} replies`
                     : `View ${comment.replies.length} replies`;
+                toggleBtn.classList.toggle('expanded', expanded);
             };
             updateLabel();
             toggleBtn.addEventListener('click', () => {

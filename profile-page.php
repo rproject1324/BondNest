@@ -2395,6 +2395,7 @@ unset($_SESSION['form_data']);
   <link rel="stylesheet" href="comments-modal.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="edit-post-modal.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="edit-comment-modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="bio-details-modal.css?v=<?php echo time(); ?>">
   </head>
 <body class="profile-page">
 <?php include 'navbar.php'; ?>

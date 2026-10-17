@@ -1,0 +1,218 @@
+/* =====================================================================
+   BondNest - Bio Details modal redesign (ID-scoped, loaded last, !important)
+   Overrides the legacy .bio-details-* rules in profile-page.css.
+   ===================================================================== */
+
+#bioDetailsModal {
+    --bd-teal: #0e8b7f;
+    --bd-teal-dark: #0b6f66;
+    --bd-teal-soft: #e7f5f2;
+    --bd-text: #1f2d2d;
+    --bd-muted: #7c848e;
+    --bd-border: #e4eceb;
+}
+
+/* ---- Card ---- */
+#bioDetailsModal .bio-details-card {
+    background: #ffffff !important;
+    border: none !important;
+    border-top: 5px solid var(--bd-teal) !important;
+    border-radius: 18px !important;
+    max-width: 510px !important;
+    padding: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-shadow: 0 24px 60px rgba(15, 45, 45, 0.28) !important;
+}
+
+/* ---- Header (soft teal gradient) ---- */
+#bioDetailsModal .bio-details-header {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 24px 26px !important;
+    background: linear-gradient(120deg, #cfece7 0%, #e9f7f4 48%, #ffffff 100%) !important;
+    overflow: hidden !important;
+}
+
+#bioDetailsModal .bio-details-header::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -70px !important;
+    right: -50px !important;
+    width: 190px !important;
+    height: 190px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    pointer-events: none !important;
+}
+
+#bioDetailsModal .bio-details-avatar,
+#bioDetailsModal .bio-details-header .initials-avatar {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: 0 4px 14px rgba(15, 45, 45, 0.14) !important;
+    flex-shrink: 0 !important;
+}
+
+#bioDetailsModal .bio-details-identity {
+    position: relative !important;
+    z-index: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+}
+
+#bioDetailsModal .bio-details-identity h3 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    color: var(--bd-text) !important;
+    line-height: 1.2 !important;
+}
+
+#bioDetailsModal .bio-details-handle {
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+    color: var(--bd-muted) !important;
+}
+
+/* ---- Close button ---- */
+#bioDetailsModal .bio-details-close {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    background: #f1f4f7 !important;
+    color: #5a6672 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    z-index: 3 !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+#bioDetailsModal .bio-details-close:hover {
+    background: #e6ebef !important;
+    color: var(--bd-text) !important;
+}
+
+/* ---- Body ---- */
+#bioDetailsModal .bio-details-body {
+    padding: 22px 26px 26px !important;
+    font-size: 14px !important;
+    color: #4a5a5a !important;
+    line-height: 1.6 !important;
+}
+
+/* ---- Section headings (icon badge + label) ---- */
+#bioDetailsModal .bio-details-section {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 0 12px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--bd-text) !important;
+}
+
+#bioDetailsModal .bio-details-section:first-child {
+    margin-top: 0 !important;
+}
+
+#bioDetailsModal .bio-details-section i {
+    flex: 0 0 auto !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    background: var(--bd-teal-soft) !important;
+    color: var(--bd-teal) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 13px !important;
+    margin: 0 !important;
+}
+
+/* ---- Bio text box ---- */
+#bioDetailsModal .bio-details-bio {
+    margin: 0 0 22px !important;
+    padding: 14px 16px !important;
+    border: 1px solid var(--bd-border) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #5a6a6a !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+#bioDetailsModal .bio-details-bio .empty-info {
+    color: var(--bd-muted) !important;
+}
+
+/* ---- Details list card ---- */
+#bioDetailsModal .bio-details-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--bd-border) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+}
+
+#bioDetailsModal .bio-details-list li {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #eef2f1 !important;
+    font-size: 14px !important;
+    color: #4a5a5a !important;
+}
+
+#bioDetailsModal .bio-details-list li:last-child {
+    border-bottom: none !important;
+}
+
+#bioDetailsModal .bio-details-list li i {
+    flex: 0 0 auto !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background: var(--bd-teal-soft) !important;
+    color: var(--bd-teal) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 12px !important;
+    margin: 0 !important;
+    text-align: center !important;
+}
+
+#bioDetailsModal .bio-details-list a {
+    color: var(--bd-teal) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    word-break: break-all !important;
+}
+
+#bioDetailsModal .bio-details-list a:hover {
+    text-decoration: underline !important;
+}

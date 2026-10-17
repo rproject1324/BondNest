@@ -2396,6 +2396,7 @@ unset($_SESSION['form_data']);
     <link rel="stylesheet" href="edit-post-modal.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="edit-comment-modal.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="bio-details-modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="profile-activity-bio.css?v=<?php echo time(); ?>">
   </head>
 <body class="profile-page">
 <?php include 'navbar.php'; ?>
@@ -2601,7 +2602,7 @@ unset($_SESSION['form_data']);
     <div class="card-content">
         <ul class="info-list">
             <!-- Bio Section -->
-            <li class="info-item">
+            <li class="info-item bio-bio-item">
                 <i class="fas fa-align-left info-icon"></i>
                 <div class="info-text">
                     <?php if (!empty($user['bio'])): ?>
@@ -2638,7 +2639,7 @@ unset($_SESSION['form_data']);
             <li class="info-item">
                 <i class="fas fa-birthday-cake info-icon"></i>
                 <div class="info-text">
-                    Born on <?php echo date('F j, Y', strtotime($user['birthday'])); ?>
+                    <?php echo date('F j, Y', strtotime($user['birthday'])); ?>
                 </div>
             </li>
             
@@ -2646,7 +2647,7 @@ unset($_SESSION['form_data']);
                 <i class="fas fa-home info-icon"></i>
                 <div class="info-text">
                     <?php if (!empty($user['location'])): ?>
-                        Lives in <?php echo htmlspecialchars($user['location']); ?>
+                        <?php echo htmlspecialchars($user['location']); ?>
                     <?php else: ?>
                         <span class="empty-info">Add your location</span>
                     <?php endif; ?>
@@ -2657,7 +2658,7 @@ unset($_SESSION['form_data']);
                 <i class="fas fa-heart info-icon"></i>
                 <div class="info-text">
                     <?php if (!empty($user['interests'])): ?>
-                        Interested in <?php echo htmlspecialchars($user['interests']); ?>
+                        <?php echo htmlspecialchars($user['interests']); ?>
                     <?php else: ?>
                         <span class="empty-info">Add your interests</span>
                     <?php endif; ?>
@@ -2779,7 +2780,7 @@ unset($_SESSION['form_data']);
                 <!-- 2. Your Activity Container (Below Composer) -->
                 <div class="activity-feed">
                     <div class="activity-feed-header-card">
-                        <h2 class="feed-title">Your Activity</h2>
+                        <h2 class="feed-title">Your Activity <span class="activity-count"><?php echo count($posts); ?> <?php echo count($posts) === 1 ? 'post' : 'posts'; ?></span></h2>
                     </div>
 
                     <!-- Display user posts -->

@@ -1,0 +1,172 @@
+/* =====================================================================
+   BondNest - Profile page: "Bio" sidebar card + "Your Activity" header
+   Only these two areas are restyled. Everything else is left untouched.
+   Loaded last, !important overrides, scoped to #bioCard / .activity-feed-header-card
+   ===================================================================== */
+
+#bioCard {
+    --pb-teal: #0e8b7f;
+    --pb-teal-soft: #e7f5f2;
+    --pb-text: #1f2d2d;
+    --pb-muted: #8a97a0;
+    --pb-border: #eef2f2;
+}
+
+/* ---- Bio card header (accent bar + title) ---- */
+#bioCard .card-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 0 16px !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--pb-text) !important;
+}
+
+#bioCard .card-title i {
+    display: none !important;
+}
+
+#bioCard .card-title::before {
+    content: '' !important;
+    flex: 0 0 auto !important;
+    width: 4px !important;
+    height: 18px !important;
+    border-radius: 3px !important;
+    background: var(--pb-teal) !important;
+}
+
+/* ---- Bio preview text ---- */
+#bioCard .info-list {
+    margin-top: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+#bioCard .bio-bio-item {
+    display: block !important;
+    padding-bottom: 14px !important;
+    margin-bottom: 16px !important;
+    border-bottom: 1px solid var(--pb-border) !important;
+}
+
+#bioCard .bio-bio-item .info-icon {
+    display: none !important;
+}
+
+#bioCard .bio-bio-item .info-text {
+    font-size: 0.86rem !important;
+    font-weight: 400 !important;
+    line-height: 1.62 !important;
+    color: #6b7a7a !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+#bioCard .bio-bio-item .see-more-hint {
+    color: var(--pb-teal) !important;
+    font-weight: 600 !important;
+}
+
+/* ---- Detail rows (icon badge + label / value) ---- */
+#bioCard .info-list > li.info-item:not(.bio-bio-item) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+    padding: 0 !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item):last-child {
+    margin-bottom: 0 !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .info-icon {
+    flex: 0 0 auto !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    background: var(--pb-teal-soft) !important;
+    color: var(--pb-teal) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    font-size: 14px !important;
+    text-align: center !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .info-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: var(--pb-text) !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .info-text::before {
+    font-size: 0.72rem !important;
+    font-weight: 400 !important;
+    color: var(--pb-muted) !important;
+    letter-spacing: 0.01em !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(2) .info-text::before { content: 'Age' !important; }
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(3) .info-text::before { content: 'Gender' !important; }
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(4) .info-text::before { content: 'Birthday' !important; }
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(5) .info-text::before { content: 'Location' !important; }
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(6) .info-text::before { content: 'Interests' !important; }
+#bioCard .info-list > li.info-item:not(.bio-bio-item):nth-child(7) .info-text::before { content: 'Website' !important; }
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .info-text a {
+    color: var(--pb-teal) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    word-break: break-all !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .info-text a:hover {
+    text-decoration: underline !important;
+}
+
+#bioCard .info-list > li.info-item:not(.bio-bio-item) .empty-info {
+    color: var(--pb-muted) !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+}
+
+/* ---- "Your Activity" header ---- */
+.activity-feed-header-card .feed-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #1f2d2d !important;
+}
+
+.activity-feed-header-card .feed-title::before {
+    content: '' !important;
+    flex: 0 0 auto !important;
+    width: 4px !important;
+    height: 18px !important;
+    border-radius: 3px !important;
+    background: #0e8b7f !important;
+}
+
+.activity-feed-header-card .activity-count {
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    color: #0e8b7f !important;
+    background: #e7f5f2 !important;
+    border-radius: 999px !important;
+    padding: 3px 10px !important;
+    line-height: 1 !important;
+}

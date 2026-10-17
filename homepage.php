@@ -2011,7 +2011,9 @@ if (menuTrigger) {
             </div>
             <div class="edit-compose-right">
                 <span class="edit-field-label">Photo</span>
-                <img src="" class="edit-image-preview" id="editImagePreview" style="display:none;">
+                <div class="edit-image-preview-wrap">
+                    <img src="" class="edit-image-preview" id="editImagePreview" style="display:none;">
+                </div>
             </div>
         </div>
         <div class="edit-post-actions">

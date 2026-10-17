@@ -296,20 +296,38 @@
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) 340px !important;
     column-gap: 24px !important;
-    align-items: start !important;
+    align-items: stretch !important;
+}
+
+/* keep both columns bottom-aligned like the mock */
+#editPostModal.has-image .add-to-post {
+    margin-bottom: 0 !important;
 }
 
 #editPostModal.has-image .edit-compose-right {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
     padding-left: 24px !important;
     border-left: 1px solid var(--epm-border) !important;
 }
 
 /* ---- Photo preview (no `display` here so the JS can hide/show it) ---- */
+#editPostModal .edit-image-preview-wrap {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+}
+
 #editPostModal .edit-image-preview {
+    flex: 1 1 auto !important;
     width: 100% !important;
+    height: 100% !important;
     max-width: 100% !important;
-    max-height: 300px !important;
+    max-height: none !important;
+    min-height: 0 !important;
     object-fit: cover !important;
     border-radius: 14px !important;
     margin: 0 !important;
@@ -387,5 +405,14 @@
         padding-top: 16px !important;
         border-left: none !important;
         border-top: 1px solid var(--epm-border) !important;
+    }
+
+    #editPostModal .edit-image-preview-wrap {
+        flex: 0 0 auto !important;
+    }
+
+    #editPostModal .edit-image-preview {
+        height: auto !important;
+        max-height: 320px !important;
     }
 }

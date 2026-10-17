@@ -352,28 +352,45 @@
     align-items: stretch !important;
 }
 
+/* keep both columns bottom-aligned like the mock */
+#createPostModal.has-image .add-to-post {
+    margin-bottom: 0 !important;
+}
+
 #createPostModal.has-image .compose-right {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
     padding-left: 24px !important;
     border-left: 1px solid var(--cpm-border) !important;
 }
 
 /* ---- Attached photo preview ---- */
 #createPostModal .compose-right .image-preview-container {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
     margin: 0 !important;
 }
 
 #createPostModal .image-preview-wrapper {
     position: relative !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    min-height: 0 !important;
     margin: 0 !important;
+    width: 100% !important;
     max-width: 100% !important;
 }
 
 #createPostModal .image-preview {
     display: block !important;
+    flex: 1 1 auto !important;
     width: 100% !important;
+    height: 100% !important;
     max-width: 100% !important;
-    max-height: 300px !important;
+    max-height: none !important;
+    min-height: 0 !important;
     object-fit: cover !important;
     border-radius: 14px !important;
 }
@@ -429,5 +446,15 @@
         padding-top: 16px !important;
         border-left: none !important;
         border-top: 1px solid var(--cpm-border) !important;
+    }
+
+    #createPostModal .compose-right .image-preview-container,
+    #createPostModal .image-preview-wrapper {
+        flex: 0 0 auto !important;
+    }
+
+    #createPostModal .image-preview {
+        height: auto !important;
+        max-height: 320px !important;
     }
 }

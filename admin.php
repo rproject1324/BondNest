@@ -1968,39 +1968,12 @@ function formatDate($date) {
 
     <!-- Post Modal -->
     <div class="modal-overlay" id="postModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <span class="apm-head-icon"><i class="bi bi-eye"></i></span>
-                <div class="apm-head-text">
-                    <h2 class="modal-title">Post details</h2>
-                    <span class="apm-head-sub">Review this post and take an action</span>
-                </div>
-                <button class="close-modal" type="button" aria-label="Close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="post-header">
-                    <div class="post-avatar" id="modalAvatarContainer"></div>
-                    <div class="post-user-info">
-                        <h3 id="modalAuthor"></h3>
-                        <p>
-                            <span class="apm-username-pill">@<span id="modalUsername"></span></span>
-                            <span class="apm-date-pill" id="modalCreatedAt"></span>
-                        </p>
-                    </div>
-                    <span class="apm-status-pill posted" id="modalStatusPill">
-                        <span class="apm-dot"></span>
-                        <span id="modalStatusText">Pending review</span>
-                    </span>
-                </div>
-                
-                <div class="post-content" id="modalContent"></div>
-                
-                <div class="post-image-container" id="modalImageContainer" style="display: none;">
+        <div class="modal-container" id="postModalContainer">
+            <div class="apm-media" id="modalMediaPanel">
+                <div class="apm-media-img" id="modalImageContainer" style="display: none;">
                     <img src="" alt="Post image" class="post-image" id="modalImage">
                 </div>
-                
-                <div class="apm-engagement">
-                    <span class="apm-engagement-label">Engagement</span>
+                <div class="apm-media-actions" id="modalMediaActionsSlot">
                     <div class="post-actions" id="modalPostActions">
                         <div class="post-action like-button" id="modalLikeButton">
                             <i class="bi bi-heart" id="modalLikeIcon"></i>
@@ -2014,38 +1987,72 @@ function formatDate($date) {
                         </div>
                     </div>
                 </div>
-                
-                <div class="post-actions-section">
-                    <form class="action-form" id="postActionForm">
-                        <input type="hidden" id="actionPostId" name="post_id">
-                        
-                        <div class="form-group">
-                            <label for="actionComment">Comments / Reason for action</label>
-                            <textarea id="actionComment" name="comment" maxlength="500" placeholder="Enter your comments or reason for taking this action..."></textarea>
-                            <div class="apm-counter"><span id="actionCommentCount">0</span> / 500</div>
-                        </div>
-                        
-                    </form>
-                </div>
             </div>
-            <div class="apm-footer">
-                <div class="action-buttons">
-                    <button type="button" class="action-btn btn-delete" data-action="delete">
-                        <i class="bi bi-trash3"></i>
-                        Delete
-                    </button>
-                    <button type="button" class="action-btn btn-hold" data-action="hold">
-                        <i class="bi bi-pause"></i>
-                        Hold
-                    </button>
-                    <button type="button" class="action-btn btn-warn" data-action="warn">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Send warning
-                    </button>
-                    <button type="button" class="action-btn btn-approve" data-action="approve">
+
+            <div class="apm-detail">
+                <div class="modal-header">
+                    <span class="apm-head-icon"><i class="bi bi-eye"></i></span>
+                    <div class="apm-head-text">
+                        <h2 class="modal-title">Post details</h2>
+                        <span class="apm-head-sub">Review this post and take an action</span>
+                    </div>
+                    <button class="close-modal" type="button" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="post-header">
+                        <div class="post-avatar" id="modalAvatarContainer"></div>
+                        <div class="post-user-info">
+                            <h3 id="modalAuthor"></h3>
+                            <p>
+                                <span class="apm-username-pill">@<span id="modalUsername"></span></span>
+                                <span class="apm-date-pill" id="modalCreatedAt"></span>
+                            </p>
+                        </div>
+                        <span class="apm-status-pill posted" id="modalStatusPill">
+                            <span class="apm-dot"></span>
+                            <span id="modalStatusText">Pending</span>
+                        </span>
+                    </div>
+
+                    <div class="post-content" id="modalContent"></div>
+
+                    <div class="apm-body-engagement" id="modalBodyEngagement" style="display: none;">
+                        <span class="apm-engagement-label">Engagement</span>
+                        <div class="apm-body-actions-slot" id="modalBodyActionsSlot"></div>
+                    </div>
+
+                    <div class="post-actions-section">
+                        <form class="action-form" id="postActionForm">
+                            <input type="hidden" id="actionPostId" name="post_id">
+
+                            <div class="form-group">
+                                <label for="actionComment">Comments / Reason for action</label>
+                                <textarea id="actionComment" name="comment" maxlength="500" placeholder="Enter your comments or reason for taking this action..."></textarea>
+                                <div class="apm-counter"><span id="actionCommentCount">0</span> / 500</div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <div class="apm-footer">
+                    <button type="button" class="action-btn btn-approve apm-approve-full" id="approvePostBtn" data-action="approve">
                         <i class="bi bi-check-lg"></i>
-                        Approve
+                        Approve post
                     </button>
+                    <div class="action-buttons">
+                        <button type="button" class="action-btn btn-hold" data-action="hold">
+                            <i class="bi bi-pause"></i>
+                            Hold
+                        </button>
+                        <button type="button" class="action-btn btn-warn" data-action="warn">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Send warning
+                        </button>
+                        <button type="button" class="action-btn btn-delete" data-action="delete">
+                            <i class="bi bi-trash3"></i>
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3179,6 +3186,8 @@ function formatDate($date) {
                          modalImageContainer.style.display = 'none';
                      }
                  }
+                 if (typeof window.applyModalMediaLayout === 'function') window.applyModalMediaLayout(!!post.image_path);
+                 if (typeof window.applyModalStatus === 'function') window.applyModalStatus(post);
                  
                  // Update like and comment counts
                  const modalLikeCount = document.getElementById('modalLikeCount');

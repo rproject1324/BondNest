@@ -1,18 +1,70 @@
-/* Admin "Post details" modal redesign.
+/* Admin "Post details" modal — two-column redesign.
    Scoped to #postModal and loaded after the inline admin styles so it wins. */
 
 #postModal .modal-container {
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
     width: 100% !important;
-    max-width: 660px !important;
+    max-width: 960px !important;
     max-height: 92vh !important;
     padding: 0 !important;
     overflow: hidden !important;
-    border-radius: 16px !important;
+    border-radius: 18px !important;
     background: #ffffff !important;
     border: 1px solid #e4eceb !important;
     box-shadow: 0 24px 60px rgba(16, 42, 42, 0.20) !important;
+}
+
+/* ---------- Left: media panel ---------- */
+#postModal .apm-media {
+    width: 46% !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    border-right: 1px solid #eef2f1 !important;
+    box-sizing: border-box !important;
+}
+
+#postModal .modal-container.no-image .apm-media {
+    display: none !important;
+}
+
+#postModal .apm-media-img {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
+#postModal .post-image {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 14px !important;
+    object-fit: contain !important;
+    box-shadow: 0 10px 26px rgba(16, 42, 42, 0.16) !important;
+}
+
+#postModal .apm-media-actions {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* ---------- Right: detail column ---------- */
+#postModal .apm-detail {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 /* ---------- Header ---------- */
@@ -22,39 +74,39 @@
     align-items: center !important;
     justify-content: flex-start !important;
     gap: 14px !important;
-    padding: 20px 22px !important;
+    padding: 20px 24px !important;
     background: #ffffff !important;
     border-bottom: 1px solid #eef2f1 !important;
     flex-shrink: 0 !important;
 }
 
 #postModal .apm-head-icon {
-    width: 44px !important;
-    height: 44px !important;
+    width: 46px !important;
+    height: 46px !important;
     border-radius: 50% !important;
     background: #e7f5f2 !important;
     color: #0e8b7f !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 21px !important;
+    font-size: 22px !important;
     flex-shrink: 0 !important;
 }
 
 #postModal .apm-head-text {
     display: flex !important;
     flex-direction: column !important;
-    gap: 2px !important;
+    gap: 3px !important;
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 #postModal .modal-title {
     font-size: 20px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #1f2d2d !important;
     margin: 0 !important;
-    line-height: 1.25 !important;
+    line-height: 1.2 !important;
 }
 
 #postModal .apm-head-sub {
@@ -67,8 +119,8 @@
 #postModal .close-modal {
     position: static !important;
     margin-left: auto !important;
-    width: 34px !important;
-    height: 34px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50% !important;
     background: #f1f3f5 !important;
     color: #5b6b6b !important;
@@ -88,7 +140,7 @@
 
 /* ---------- Body ---------- */
 #postModal .modal-body {
-    padding: 22px !important;
+    padding: 22px 24px !important;
     overflow-y: auto !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
@@ -98,13 +150,13 @@
 #postModal .post-header {
     display: flex !important;
     align-items: center !important;
-    gap: 14px !important;
+    gap: 13px !important;
     margin: 0 0 16px !important;
 }
 
 #postModal .post-avatar {
-    width: 52px !important;
-    height: 52px !important;
+    width: 48px !important;
+    height: 48px !important;
     border-radius: 50% !important;
     border: none !important;
     overflow: hidden !important;
@@ -159,6 +211,7 @@
     font-size: 12.5px !important;
     font-weight: 400 !important;
     line-height: 1 !important;
+    white-space: nowrap !important;
 }
 
 #postModal .apm-status-pill {
@@ -196,52 +249,36 @@
     border-color: #f8d3d3 !important;
 }
 
-/* ---------- Content ---------- */
+/* ---------- Content box ---------- */
 #postModal .post-content {
     margin: 0 0 16px !important;
+    padding: 13px 16px !important;
+    border-radius: 12px !important;
+    background: #f4f6f7 !important;
     font-size: 15px !important;
-    line-height: 1.55 !important;
-    color: #1f2d2d !important;
+    line-height: 1.5 !important;
+    color: #3a4a4a !important;
     word-break: break-word !important;
 }
 
-/* ---------- Image ---------- */
-#postModal .post-image-container {
-    margin: 0 0 16px !important;
-    padding: 24px !important;
-    border-radius: 14px !important;
-    background: #f4f6f7 !important;
-    text-align: center !important;
-    overflow: hidden !important;
+#postModal .post-content:empty {
+    display: none !important;
 }
 
-#postModal .post-image {
-    display: inline-block !important;
-    width: auto !important;
-    height: auto !important;
-    max-width: 100% !important;
-    max-height: 340px !important;
-    border-radius: 10px !important;
-    object-fit: contain !important;
-    vertical-align: middle !important;
-    box-shadow: 0 8px 20px rgba(16, 42, 42, 0.14) !important;
-}
-
-/* ---------- Engagement row ---------- */
-#postModal .apm-engagement {
-    display: flex !important;
+/* ---------- Engagement (shown in body only when there is no image) ---------- */
+#postModal .apm-body-engagement {
+    display: none !important;
     align-items: center !important;
-    justify-content: space-between !important;
     gap: 12px !important;
-    margin: 0 0 20px !important;
-    padding: 10px 14px !important;
-    border: 1px solid #e4eceb !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
+    margin: 0 0 16px !important;
+}
+
+#postModal .modal-container.no-image .apm-body-engagement {
+    display: flex !important;
 }
 
 #postModal .apm-engagement-label {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     font-weight: 500 !important;
     color: #7c848e !important;
 }
@@ -249,50 +286,54 @@
 #postModal #modalPostActions {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
+    background: transparent !important;
 }
 
 #postModal #modalPostActions .post-action {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 6px 12px !important;
+    gap: 7px !important;
+    padding: 8px 14px !important;
     border-radius: 999px !important;
-    background: #e7f5f2 !important;
-    color: #0e8b7f !important;
+    border: 1px solid #e4eceb !important;
+    background: #ffffff !important;
+    color: #3a4a4a !important;
     font-size: 13px !important;
     font-weight: 500 !important;
     line-height: 1 !important;
     cursor: pointer !important;
-    transition: background 0.18s ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease !important;
 }
 
 #postModal #modalPostActions .post-action:hover {
-    background: #d9efe9 !important;
+    background: #f7f9f9 !important;
+    border-color: #d5e0de !important;
 }
 
 #postModal #modalPostActions .post-action i {
     font-size: 15px !important;
-    color: #0e8b7f !important;
+    color: #6b7a7a !important;
 }
 
 #postModal #modalPostActions .post-action span {
-    color: #0e8b7f !important;
+    color: #3a4a4a !important;
 }
 
 #postModal #modalLikeCount,
 #postModal #modalCommentCount {
-    margin: 0 0 0 2px !important;
-    color: #0e8b7f !important;
-    font-size: 12.5px !important;
+    margin: 0 0 0 1px !important;
+    color: #6b7a7a !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
 }
 
 #postModal #modalPostActions #modalLikeIcon.bi-heart-fill,
-#postModal #modalPostActions #modalLikeButton[data-liked="true"],
+#postModal #modalPostActions #modalLikeButton[data-liked="true"] #modalLikeIcon,
 #postModal #modalPostActions #modalLikeButton[data-liked="true"] span,
 #postModal #modalPostActions #modalLikeButton[data-liked="true"] .like-count {
     color: #e63946 !important;
@@ -313,25 +354,26 @@
 
 #postModal .form-group label {
     display: block !important;
-    margin: 0 0 8px !important;
+    margin: 0 0 9px !important;
     font-size: 14px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     color: #1f2d2d !important;
 }
 
 #postModal .form-group textarea {
     width: 100% !important;
-    min-height: 120px !important;
+    min-height: 118px !important;
     padding: 14px 16px !important;
-    border: 1.5px solid #0e8b7f !important;
+    border: 1px solid #e2e8e8 !important;
     border-radius: 12px !important;
-    background: #ffffff !important;
+    background: #f7f9f9 !important;
     color: #1f2d2d !important;
     font-family: inherit !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
     resize: vertical !important;
-    box-shadow: 0 0 0 4px rgba(14, 139, 127, 0.07) !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
 }
 
 #postModal .form-group textarea::placeholder {
@@ -341,7 +383,8 @@
 #postModal .form-group textarea:focus {
     outline: none !important;
     border-color: #0e8b7f !important;
-    box-shadow: 0 0 0 4px rgba(14, 139, 127, 0.15) !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(14, 139, 127, 0.12) !important;
 }
 
 #postModal .apm-counter {
@@ -354,18 +397,12 @@
 /* ---------- Footer ---------- */
 #postModal .apm-footer {
     flex-shrink: 0 !important;
-    padding: 16px 22px !important;
+    padding: 18px 24px !important;
     background: #ffffff !important;
     border-top: 1px solid #eef2f1 !important;
-}
-
-#postModal .action-buttons {
     display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 10px !important;
-    width: 100% !important;
-    flex-wrap: nowrap !important;
+    flex-direction: column !important;
+    gap: 12px !important;
 }
 
 #postModal .action-btn {
@@ -374,14 +411,14 @@
     justify-content: center !important;
     gap: 8px !important;
     padding: 10px 18px !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     border: 1px solid transparent !important;
     background: #ffffff !important;
     font-size: 14px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
-    transition: background 0.18s ease, border-color 0.18s ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease, opacity 0.18s ease !important;
 }
 
 #postModal .action-btn i {
@@ -389,12 +426,14 @@
 }
 
 #postModal .action-btn:disabled {
-    opacity: 0.65 !important;
+    opacity: 0.55 !important;
     cursor: not-allowed !important;
 }
 
-#postModal .action-btn[data-action="delete"] {
-    margin-right: auto !important;
+#postModal .apm-approve-full {
+    width: 100% !important;
+    height: 48px !important;
+    font-size: 15px !important;
 }
 
 #postModal .btn-approve {
@@ -407,23 +446,35 @@
     color: #ffffff !important;
 }
 
-#postModal .btn-approve:hover {
+#postModal .btn-approve:hover:not(:disabled) {
     background: #0b6f66 !important;
     border-color: #0b6f66 !important;
 }
 
+#postModal .action-buttons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+}
+
+#postModal .action-buttons .action-btn {
+    flex: 1 1 0 !important;
+    height: 44px !important;
+}
+
 #postModal .btn-hold {
-    background: #fdf3e0 !important;
+    background: #fdf1d6 !important;
     color: #b9791a !important;
-    border-color: #f6e3bf !important;
+    border-color: #fdf1d6 !important;
 }
 
 #postModal .btn-hold i {
     color: #b9791a !important;
 }
 
-#postModal .btn-hold:hover {
-    background: #fbeac9 !important;
+#postModal .btn-hold:hover:not(:disabled) {
+    background: #fbeac2 !important;
 }
 
 #postModal .btn-warn {
@@ -436,7 +487,7 @@
     color: #e08a1a !important;
 }
 
-#postModal .btn-warn:hover {
+#postModal .btn-warn:hover:not(:disabled) {
     background: #fdf6ea !important;
 }
 
@@ -450,12 +501,27 @@
     color: #d64545 !important;
 }
 
-#postModal .btn-delete:hover {
+#postModal .btn-delete:hover:not(:disabled) {
     background: #fdecec !important;
     border-color: #eeb9b9 !important;
 }
 
 /* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+    #postModal .modal-container {
+        flex-direction: column !important;
+        max-height: 94vh !important;
+    }
+
+    #postModal .apm-media {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid #eef2f1 !important;
+        padding: 18px !important;
+        max-height: 42vh !important;
+    }
+}
+
 @media (max-width: 520px) {
     #postModal .modal-header {
         padding: 16px !important;
@@ -470,11 +536,10 @@
     }
 
     #postModal .action-buttons {
-        flex-wrap: wrap !important;
-        justify-content: center !important;
+        flex-direction: column !important;
     }
 
-    #postModal .action-btn[data-action="delete"] {
-        margin-right: 0 !important;
+    #postModal .action-buttons .action-btn {
+        width: 100% !important;
     }
 }

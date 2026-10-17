@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Store all posts data
     let currentPosts = []; // Will be populated on page load
 
+    // The post currently shown in the details modal
+    let modalCurrentPost = null;
+
     // Initial load of posts data
     loadPostsData();
     
@@ -276,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         modalAuthor.textContent = `${post.first_name || ''} ${post.last_name || ''}`.trim();
         modalUsername.textContent = post.username || '';
-        modalCreatedAt.textContent = formatDate(post.created_at);
+        modalCreatedAt.textContent = formatDate(post.created_at).replace(', ', ' \u00b7 ');
         modalContent.textContent = post.content || '';
         actionPostId.value = post.id;
         
@@ -316,27 +319,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Handle image
+        // Handle image + media panel layout
+        modalCurrentPost = post;
         if (post.image_path) {
-            modalImageContainer.style.display = 'block';
+            modalImageContainer.style.display = 'flex';
             modalImage.src = post.image_path;
         } else {
             modalImageContainer.style.display = 'none';
         }
+        applyModalMediaLayout(!!post.image_path);
         
         // Status pill
-        const modalStatusPill = document.getElementById('modalStatusPill');
-        const modalStatusText = document.getElementById('modalStatusText');
-        if (modalStatusPill && modalStatusText) {
-            const st = (post.status || 'posted').toString().toLowerCase();
-            let statusLabel = 'Pending review';
-            let statusClass = 'posted';
-            if (st === 'approved') { statusLabel = 'Approved'; statusClass = 'approved'; }
-            else if (st === 'on-hold') { statusLabel = 'On hold'; statusClass = 'on-hold'; }
-            else if (st === 'warned') { statusLabel = 'Warned'; statusClass = 'warned'; }
-            modalStatusPill.className = 'apm-status-pill ' + statusClass;
-            modalStatusText.textContent = statusLabel;
-        }
+        applyModalStatus(post);
         
         // Reset the reason field and its character counter
         const actionCommentField = document.getElementById('actionComment');
@@ -359,6 +353,50 @@ document.addEventListener('DOMContentLoaded', function() {
         // Record view action
         recordAction('view', post.id);
     }
+
+    // Move the engagement pills + toggle the media panel depending on image presence
+    function applyModalMediaLayout(hasImage) {
+        const container = document.getElementById('postModalContainer');
+        const mediaSlot = document.getElementById('modalMediaActionsSlot');
+        const bodySlot = document.getElementById('modalBodyActionsSlot');
+        const actionsEl = document.getElementById('modalPostActions');
+        if (!container || !actionsEl) return;
+
+        if (hasImage) {
+            container.classList.remove('no-image');
+            if (mediaSlot && actionsEl.parentNode !== mediaSlot) mediaSlot.appendChild(actionsEl);
+        } else {
+            container.classList.add('no-image');
+            if (bodySlot && actionsEl.parentNode !== bodySlot) bodySlot.appendChild(actionsEl);
+        }
+    }
+
+    // Update the status badge and the approve button availability
+    function applyModalStatus(post) {
+        const pill = document.getElementById('modalStatusPill');
+        const text = document.getElementById('modalStatusText');
+        const approveBtn = document.getElementById('approvePostBtn');
+        const st = (post && post.status ? post.status : 'posted').toString().toLowerCase();
+
+        let label = 'Pending';
+        let cls = 'posted';
+        if (st === 'approved') { label = 'Approved'; cls = 'approved'; }
+        else if (st === 'on-hold') { label = 'On hold'; cls = 'on-hold'; }
+        else if (st === 'warned') { label = 'Warned'; cls = 'warned'; }
+
+        if (pill) pill.className = 'apm-status-pill ' + cls;
+        if (text) text.textContent = label;
+
+        if (approveBtn) {
+            const alreadyApproved = (st === 'approved');
+            approveBtn.disabled = alreadyApproved;
+            approveBtn.title = alreadyApproved ? 'This post has already been approved' : '';
+        }
+    }
+
+    // Expose for the inline dashboard scripts
+    window.applyModalMediaLayout = applyModalMediaLayout;
+    window.applyModalStatus = applyModalStatus;
     
     // Close modal
     if (closeModal) {
@@ -532,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
             buttons.forEach(btn => {
                 btn.disabled = false;
                 if (btn.dataset.action === 'approve') {
-                    btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve`;
+                    btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve post`;
                 } else if (btn.dataset.action === 'warn') {
                     btn.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Send warning`;
                 } else if (btn.dataset.action === 'delete') {
@@ -541,6 +579,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     btn.innerHTML = `<i class="bi bi-pause"></i> Hold`;
                 }
             });
+
+            // Keep the approve button disabled if the post is already approved
+            if (modalCurrentPost) applyModalStatus(modalCurrentPost);
         });
     }
     

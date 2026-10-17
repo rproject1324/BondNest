@@ -2393,6 +2393,7 @@ unset($_SESSION['form_data']);
     </style>
   <link rel="stylesheet" href="create-post-modal.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="comments-modal.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="edit-post-modal.css?v=<?php echo time(); ?>">
   </head>
 <body class="profile-page">
 <?php include 'navbar.php'; ?>
@@ -3067,28 +3068,50 @@ unset($_SESSION['form_data']);
 
 <!-- Edit Post Modal -->
 <div class="edit-post-modal" id="editPostModal" style="display:none;">
-    <div class="edit-post-modal-content" style="position:relative; z-index:1001; background:white; border-radius:10px; max-width:600px; width:90%; max-height:80vh; overflow:hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+    <div class="edit-post-modal-content" style="position:relative; z-index:1001;">
         <div class="edit-post-header">
-            <h2>Edit Post</h2>
-            <span class="edit-post-close" id="closeEditPost">&times;</span>
+            <div class="edit-post-header-text">
+                <h2>Edit post</h2>
+                <p class="edit-post-subtitle">Update your caption or photo</p>
+            </div>
+            <button type="button" class="edit-post-close" id="closeEditPost" aria-label="Close">&times;</button>
         </div>
         <div class="edit-post-body">
-            <textarea id="editPostContent" placeholder="Edit your post..."></textarea>
-            <img src="" class="edit-image-preview" id="editImagePreview" style="display:none; max-width:100%; max-height:200px; border-radius:8px; margin-top:10px;">
-            <div class="add-to-post">
-                <span>Change image</span>
-                <div class="icons">
-                    <label for="editPostImage" style="cursor: pointer;">
-                        <i class="bi bi-image" style="color: lightgreen;"></i>
-                    </label>
-                    <input type="file" id="editPostImage" name="editPostImage" accept="image/*" style="display: none;">
-                    <button class="btn btn-danger" id="removePostImage" style="display:none;">Remove Image</button>
+            <div class="edit-compose-left">
+                <div class="user-info">
+                    <div class="profile-picture">
+                        <?php if (!empty($user['profile_picture'])): ?>
+                            <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Profile Picture">
+                        <?php else: ?>
+                            <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 48); ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+                        <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
+                    </div>
                 </div>
+                <span class="edit-field-label">Caption</span>
+                <textarea id="editPostContent" placeholder="Edit your post..."></textarea>
+                <div class="add-to-post">
+                    <span class="add-to-post-label">Photo options</span>
+                    <div class="icons">
+                        <label for="editPostImage" class="icon-pill media-pill">
+                            <i class="bi bi-image"></i> Change image
+                        </label>
+                        <input type="file" id="editPostImage" name="editPostImage" accept="image/*" style="display: none;">
+                        <button type="button" class="remove-pill" id="removePostImage" style="display:none;">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="edit-compose-right">
+                <span class="edit-field-label">Photo</span>
+                <img src="" class="edit-image-preview" id="editImagePreview" style="display:none;">
             </div>
         </div>
         <div class="edit-post-actions">
-            <button class="btn btn-secondary" id="cancelEditPost">Cancel</button>
-            <button class="btn btn-primary" id="saveEditPost">Save Changes</button>
+            <button class="btn btn-secondary cancel-button" id="cancelEditPost">Cancel</button>
+            <button class="btn btn-primary post-button" id="saveEditPost">Save Changes</button>
         </div>
     </div>
 </div>
@@ -3413,6 +3436,26 @@ document.addEventListener('click', async function(e) {
         }
     }
 });
+
+// Toggle the two-column layout based on whether a photo is showing
+(function () {
+    const initEditPostLayout = () => {
+        const preview = document.getElementById('editImagePreview');
+        const modal = document.getElementById('editPostModal');
+        if (!preview || !modal) return;
+        const sync = () => {
+            const hasImage = !!preview.getAttribute('src') && preview.style.display !== 'none';
+            modal.classList.toggle('has-image', hasImage);
+        };
+        sync();
+        new MutationObserver(sync).observe(preview, { attributes: true, attributeFilter: ['src', 'style'] });
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initEditPostLayout);
+    } else {
+        initEditPostLayout();
+    }
+})();
 
 document.getElementById('closeEditPost').addEventListener('click', function() {
     document.getElementById('editPostModal').style.display = 'none';

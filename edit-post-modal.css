@@ -1,0 +1,391 @@
+/* =====================================================================
+   BondNest - redesigned "Edit post" modal
+   Scoped to #editPostModal so it cleanly overrides the legacy
+   .edit-post-* rules on both homepage.php and profile-page.php.
+   Matches the redesigned Create post modal (tinted header, two-column
+   layout with the attached photo on the right).
+   ===================================================================== */
+
+#editPostModal {
+    --epm-teal: #0e8b7f;
+    --epm-teal-dark: #0b6f66;
+    --epm-teal-soft: #e7f5f2;
+    --epm-text: #1f2d2d;
+    --epm-muted: #7c848e;
+    --epm-label: #5b6b6b;
+    --epm-border: #e4eceb;
+    --epm-placeholder: #9aa6ad;
+    --epm-danger: #e5484d;
+    --epm-danger-soft: #fdecec;
+}
+
+/* ---- Card ---- */
+#editPostModal .edit-post-modal-content {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    max-height: 90vh !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-shadow: 0 20px 50px rgba(15, 45, 45, 0.18) !important;
+}
+
+/* ---- Header (soft teal tint) ---- */
+#editPostModal .edit-post-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    padding: 24px 26px !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    background: linear-gradient(135deg, #e8f6f3 0%, #f4fbf9 55%, #eaf7f4 100%) !important;
+}
+
+#editPostModal .edit-post-header-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+#editPostModal .edit-post-header h2 {
+    margin: 0 !important;
+    font-size: 26px !important;
+    font-weight: 500 !important;
+    color: var(--epm-text) !important;
+    line-height: 1.2 !important;
+}
+
+#editPostModal .edit-post-subtitle {
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--epm-muted) !important;
+    line-height: 1.3 !important;
+}
+
+/* ---- Circular close button ---- */
+#editPostModal .edit-post-close {
+    flex-shrink: 0 !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    color: #3a4a4a !important;
+    border: 1px solid #e2ecea !important;
+    border-radius: 50% !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(15, 45, 45, 0.06) !important;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+}
+
+#editPostModal .edit-post-close:hover {
+    background: #f0f6f5 !important;
+    color: var(--epm-teal) !important;
+    transform: scale(1.05) !important;
+}
+
+/* ---- Body ---- */
+#editPostModal .edit-post-body {
+    padding: 22px 26px 20px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+#editPostModal .edit-compose-left {
+    min-width: 0 !important;
+}
+
+#editPostModal .edit-compose-right {
+    display: none !important;
+}
+
+/* ---- User row ---- */
+#editPostModal .user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 0 18px 0 !important;
+}
+
+#editPostModal .user-info .profile-picture {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+#editPostModal .user-info .profile-picture img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+#editPostModal .user-info .profile-picture .initials-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    font-size: 16px !important;
+}
+
+#editPostModal .user-details {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+}
+
+#editPostModal .user-info .user-details .user-name {
+    display: block !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    color: var(--epm-text) !important;
+    line-height: 1.2 !important;
+}
+
+#editPostModal .privacy-chip {
+    align-self: flex-start !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 12px !important;
+    border-radius: 999px !important;
+    background: var(--epm-teal-soft) !important;
+    color: var(--epm-teal) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+}
+
+#editPostModal .privacy-chip i {
+    font-size: 13px !important;
+    color: var(--epm-teal) !important;
+}
+
+/* ---- Field labels (CAPTION / PHOTO) ---- */
+#editPostModal .edit-field-label {
+    display: block !important;
+    margin: 0 0 10px 2px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--epm-muted) !important;
+}
+
+/* ---- Caption textarea ---- */
+#editPostModal .edit-post-body textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 150px !important;
+    padding: 16px 18px !important;
+    margin: 0 0 18px 0 !important;
+    border: 1px solid var(--epm-border) !important;
+    border-radius: 16px !important;
+    background: #fbfdfd !important;
+    color: var(--epm-text) !important;
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    outline: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+#editPostModal .edit-post-body textarea::placeholder {
+    color: var(--epm-placeholder) !important;
+}
+
+#editPostModal .edit-post-body textarea:focus {
+    border-color: var(--epm-teal) !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.12) !important;
+}
+
+/* ---- Photo options row ---- */
+#editPostModal .add-to-post {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 0 16px 0 !important;
+    border: 1px solid var(--epm-border) !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+}
+
+#editPostModal .add-to-post .add-to-post-label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--epm-label) !important;
+}
+
+#editPostModal .add-to-post .icons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+#editPostModal .icon-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--epm-teal-soft) !important;
+    color: var(--epm-teal) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+#editPostModal .add-to-post .icons .icon-pill i {
+    font-size: 15px !important;
+    color: var(--epm-teal) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#editPostModal .icon-pill.media-pill:hover {
+    background: #d5ece8 !important;
+}
+
+/* Remove pill - red. NB: no `display` here so the JS can hide/show it. */
+#editPostModal .remove-pill {
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--epm-danger-soft) !important;
+    color: var(--epm-danger) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+#editPostModal .remove-pill:hover {
+    background: #fbdcdc !important;
+}
+
+/* ---- Expanded two-column state (photo attached) ---- */
+#editPostModal.has-image .edit-post-modal-content {
+    max-width: 900px !important;
+}
+
+#editPostModal.has-image .edit-post-body {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 340px !important;
+    column-gap: 24px !important;
+    align-items: start !important;
+}
+
+#editPostModal.has-image .edit-compose-right {
+    display: block !important;
+    padding-left: 24px !important;
+    border-left: 1px solid var(--epm-border) !important;
+}
+
+/* ---- Photo preview (no `display` here so the JS can hide/show it) ---- */
+#editPostModal .edit-image-preview {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 300px !important;
+    object-fit: cover !important;
+    border-radius: 14px !important;
+    margin: 0 !important;
+}
+
+/* ---- Footer ---- */
+#editPostModal .edit-post-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 18px 26px !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--epm-border) !important;
+    border-radius: 0 0 20px 20px !important;
+    background: #ffffff !important;
+}
+
+#editPostModal .edit-post-actions .cancel-button {
+    padding: 11px 24px !important;
+    border: 1px solid #dbe6e4 !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: var(--epm-label) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+#editPostModal .edit-post-actions .cancel-button:hover {
+    background: #f4f8f7 !important;
+    border-color: #c9dad7 !important;
+}
+
+#editPostModal .edit-post-actions .post-button {
+    width: auto !important;
+    padding: 11px 30px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--epm-teal) !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 16px rgba(14, 139, 127, 0.22) !important;
+    transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+#editPostModal .edit-post-actions .post-button:hover {
+    background: var(--epm-teal-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px rgba(14, 139, 127, 0.28) !important;
+    opacity: 1 !important;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 760px) {
+    #editPostModal .edit-post-header { padding: 18px !important; }
+    #editPostModal .edit-post-body { padding: 18px !important; }
+    #editPostModal .edit-post-actions { padding: 14px 18px !important; }
+    #editPostModal .edit-post-header h2 { font-size: 22px !important; }
+
+    #editPostModal.has-image .edit-post-modal-content { max-width: 520px !important; }
+
+    #editPostModal.has-image .edit-post-body {
+        display: block !important;
+    }
+
+    #editPostModal.has-image .edit-compose-right {
+        margin-top: 18px !important;
+        padding-left: 0 !important;
+        padding-top: 16px !important;
+        border-left: none !important;
+        border-top: 1px solid var(--epm-border) !important;
+    }
+}

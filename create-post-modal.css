@@ -27,48 +27,71 @@
 #createPostModal .modal-content {
     background: #ffffff !important;
     border: none !important;
+    border-top: 5px solid var(--cpm-teal) !important;
     border-radius: 20px !important;
     padding: 0 !important;
     overflow: hidden !important;
     width: 100% !important;
-    max-width: 520px !important;
+    max-width: 500px !important;
     height: auto !important;
     max-height: 90vh !important;
     margin: 0 auto !important;
-    box-shadow: 0 20px 50px rgba(15, 45, 45, 0.18) !important;
+    box-shadow: 0 24px 60px rgba(15, 45, 45, 0.22) !important;
 }
 
 #createPostModal #postForm {
     width: 100% !important;
-    max-width: 520px !important;
+    max-width: 500px !important;
     margin: 0 auto !important;
 }
 
-/* ---- Header (soft teal tint) ---- */
+/* ---- Header (white with icon badge) ---- */
 #createPostModal .modal-header {
     display: flex !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     justify-content: space-between !important;
     gap: 16px !important;
-    padding: 24px 26px !important;
+    padding: 22px 26px !important;
     margin: 0 !important;
     border: none !important;
+    border-bottom: 1px solid var(--cpm-border) !important;
     border-radius: 20px 20px 0 0 !important;
-    background: linear-gradient(135deg, #e8f6f3 0%, #f4fbf9 55%, #eaf7f4 100%) !important;
+    background: #ffffff !important;
+}
+
+#createPostModal .modal-header-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+}
+
+#createPostModal .modal-header-icon {
+    flex: 0 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: var(--cpm-teal-soft) !important;
+    color: var(--cpm-teal) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
 }
 
 #createPostModal .modal-header-text {
     display: flex !important;
     flex-direction: column !important;
-    gap: 4px !important;
+    gap: 3px !important;
+    min-width: 0 !important;
 }
 
 #createPostModal .modal-header h2 {
     margin: 0 !important;
-    font-size: 26px !important;
-    font-weight: 500 !important;
+    font-size: 22px !important;
+    font-weight: 600 !important;
     color: var(--cpm-text) !important;
-    line-height: 1.2 !important;
+    line-height: 1.15 !important;
 }
 
 #createPostModal .modal-subtitle {
@@ -82,28 +105,26 @@
 /* ---- Circular close button ---- */
 #createPostModal .modal-header .close-button {
     flex-shrink: 0 !important;
-    width: 38px !important;
-    height: 38px !important;
+    width: 40px !important;
+    height: 40px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #ffffff !important;
-    color: #3a4a4a !important;
-    border: 1px solid #e2ecea !important;
+    background: #f1f4f7 !important;
+    color: #5a6672 !important;
+    border: none !important;
     border-radius: 50% !important;
     font-size: 20px !important;
     font-weight: 500 !important;
     line-height: 1 !important;
     padding: 0 !important;
     cursor: pointer !important;
-    box-shadow: 0 2px 6px rgba(15, 45, 45, 0.06) !important;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
 }
 
 #createPostModal .modal-header .close-button:hover {
-    background: #f0f6f5 !important;
-    color: var(--cpm-teal) !important;
-    transform: scale(1.05) !important;
+    background: #e6ebef !important;
+    color: var(--cpm-text) !important;
 }
 
 /* ---- Body ---- */
@@ -174,21 +195,28 @@
 }
 
 /* ---- Composer textarea ---- */
+#createPostModal .cpm-textarea-wrap {
+    position: relative !important;
+    margin: 0 0 18px 0 !important;
+}
+
 #createPostModal .modal-body textarea {
+    display: block !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    min-height: 130px !important;
-    padding: 16px 18px !important;
-    margin: 0 0 18px 0 !important;
-    border: 1px solid var(--cpm-border) !important;
-    border-radius: 16px !important;
-    background: #fbfdfd !important;
+    min-height: 150px !important;
+    padding: 14px 16px 32px !important;
+    margin: 0 !important;
+    border: 1.5px solid var(--cpm-teal) !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
     color: var(--cpm-text) !important;
-    font-size: 16px !important;
+    font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
     resize: none !important;
     outline: none !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.08) !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
@@ -198,7 +226,17 @@
 
 #createPostModal .modal-body textarea:focus {
     border-color: var(--cpm-teal) !important;
-    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.16) !important;
+}
+
+#createPostModal .cpm-counter {
+    position: absolute !important;
+    right: 16px !important;
+    bottom: 12px !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--cpm-muted) !important;
+    pointer-events: none !important;
 }
 
 /* ---- Add to your post ---- */
@@ -296,8 +334,11 @@
 }
 
 #createPostModal .modal-footer .post-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
     width: auto !important;
-    padding: 11px 30px !important;
+    padding: 11px 26px !important;
     border: none !important;
     border-radius: 999px !important;
     background: var(--cpm-teal) !important;
@@ -308,6 +349,22 @@
     cursor: pointer !important;
     box-shadow: 0 6px 16px rgba(14, 139, 127, 0.22) !important;
     transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+#createPostModal .modal-footer .post-button::before {
+    content: '' !important;
+    flex: 0 0 auto !important;
+    width: 16px !important;
+    height: 16px !important;
+    background-color: currentColor !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M22%202%2011%2013'/%3E%3Cpath%20d='M22%202%2015%2022l-4-9-9-4%2020-7z'/%3E%3C/svg%3E") !important;
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M22%202%2011%2013'/%3E%3Cpath%20d='M22%202%2015%2022l-4-9-9-4%2020-7z'/%3E%3C/svg%3E") !important;
+    -webkit-mask-repeat: no-repeat !important;
+    mask-repeat: no-repeat !important;
+    -webkit-mask-position: center !important;
+    mask-position: center !important;
+    -webkit-mask-size: 16px 16px !important;
+    mask-size: 16px 16px !important;
 }
 
 #createPostModal .modal-footer .post-button:hover {

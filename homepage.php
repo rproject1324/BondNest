@@ -1651,9 +1651,12 @@ if (menuTrigger) {
             <form id="postForm" method="POST" enctype="multipart/form-data" action="create_post.php" style="position:relative; z-index:1001;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <div class="modal-header-text">
-                            <h2>Create post</h2>
-                            <p class="modal-subtitle">Share something with your friends</p>
+                        <div class="modal-header-main">
+                            <span class="modal-header-icon"><i class="bi bi-plus-lg"></i></span>
+                            <div class="modal-header-text">
+                                <h2>Create post</h2>
+                                <p class="modal-subtitle">Share something with your friends</p>
+                            </div>
                         </div>
                         <button type="button" class="close-button" aria-label="Close">&times;</button>
                     </div>
@@ -1672,7 +1675,10 @@ if (menuTrigger) {
                                     <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
                                 </div>
                             </div>
-                            <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
+                            <div class="cpm-textarea-wrap">
+                                <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent" maxlength="500"></textarea>
+                                <span class="cpm-counter" id="postCounter">0 / 500</span>
+                            </div>
                             <div class="add-to-post">
                                 <span class="add-to-post-label">Add to your post</span>
                                 <div class="icons">
@@ -1698,6 +1704,31 @@ if (menuTrigger) {
                 </div>
             </form>
         </div>
+                <script>
+                (function () {
+                    function setupCreatePostCounter() {
+                        var ta = document.getElementById('postContent');
+                        var counter = document.getElementById('postCounter');
+                        var modal = document.getElementById('createPostModal');
+                        if (!ta || !counter) { return; }
+                        var max = parseInt(ta.getAttribute('maxlength'), 10) || 500;
+                        function update() {
+                            var len = ta.value ? ta.value.length : 0;
+                            counter.textContent = len + ' / ' + max;
+                        }
+                        ta.addEventListener('input', update);
+                        if (modal) {
+                            new MutationObserver(update).observe(modal, { attributes: true, attributeFilter: ['style'] });
+                        }
+                        update();
+                    }
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', setupCreatePostCounter);
+                    } else {
+                        setupCreatePostCounter();
+                    }
+                })();
+                </script>
                 <!------------------------------------------- FEED SECTION -------------------------------------------->
 <!------------------------------------------- FEED SECTION -------------------------------------------->
 <div class="feeds">

@@ -2939,9 +2939,6 @@ unset($_SESSION['form_data']);
                                     <i class="bi bi-plus-square-dotted"></i> Media
                                 </label>
                                 <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
-                                <button type="button" class="icon-pill emoji-pill">
-                                    <i class="fa-regular fa-face-smile-beam"></i> Emoji
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -3925,7 +3922,7 @@ function createCommentElement(comment) {
             const toggleBtn = document.createElement('button');
             toggleBtn.type = 'button';
             toggleBtn.className = 'view-replies-btn';
-            let expanded = true;
+            let expanded = false;
             const updateLabel = () => {
                 toggleBtn.textContent = expanded
                     ? `Hide ${comment.replies.length} replies`
@@ -3933,6 +3930,7 @@ function createCommentElement(comment) {
                 toggleBtn.classList.toggle('expanded', expanded);
             };
             updateLabel();
+            repliesContainer.style.display = 'none';
             toggleBtn.addEventListener('click', () => {
                 expanded = !expanded;
                 repliesContainer.style.display = expanded ? '' : 'none';

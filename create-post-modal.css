@@ -1,0 +1,330 @@
+/* =====================================================================
+   BondNest - redesigned "Create post" modal
+   Scoped to #createPostModal so it cleanly overrides the legacy
+   .modal-* rules on both homepage.php and profile-page.php.
+   Applies the global Poppins type scale (titles 26/500, names 17/500,
+   body 16/400, helper 13/400, labels 14/500, buttons 15/500).
+   ===================================================================== */
+
+#createPostModal {
+    --cpm-teal: #0e8b7f;
+    --cpm-teal-dark: #0b6f66;
+    --cpm-teal-soft: #e7f5f2;
+    --cpm-text: #1f2d2d;
+    --cpm-muted: #7c848e;
+    --cpm-label: #5b6b6b;
+    --cpm-border: #e4eceb;
+    --cpm-placeholder: #9aa6ad;
+}
+
+/* ---- Card ---- */
+#createPostModal .modal-content {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    height: auto !important;
+    max-height: 90vh !important;
+    margin: 0 auto !important;
+    box-shadow: 0 20px 50px rgba(15, 45, 45, 0.18) !important;
+}
+
+#createPostModal #postForm {
+    width: 100% !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+}
+
+/* ---- Header (soft teal tint) ---- */
+#createPostModal .modal-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    padding: 24px 26px !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    background: linear-gradient(135deg, #e8f6f3 0%, #f4fbf9 55%, #eaf7f4 100%) !important;
+}
+
+#createPostModal .modal-header-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+#createPostModal .modal-header h2 {
+    margin: 0 !important;
+    font-size: 26px !important;
+    font-weight: 500 !important;
+    color: var(--cpm-text) !important;
+    line-height: 1.2 !important;
+}
+
+#createPostModal .modal-subtitle {
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--cpm-muted) !important;
+    line-height: 1.3 !important;
+}
+
+/* ---- Circular close button ---- */
+#createPostModal .modal-header .close-button {
+    flex-shrink: 0 !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    color: #3a4a4a !important;
+    border: 1px solid #e2ecea !important;
+    border-radius: 50% !important;
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(15, 45, 45, 0.06) !important;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+}
+
+#createPostModal .modal-header .close-button:hover {
+    background: #f0f6f5 !important;
+    color: var(--cpm-teal) !important;
+    transform: scale(1.05) !important;
+}
+
+/* ---- Body ---- */
+#createPostModal .modal-body {
+    padding: 22px 26px 20px !important;
+}
+
+#createPostModal .user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 0 16px 0 !important;
+}
+
+#createPostModal .user-info .profile-picture {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+#createPostModal .user-info .profile-picture img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+#createPostModal .user-info .profile-picture .initials-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    font-size: 16px !important;
+}
+
+#createPostModal .user-details {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+}
+
+#createPostModal .user-info .user-details .user-name {
+    display: block !important;
+    font-size: 17px !important;
+    font-weight: 500 !important;
+    color: var(--cpm-text) !important;
+    line-height: 1.2 !important;
+}
+
+#createPostModal .privacy-chip {
+    align-self: flex-start !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 12px !important;
+    border-radius: 999px !important;
+    background: var(--cpm-teal-soft) !important;
+    color: var(--cpm-teal) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+}
+
+#createPostModal .privacy-chip i {
+    font-size: 13px !important;
+    color: var(--cpm-teal) !important;
+}
+
+/* ---- Composer textarea ---- */
+#createPostModal .modal-body textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 130px !important;
+    padding: 16px 18px !important;
+    margin: 0 0 18px 0 !important;
+    border: 1px solid var(--cpm-border) !important;
+    border-radius: 16px !important;
+    background: #fbfdfd !important;
+    color: var(--cpm-text) !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    outline: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+#createPostModal .modal-body textarea::placeholder {
+    color: var(--cpm-placeholder) !important;
+}
+
+#createPostModal .modal-body textarea:focus {
+    border-color: var(--cpm-teal) !important;
+    box-shadow: 0 0 0 3px rgba(14, 139, 127, 0.12) !important;
+}
+
+/* ---- Add to your post ---- */
+#createPostModal .add-to-post {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    margin: 0 0 16px 0 !important;
+    border: 1px solid var(--cpm-border) !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+}
+
+#createPostModal .add-to-post .add-to-post-label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--cpm-label) !important;
+}
+
+#createPostModal .add-to-post .icons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+#createPostModal .icon-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 8px 15px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--cpm-teal-soft) !important;
+    color: var(--cpm-teal) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+#createPostModal .icon-pill:hover {
+    background: #d5ece8 !important;
+}
+
+#createPostModal .add-to-post .icons .icon-pill i {
+    font-size: 15px !important;
+    color: var(--cpm-teal) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+}
+
+#createPostModal .add-to-post .icons label.icon-pill {
+    margin: 0 !important;
+    padding: 8px 15px !important;
+}
+
+#createPostModal .add-to-post .icons i:hover {
+    transform: none !important;
+}
+
+/* ---- Footer ---- */
+#createPostModal .modal-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 18px 26px !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--cpm-border) !important;
+    border-radius: 0 0 20px 20px !important;
+    background: #ffffff !important;
+}
+
+#createPostModal .modal-footer .cancel-button {
+    padding: 11px 24px !important;
+    border: 1px solid #dbe6e4 !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    color: var(--cpm-label) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+
+#createPostModal .modal-footer .cancel-button:hover {
+    background: #f4f8f7 !important;
+    border-color: #c9dad7 !important;
+}
+
+#createPostModal .modal-footer .post-button {
+    width: auto !important;
+    padding: 11px 30px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--cpm-teal) !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 16px rgba(14, 139, 127, 0.22) !important;
+    transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+#createPostModal .modal-footer .post-button:hover {
+    background: var(--cpm-teal-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 20px rgba(14, 139, 127, 0.28) !important;
+    opacity: 1 !important;
+}
+
+/* ---- Image preview (kept consistent with the rounded card) ---- */
+#createPostModal .image-preview-container {
+    margin: 0 !important;
+}
+
+#createPostModal .image-preview {
+    border-radius: 14px !important;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 600px) {
+    #createPostModal .modal-header { padding: 18px !important; }
+    #createPostModal .modal-body { padding: 18px !important; }
+    #createPostModal .modal-footer { padding: 14px 18px !important; }
+    #createPostModal .modal-header h2 { font-size: 22px !important; }
+    #createPostModal .add-to-post { flex-wrap: wrap !important; }
+}

@@ -1522,6 +1522,7 @@ if (menuTrigger) {
     object-fit: cover;
 }
 </style>
+    <link rel="stylesheet" href="create-post-modal.css?v=<?php echo time(); ?>">
 </head>
 
 <body class="homepage">
@@ -1611,8 +1612,11 @@ if (menuTrigger) {
             <form id="postForm" method="POST" enctype="multipart/form-data" action="create_post.php" style="position:relative; z-index:1001;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>Create post</h2>
-                        <span class="close-button">&times;</span>
+                        <div class="modal-header-text">
+                            <h2>Create post</h2>
+                            <p class="modal-subtitle">Share something with your friends</p>
+                        </div>
+                        <button type="button" class="close-button" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="user-info">
@@ -1624,25 +1628,27 @@ if (menuTrigger) {
                                 <?php endif; ?>
                             </div>
                             <div class="user-details">
-                                <span><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+                                <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+                                <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
                             </div>
                         </div>
                         <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
                         <div class="add-to-post">
-                            <span>Add to your post</span>
+                            <span class="add-to-post-label">Add to your post</span>
                             <div class="icons">
-                                <label for="post-image" style="cursor: pointer;">
-                                    <i class="bi bi-plus-square-dotted" style="color: teal;"></i>
-
+                                <label for="post-image" class="icon-pill media-pill">
+                                    <i class="bi bi-plus-square-dotted"></i> Media
                                 </label>
                                 <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
-                                <i class="fa-regular fa-face-smile-beam" style="color: teal; vertical-align: middle; margin-top: 5px; display: inline-block;"></i>
-                                <i class="bi bi-file-gif" style="color: purple;"></i>
+                                <button type="button" class="icon-pill emoji-pill">
+                                    <i class="fa-regular fa-face-smile-beam"></i> Emoji
+                                </button>
                             </div>
                         </div>
                         <div class="image-preview-container" id="imagePreviewContainer"></div>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="cancel-button">Cancel</button>
                         <button type="submit" class="post-button">Post</button>
                     </div>
                 </div>
@@ -2107,6 +2113,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (closeButton) {
         closeButton.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+    }
+
+    const cancelButton = modal?.querySelector('.cancel-button');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
             modal.style.display = "none";
         });
     }

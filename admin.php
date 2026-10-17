@@ -1684,31 +1684,27 @@ function formatDate($date) {
     }
     </style>
     <link rel="stylesheet" href="admin-post-modal.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="admin-dashboard.css?v=<?php echo time(); ?>">
 </head>
 <body>
-<nav class="navbar">
-    <div class="navbar-container">
-        <div class="navbar-main">
-            <div class="navbar-brand">
-                <a href="homepage.php" class="navbar-logo">
-                    <img src="./web-images/bn-logo.png" class="logo-img" alt="BondNest Logo">
-                    BondNest Admin
-                </a>
-                        </div>
-                    </div>
-                    
-        <div class="navbar-right">
-            <a href="index.php" class="logout-btn" id="logoutButton">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Log Out</span>
-                    </a>
-                </div>
-        
-        <div class="navbar-toggle">
-            <span class="navbar-toggle-icon"></span>
+<div class="admin-shell">
+    <aside class="admin-nav">
+        <div class="admin-brand">
+            <img src="./web-images/bn-logo.png" alt="BondNest Logo">
+            <div class="admin-brand-text">
+                <span class="admin-brand-name">BondNest</span>
+                <span class="admin-brand-sub">&mdash; ADMIN</span>
             </div>
-    </div>
-</nav>
+        </div>
+        <nav class="admin-menu">
+            <a href="admin.php" class="admin-menu-item active"><i class="bi bi-grid"></i> Overview</a>
+            <a href="admin.php" class="admin-menu-item"><i class="bi bi-file-earmark-text"></i> Posts</a>
+            <a href="#" class="admin-menu-item"><i class="bi bi-people"></i> Users</a>
+            <a href="#" class="admin-menu-item"><i class="bi bi-activity"></i> Activity</a>
+        </nav>
+        <a href="index.php" class="admin-logout" id="logoutButton"><i class="bi bi-box-arrow-right"></i> Log Out</a>
+    </aside>
+    <main class="admin-main">
 
 <!-- Logout confirmation overlay -->
 <div class="logout-confirmation-overlay" id="logoutConfirmationOverlay">
@@ -1724,260 +1720,251 @@ function formatDate($date) {
         </div>
     </div>
 </div>
-    <div class="container">
-        <div class="admin-layout">
-            <!-- Sidebar with Stats Cards -->
-            <div class="admin-sidebar">
-                <div class="sidebar-header">
-                    <h3><i class="bi bi-bar-chart-line"></i> Dashboard Stats</h3>
-                </div>
-                <!-- Stats Cards - Now in sidebar -->
-                <div class="stats-column">
-                    <div class="stat-card users">
-                        <div class="title">
-                            <i class="bi bi-people-fill"></i>
-                            Total Users
-                        </div>
-                        <div class="value" id="total-users-value"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
-                        <div class="change <?php echo ($percent_changes['users'] >= 0) ? 'positive' : 'negative'; ?>" id="total-users-change">
-                            <i class="bi bi-<?php echo ($percent_changes['users'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
-                            <span><?php echo abs($percent_changes['users'] ?? 0); ?>% from last month</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card posts">
-                        <div class="title">
-                            <i class="bi bi-file-earmark-text"></i>
-                            Total Posts
-                        </div>
-                        <div class="value" id="total-posts-value"><?php echo number_format($stats['total_posts'] ?? 0); ?></div>
-                        <div class="change <?php echo ($percent_changes['posts'] >= 0) ? 'positive' : 'negative'; ?>" id="total-posts-change">
-                            <i class="bi bi-<?php echo ($percent_changes['posts'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
-                            <span><?php echo abs($percent_changes['posts'] ?? 0); ?>% from last month</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card today">
-                        <div class="title">
-                            <i class="bi bi-calendar-day"></i>
-                            Today's Posts
-                        </div>
-                        <div class="value" id="today-posts-value"><?php echo number_format($stats['today_posts'] ?? 0); ?></div>
-                        <div class="change <?php echo ($percent_changes['today_posts'] >= 0) ? 'positive' : 'negative'; ?>" id="today-posts-change">
-                            <i class="bi bi-<?php echo ($percent_changes['today_posts'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
-                            <span><?php echo abs($percent_changes['today_posts'] ?? 0); ?>% from yesterday</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card actions">
-                        <div class="title">
-                            <i class="bi bi-activity"></i>
-                            Today's Actions
-                        </div>
-                        <div class="value" id="today-actions-value"><?php echo number_format($stats['today_actions'] ?? 0); ?></div>
-                        <div class="change <?php echo ($percent_changes['today_actions'] >= 0) ? 'positive' : 'negative'; ?>" id="today-actions-change">
-                            <i class="bi bi-<?php echo ($percent_changes['today_actions'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
-                            <span><?php echo abs($percent_changes['today_actions'] ?? 0); ?>% from yesterday</span>
-                        </div>
-                        </div>
 
-                    </div>
+        <div class="admin-page-head">
+            <div>
+                <h1 class="admin-page-title">Overview</h1>
+                <p class="admin-subtitle"><?php echo date('l, F j, Y'); ?> &middot; everything on BondNest at a glance</p>
+            </div>
+            <div class="admin-head-actions">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search posts...">
                 </div>
-                
-            <!-- Main content -->
-            <div class="main-content">
-                <div class="content">
+                <button class="refresh-btn" id="refreshPostsBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
 
-                
-                <!-- Posts Table -->
-                <div class="post-table-container">
-                    <div class="table-header">
-                        <h2 class="section-title">Recent Posts</h2>
-                        
-                        <div class="table-actions">
-                            <div class="search-box">
-                                <i class="bi bi-search"></i>
-                                <input type="text" placeholder="Search posts...">
-                            </div>
-                                
-                                <button class="refresh-btn" id="refreshPostsBtn">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                    Refresh
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="post-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User</th>
-                                    <th>Content</th>
-                                    <th>Image</th>
-                                    <th>Created</th>
-                                    <th>Likes</th>
-                                    <th>Comments</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                                <tbody id="posts-table-body">
-                                <?php if (!empty($posts)): ?>
-                                    <?php foreach ($posts as $post): ?>
-                                    <tr>
-                                        <td><?php echo $post['id']; ?></td>
-                                        <td>
-                                            <div class="user-cell">
-                                                <?php if (!empty($post['profile_picture'])): ?>
-                                                    <img src="<?php echo htmlspecialchars($post['profile_picture']); ?>" alt="User" class="user-avatar">
-                                                <?php else: ?>
-                                                    <?php echo getInitialsHtml($post['first_name'] ?? '', $post['last_name'] ?? '', 40); ?>
-                                                <?php endif; ?>
-                                                <div class="user-info">
-                                                    <div class="user-name"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></div>
-                                                    <div class="username">@<?php echo htmlspecialchars($post['username']); ?></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="content-cell" title="<?php echo htmlspecialchars($post['content']); ?>">
-                                            <?php echo htmlspecialchars(substr($post['content'], 0, 50)) . (strlen($post['content']) > 50 ? '...' : ''); ?>
-                                        </td>
-                                        <td class="image-cell">
-                                            <span class="<?php echo $post['image_path'] ? 'has-image' : 'no-image'; ?>">
-                                                <i class="bi bi-<?php echo $post['image_path'] ? 'image-fill' : 'image'; ?>"></i>
-                                            </span>
-                                        </td>
-                                        <td><?php echo formatDate($post['created_at']); ?></td>
-                                        <td>
-                                            <span class="engagement-count">
-                                                <?php if (($post['likes'] ?? 0) > 0): ?>
-                                                    <i class="bi bi-heart-fill" style="color: #e63946;"></i>
-                                                <?php else: ?>
-                                                    <i class="bi bi-heart"></i>
-                                                <?php endif; ?>
-                                                <?php echo $post['likes'] ?? 0; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="engagement-count">
-                                                <i class="bi bi-chat-dots"></i>
-                                                <?php echo $post['comment_count'] ?? 0; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                                <span class="status-badge status-<?php echo strtolower($post['status']); ?>">
-                                                    <?php if($post['status'] === 'on-hold'): ?>
-                                                        <i class="bi bi-pause-circle-fill"></i>
-                                                        On Hold
-                                                    <?php elseif($post['status'] === 'approved'): ?>
-                                                        <i class="bi bi-check-circle-fill"></i>
-                                                        Approved
-                                                    <?php elseif($post['status'] === 'posted'): ?>
-                                                        <i class="bi bi-file-post"></i>
-                                                        Posted
-                                                    <?php else: ?>
-                                                <i class="bi bi-clock"></i>
-                                                        <?php echo ucfirst($post['status']); ?>
-                                                    <?php endif; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-btns">
-                                                <button class="btn btn-view btn-sm view-btn" data-post-id="<?php echo $post['id']; ?>">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                    View
-                                                </button>
-                                                <button class="btn btn-warn btn-sm warn-btn" data-post-id="<?php echo $post['id']; ?>">
-                                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                                    Warn
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="9">
-                                            <div class="empty-state">
-                                                <i class="bi bi-file-earmark-excel"></i>
-                                                <h3>No Posts Found</h3>
-                                                <p>There are currently no posts to display. Check back later or encourage users to create content.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="pagination" <?php echo ($total_posts == 0) ? 'style="display: none;"' : ''; ?>>
-                        <div class="pagination-info">
-                            <?php
-                            $start = min($offset + 1, $total_posts);
-                            $end = min($offset + $posts_per_page, $total_posts);
-                            echo "Showing $start to $end of $total_posts entries";
-                            ?>
-                        </div>
-                        
-                        <div class="pagination-controls">
-                            <?php if ($current_page > 1): ?>
-                                <button data-page="<?php echo $current_page - 1; ?>" class="page-btn page-link">
-                                    <i class="bi bi-chevron-left"></i>
-                                </button>
-                            <?php else: ?>
-                            <button class="page-btn disabled">
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
-                            <?php endif; ?>
-                            
-                            <?php
-                            // Determine which page numbers to show
-                            $start_page = max(1, min($current_page - 2, $total_pages - 4));
-                            $end_page = min($total_pages, max($current_page + 2, 5));
-                            
-                            // Show first page if we're not starting at 1
-                            if ($start_page > 1) {
-                                echo '<button data-page="1" class="page-btn page-link">1</button>';
-                                if ($start_page > 2) {
-                                    echo '<span class="page-ellipsis">...</span>';
-                                }
-                            }
-                            
-                            // Generate page numbers
-                            for ($i = $start_page; $i <= $end_page; $i++) {
-                                if ($i == $current_page) {
-                                    echo '<button class="page-btn active">' . $i . '</button>';
-                                } else {
-                                    echo '<button data-page="' . $i . '" class="page-btn page-link">' . $i . '</button>';
-                                }
-                            }
-                            
-                            // Show last page if we're not ending at the last page
-                            if ($end_page < $total_pages) {
-                                if ($end_page < $total_pages - 1) {
-                                    echo '<span class="page-ellipsis">...</span>';
-                                }
-                                echo '<button data-page="' . $total_pages . '" class="page-btn page-link">' . $total_pages . '</button>';
-                            }
-                            ?>
-                            
-                            <?php if ($current_page < $total_pages): ?>
-                                <button data-page="<?php echo $current_page + 1; ?>" class="page-btn page-link">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                            <?php else: ?>
-                                <button class="page-btn disabled">
-                                    <i class="bi bi-chevron-right"></i>
-                                </button>
-                            <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
+        <div class="admin-stats-row">
+            <div class="stat-card users">
+                <span class="stat-card-icon"><i class="bi bi-people"></i></span>
+                <div class="title">Total users</div>
+                <div class="value" id="total-users-value"><?php echo number_format($stats['total_users'] ?? 0); ?></div>
+                <div class="change <?php echo ($percent_changes['users'] >= 0) ? 'positive' : 'negative'; ?>" id="total-users-change">
+                    <i class="bi bi-<?php echo ($percent_changes['users'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <span><?php echo abs($percent_changes['users'] ?? 0); ?>% from last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card posts">
+                <span class="stat-card-icon"><i class="bi bi-file-earmark-text"></i></span>
+                <div class="title">Total posts</div>
+                <div class="value" id="total-posts-value"><?php echo number_format($stats['total_posts'] ?? 0); ?></div>
+                <div class="change <?php echo ($percent_changes['posts'] >= 0) ? 'positive' : 'negative'; ?>" id="total-posts-change">
+                    <i class="bi bi-<?php echo ($percent_changes['posts'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <span><?php echo abs($percent_changes['posts'] ?? 0); ?>% from last month</span>
+                </div>
+            </div>
+
+            <div class="stat-card today">
+                <span class="stat-card-icon"><i class="bi bi-calendar-day"></i></span>
+                <div class="title">Today's posts</div>
+                <div class="value" id="today-posts-value"><?php echo number_format($stats['today_posts'] ?? 0); ?></div>
+                <div class="change <?php echo ($percent_changes['today_posts'] >= 0) ? 'positive' : 'negative'; ?>" id="today-posts-change">
+                    <i class="bi bi-<?php echo ($percent_changes['today_posts'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <span><?php echo abs($percent_changes['today_posts'] ?? 0); ?>% from yesterday</span>
+                </div>
+            </div>
+
+            <div class="stat-card actions">
+                <span class="stat-card-icon"><i class="bi bi-activity"></i></span>
+                <div class="title">Today's actions</div>
+                <div class="value" id="today-actions-value"><?php echo number_format($stats['today_actions'] ?? 0); ?></div>
+                <div class="change <?php echo ($percent_changes['today_actions'] >= 0) ? 'positive' : 'negative'; ?>" id="today-actions-change">
+                    <i class="bi bi-<?php echo ($percent_changes['today_actions'] >= 0) ? 'arrow-up' : 'arrow-down'; ?>"></i>
+                    <span><?php echo abs($percent_changes['today_actions'] ?? 0); ?>% from yesterday</span>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="admin-content-grid">
+            <div class="post-table-container">
+                <div class="table-header">
+                    <h2 class="section-title">Recent Posts</h2>
+                    <div class="admin-tabs">
+                        <button type="button" class="admin-tab active" data-tab="all">All</button>
+                        <button type="button" class="admin-tab" data-tab="posted">Posted</button>
+                        <button type="button" class="admin-tab" data-tab="flagged">Flagged</button>
+                    </div>
+                </div>
+
+                <div class="posts-list" id="posts-table-body">
+                    <?php if (!empty($posts)): ?>
+                        <?php foreach ($posts as $post): ?>
+                        <div class="post-row" data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo strtolower($post['status']); ?>">
+                            <div class="pr-thumb <?php echo !empty($post['image_path']) ? 'has-image' : 'no-image'; ?>">
+                                <i class="bi bi-<?php echo !empty($post['image_path']) ? 'image-fill' : 'image'; ?>"></i>
+                            </div>
+                            <div class="pr-main">
+                                <div class="pr-author">
+                                    <span class="pr-name user-name"><?php echo htmlspecialchars(($post['first_name'] ?? '') . ' ' . ($post['last_name'] ?? '')); ?></span>
+                                    <span class="pr-username username">@<?php echo htmlspecialchars($post['username'] ?? ''); ?></span>
+                                    <span class="pr-id">#<?php echo $post['id']; ?></span>
+                                </div>
+                                <div class="pr-content content-cell" title="<?php echo htmlspecialchars($post['content']); ?>">
+                                    <?php echo htmlspecialchars(substr($post['content'], 0, 50)) . (strlen($post['content']) > 50 ? '...' : ''); ?>
+                                </div>
+                                <div class="pr-date"><?php echo formatDate($post['created_at']); ?></div>
+                            </div>
+                            <div class="pr-actions">
+                                <span class="engagement-count like-count">
+                                    <?php if (($post['likes'] ?? 0) > 0): ?>
+                                        <i class="bi bi-heart-fill" style="color: #e63946;"></i>
+                                    <?php else: ?>
+                                        <i class="bi bi-heart"></i>
+                                    <?php endif; ?>
+                                    <?php echo $post['likes'] ?? 0; ?>
+                                </span>
+                                <span class="engagement-count comment-count">
+                                    <i class="bi bi-chat-dots"></i>
+                                    <?php echo $post['comment_count'] ?? 0; ?>
+                                </span>
+                                <span class="status-badge status-<?php echo strtolower($post['status']); ?>">
+                                    <?php if($post['status'] === 'on-hold'): ?>
+                                        <i class="bi bi-pause-circle-fill"></i> On Hold
+                                    <?php elseif($post['status'] === 'approved'): ?>
+                                        <i class="bi bi-check-circle-fill"></i> Approved
+                                    <?php elseif($post['status'] === 'posted'): ?>
+                                        <i class="bi bi-file-post"></i> Posted
+                                    <?php else: ?>
+                                        <i class="bi bi-clock"></i> <?php echo ucfirst($post['status']); ?>
+                                    <?php endif; ?>
+                                </span>
+                                <div class="action-btns">
+                                    <button class="btn btn-view btn-sm view-btn" data-post-id="<?php echo $post['id']; ?>">
+                                        <i class="bi bi-eye-fill"></i>
+                                        View
+                                    </button>
+                                    <button class="btn btn-warn btn-sm warn-btn" data-post-id="<?php echo $post['id']; ?>">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        Warn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="bi bi-file-earmark-excel"></i>
+                            <h3>No Posts Found</h3>
+                            <p>There are currently no posts to display. Check back later or encourage users to create content.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="pagination" <?php echo ($total_posts == 0) ? 'style="display: none;"' : ''; ?>>
+                    <div class="pagination-info">
+                        <?php
+                        $start = min($offset + 1, $total_posts);
+                        $end = min($offset + $posts_per_page, $total_posts);
+                        echo "Showing $start to $end of $total_posts entries";
+                        ?>
+                    </div>
+
+                    <div class="pagination-controls">
+                        <?php if ($current_page > 1): ?>
+                            <button data-page="<?php echo $current_page - 1; ?>" class="page-btn page-link">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                        <?php else: ?>
+                            <button class="page-btn disabled">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                        <?php endif; ?>
+
+                        <?php
+                        $start_page = max(1, min($current_page - 2, $total_pages - 4));
+                        $end_page = min($total_pages, max($current_page + 2, 5));
+
+                        if ($start_page > 1) {
+                            echo '<button data-page="1" class="page-btn page-link">1</button>';
+                            if ($start_page > 2) {
+                                echo '<span class="page-ellipsis">...</span>';
+                            }
+                        }
+
+                        for ($i = $start_page; $i <= $end_page; $i++) {
+                            if ($i == $current_page) {
+                                echo '<button class="page-btn active">' . $i . '</button>';
+                            } else {
+                                echo '<button data-page="' . $i . '" class="page-btn page-link">' . $i . '</button>';
+                            }
+                        }
+
+                        if ($end_page < $total_pages) {
+                            if ($end_page < $total_pages - 1) {
+                                echo '<span class="page-ellipsis">...</span>';
+                            }
+                            echo '<button data-page="' . $total_pages . '" class="page-btn page-link">' . $total_pages . '</button>';
+                        }
+                        ?>
+
+                        <?php if ($current_page < $total_pages): ?>
+                            <button data-page="<?php echo $current_page + 1; ?>" class="page-btn page-link">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        <?php else: ?>
+                            <button class="page-btn disabled">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <?php
+            $eng_likes = 0;
+            $eng_comments = 0;
+            $eng_images = 0;
+            foreach ($posts as $eng_post) {
+                $eng_likes += (int)($eng_post['likes'] ?? 0);
+                $eng_comments += (int)($eng_post['comment_count'] ?? 0);
+                if (!empty($eng_post['image_path'])) { $eng_images++; }
+            }
+            $eng_total = count($posts);
+            $eng_max_lc = max(1, $eng_likes, $eng_comments);
+            $eng_likes_pct = (int)round($eng_likes / $eng_max_lc * 100);
+            $eng_comments_pct = (int)round($eng_comments / $eng_max_lc * 100);
+            $eng_images_pct = ($eng_total > 0) ? (int)round($eng_images / $eng_total * 100) : 0;
+            if ($eng_comments >= $eng_likes && $eng_comments > 0) {
+                $eng_note = 'Comments are driving most of the activity.';
+            } elseif ($eng_likes > 0) {
+                $eng_note = 'Likes are driving most of the activity.';
+            } else {
+                $eng_note = 'No engagement recorded yet.';
+            }
+            ?>
+            <aside class="admin-engagement">
+                <h3>Engagement</h3>
+                <div class="eng-item eng-likes">
+                    <div class="eng-item-top">
+                        <span>Likes</span>
+                        <span class="eng-val"><?php echo $eng_likes; ?></span>
+                    </div>
+                    <div class="eng-bar"><span style="width: <?php echo $eng_likes_pct; ?>%;"></span></div>
+                </div>
+                <div class="eng-item eng-comments">
+                    <div class="eng-item-top">
+                        <span>Comments</span>
+                        <span class="eng-val"><?php echo $eng_comments; ?></span>
+                    </div>
+                    <div class="eng-bar"><span style="width: <?php echo $eng_comments_pct; ?>%;"></span></div>
+                </div>
+                <div class="eng-item eng-images">
+                    <div class="eng-item-top">
+                        <span>Posts with images</span>
+                        <span class="eng-val"><?php echo $eng_images; ?> of <?php echo $eng_total; ?></span>
+                    </div>
+                    <div class="eng-bar"><span style="width: <?php echo $eng_images_pct; ?>%;"></span></div>
+                </div>
+                <p class="eng-note">Across the <?php echo $eng_total; ?> post<?php echo ($eng_total == 1) ? '' : 's'; ?> shown. <?php echo $eng_note; ?></p>
+            </aside>
+        </div>
+    </main>
+</div>
 
     <!-- Post Modal -->
     <div class="modal-overlay" id="postModal">
@@ -2825,44 +2812,31 @@ function formatDate($date) {
                         : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">${(fn+ln).toUpperCase()}</div>`; })()
                     
                     return `
-                    <tr class="${animate ? 'animate-new-row' : ''}" data-post-id="${post.id}">
-                        <td>${post.id}</td>
-                        <td>
-                            <div class="user-cell">
-                                ${profilePicHtml}
-                                <div class="user-info">
-                                    <div class="user-name">${post.first_name} ${post.last_name}</div>
-                                    <div class="username">@${post.username}</div>
-                                </div>
+                    <div class="post-row ${animate ? 'animate-new-row' : ''}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
+                        <div class="pr-thumb ${hasImage}">
+                            <i class="bi bi-${imageIcon}"></i>
+                        </div>
+                        <div class="pr-main">
+                            <div class="pr-author">
+                                <span class="pr-name user-name">${post.first_name || ''} ${post.last_name || ''}</span>
+                                <span class="pr-username username">@${post.username || ''}</span>
+                                <span class="pr-id">#${post.id}</span>
                             </div>
-                        </td>
-                        <td class="content-cell" title="${post.content || ''}">
-                            ${contentPreview}
-                        </td>
-                        <td class="image-cell">
-                            <span class="${hasImage}">
-                                <i class="bi bi-${imageIcon}"></i>
-                            </span>
-                        </td>
-                        <td>${formatDate(post.created_at)}</td>
-                        <td>
-                            <span class="engagement-count">
+                            <div class="pr-content content-cell" title="${post.content || ''}">${contentPreview}</div>
+                            <div class="pr-date">${formatDate(post.created_at)}</div>
+                        </div>
+                        <div class="pr-actions">
+                            <span class="engagement-count like-count">
                                 ${parseInt(post.likes) > 0 
                                     ? `<i class="bi bi-heart-fill" style="color: #e63946;"></i>` 
                                     : `<i class="bi bi-heart"></i>`}
                                 ${post.likes || 0}
                             </span>
-                        </td>
-                        <td>
-                            <span class="engagement-count">
+                            <span class="engagement-count comment-count">
                                 <i class="bi bi-chat-dots"></i>
                                 ${post.comment_count || 0}
                             </span>
-                        </td>
-                        <td>
                             ${statusBadge}
-                        </td>
-                        <td>
                             <div class="action-btns">
                                 <button class="btn btn-view btn-sm view-btn" data-post-id="${post.id}">
                                     <i class="bi bi-eye-fill"></i>
@@ -2873,8 +2847,8 @@ function formatDate($date) {
                                     Warn
                                 </button>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     `;
                 }).join('');
                 
@@ -3237,9 +3211,9 @@ function formatDate($date) {
              function highlightUpdatedCells(updatedLikes, updatedComments) {
                  // Highlight like count updates
                  updatedLikes.forEach(update => {
-                     const row = document.querySelector(`tr[data-post-id="${update.id}"]`);
+                     const row = document.querySelector(`.post-row[data-post-id="${update.id}"]`);
                      if (row) {
-                         const likeCell = row.querySelector('td:nth-child(6)');
+                         const likeCell = row.querySelector('.like-count');
                          if (likeCell) {
                              // Add flash animation class
                              likeCell.classList.add('flash-update');
@@ -3253,9 +3227,9 @@ function formatDate($date) {
                  
                  // Highlight comment count updates
                  updatedComments.forEach(update => {
-                     const row = document.querySelector(`tr[data-post-id="${update.id}"]`);
+                     const row = document.querySelector(`.post-row[data-post-id="${update.id}"]`);
                      if (row) {
-                         const commentCell = row.querySelector('td:nth-child(7)');
+                         const commentCell = row.querySelector('.comment-count');
                          if (commentCell) {
                              // Add flash animation class
                              commentCell.classList.add('flash-update');
@@ -3324,44 +3298,31 @@ function formatDate($date) {
                     const highlightClass = (highlightNewRows && isNewPost) ? 'highlight-new-row' : '';
                     
                     return `
-                    <tr class="${highlightClass}" data-post-id="${post.id}">
-                        <td>${post.id}</td>
-                        <td>
-                            <div class="user-cell">
-                                ${profilePicHtml}
-                                <div class="user-info">
-                                    <div class="user-name">${post.first_name} ${post.last_name}</div>
-                                    <div class="username">@${post.username}</div>
-                                </div>
+                    <div class="post-row ${highlightClass}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
+                        <div class="pr-thumb ${hasImage}">
+                            <i class="bi bi-${imageIcon}"></i>
+                        </div>
+                        <div class="pr-main">
+                            <div class="pr-author">
+                                <span class="pr-name user-name">${post.first_name || ''} ${post.last_name || ''}</span>
+                                <span class="pr-username username">@${post.username || ''}</span>
+                                <span class="pr-id">#${post.id}</span>
                             </div>
-                        </td>
-                        <td class="content-cell" title="${post.content || ''}">
-                            ${contentPreview}
-                        </td>
-                        <td class="image-cell">
-                            <span class="${hasImage}">
-                                <i class="bi bi-${imageIcon}"></i>
-                            </span>
-                        </td>
-                        <td>${formatDate(post.created_at)}</td>
-                        <td>
-                            <span class="engagement-count">
+                            <div class="pr-content content-cell" title="${post.content || ''}">${contentPreview}</div>
+                            <div class="pr-date">${formatDate(post.created_at)}</div>
+                        </div>
+                        <div class="pr-actions">
+                            <span class="engagement-count like-count">
                                 ${parseInt(post.likes) > 0 
                                     ? `<i class="bi bi-heart-fill" style="color: #e63946;"></i>` 
                                     : `<i class="bi bi-heart"></i>`}
                                 ${post.likes || 0}
                             </span>
-                        </td>
-                        <td>
-                            <span class="engagement-count">
+                            <span class="engagement-count comment-count">
                                 <i class="bi bi-chat-dots"></i>
                                 ${post.comment_count || 0}
                             </span>
-                        </td>
-                        <td>
                             ${statusBadge}
-                        </td>
-                        <td>
                             <div class="action-btns">
                                 <button class="btn btn-view btn-sm view-btn" data-post-id="${post.id}">
                                     <i class="bi bi-eye-fill"></i>
@@ -3372,13 +3333,13 @@ function formatDate($date) {
                                     Warn
                                 </button>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     `;
                 }).join('');
                 
                 // Update table content
-                postsTableBody.innerHTML = html;
+                postsTableBody.innerHTML = html || '<div class="empty-state"><i class="bi bi-file-earmark-excel"></i><h3>No Posts Found</h3><p>There are currently no posts to display.</p></div>';
                 
                 // Reattach event handlers for the new buttons
                 reattachButtonEventHandlers();
@@ -3441,7 +3402,9 @@ function storePostStatusChange(postId, status) {
                     button.addEventListener('click', function() {
                         const postId = this.getAttribute('data-post-id');
                         const action = this.classList.contains('warn-btn') ? 'warn' : null;
-                        openPostModal(postId, action);
+                        if (typeof openPostModal === 'function') {
+                            openPostModal(postId, action);
+                        }
                     });
                 });
             }
@@ -3538,12 +3501,10 @@ function storePostStatusChange(postId, status) {
                          // Show loading indicator
                          const postsTableBody = document.getElementById('posts-table-body');
                          postsTableBody.innerHTML = `
-                             <tr>
-                                 <td colspan="9" style="text-align: center; padding: 30px;">
-                                     <i class="bi bi-arrow-repeat spinning" style="font-size: 2rem; color: var(--primary);"></i>
-                                     <p>Loading page ${pageNum}...</p>
-                                 </td>
-                             </tr>
+                             <div class="loading-state">
+                                 <i class="bi bi-arrow-repeat spinning"></i>
+                                 <p>Loading page ${pageNum}...</p>
+                             </div>
                          `;
                          
                          // Fetch the data for the requested page
@@ -3696,6 +3657,34 @@ function storePostStatusChange(postId, status) {
                     }
                 });
             }
+        });
+    </script>
+
+    <!-- Dashboard tab filtering -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.admin-tab');
+            const applyTab = (tab) => {
+                const list = document.getElementById('posts-table-body');
+                if (!list) return;
+                list.querySelectorAll('.post-row').forEach(row => {
+                    const status = (row.getAttribute('data-status') || '').toLowerCase();
+                    let show = true;
+                    if (tab === 'posted') {
+                        show = (status === 'posted' || status === 'approved');
+                    } else if (tab === 'flagged') {
+                        show = (status === 'on-hold' || status === 'warned');
+                    }
+                    row.classList.toggle('is-hidden', !show);
+                });
+            };
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    applyTab(this.getAttribute('data-tab'));
+                });
+            });
         });
     </script>
 </body>

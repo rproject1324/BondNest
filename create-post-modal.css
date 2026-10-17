@@ -15,6 +15,12 @@
     --cpm-label: #5b6b6b;
     --cpm-border: #e4eceb;
     --cpm-placeholder: #9aa6ad;
+
+    /* Consistent gap between the navbar and the modal (matches the profile page) */
+    align-items: flex-start !important;
+    padding-top: 50px !important;
+    padding-bottom: 50px !important;
+    box-sizing: border-box !important;
 }
 
 /* ---- Card ---- */

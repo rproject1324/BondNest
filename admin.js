@@ -323,6 +323,26 @@ document.addEventListener('DOMContentLoaded', function() {
             modalImageContainer.style.display = 'none';
         }
         
+        // Status pill
+        const modalStatusPill = document.getElementById('modalStatusPill');
+        const modalStatusText = document.getElementById('modalStatusText');
+        if (modalStatusPill && modalStatusText) {
+            const st = (post.status || 'posted').toString().toLowerCase();
+            let statusLabel = 'Pending review';
+            let statusClass = 'posted';
+            if (st === 'approved') { statusLabel = 'Approved'; statusClass = 'approved'; }
+            else if (st === 'on-hold') { statusLabel = 'On hold'; statusClass = 'on-hold'; }
+            else if (st === 'warned') { statusLabel = 'Warned'; statusClass = 'warned'; }
+            modalStatusPill.className = 'apm-status-pill ' + statusClass;
+            modalStatusText.textContent = statusLabel;
+        }
+        
+        // Reset the reason field and its character counter
+        const actionCommentField = document.getElementById('actionComment');
+        if (actionCommentField) actionCommentField.value = '';
+        const actionCommentCounter = document.getElementById('actionCommentCount');
+        if (actionCommentCounter) actionCommentCounter.textContent = '0';
+        
         // Show modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -372,6 +392,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Process the action
                 recordAction(action, postId, comment);
             });
+        });
+    }
+    
+    // Live character counter for the reason field
+    const actionCommentInput = document.getElementById('actionComment');
+    const actionCommentCounterEl = document.getElementById('actionCommentCount');
+    if (actionCommentInput && actionCommentCounterEl) {
+        actionCommentInput.addEventListener('input', function() {
+            actionCommentCounterEl.textContent = this.value.length;
         });
     }
     
@@ -502,13 +531,13 @@ document.addEventListener('DOMContentLoaded', function() {
             buttons.forEach(btn => {
                 btn.disabled = false;
                 if (btn.dataset.action === 'approve') {
-                    btn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Approve Post`;
+                    btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve`;
                 } else if (btn.dataset.action === 'warn') {
-                    btn.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Send Warning`;
+                    btn.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Send warning`;
                 } else if (btn.dataset.action === 'delete') {
-                    btn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete Post`;
+                    btn.innerHTML = `<i class="bi bi-trash3"></i> Delete`;
                 } else if (btn.dataset.action === 'hold') {
-                    btn.innerHTML = `<i class="bi bi-pause-circle-fill"></i> Hold Post`;
+                    btn.innerHTML = `<i class="bi bi-pause"></i> Hold`;
                 }
             });
         });

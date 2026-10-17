@@ -1683,6 +1683,7 @@ function formatDate($date) {
         font-size: 1rem;
     }
     </style>
+    <link rel="stylesheet" href="admin-post-modal.css?v=<?php echo time(); ?>">
 </head>
 <body>
 <nav class="navbar">
@@ -1982,22 +1983,27 @@ function formatDate($date) {
     <div class="modal-overlay" id="postModal">
         <div class="modal-container">
             <div class="modal-header">
-                <h2 class="modal-title">Post Details</h2>
-                <button class="close-modal">&times;</button>
+                <span class="apm-head-icon"><i class="bi bi-eye"></i></span>
+                <div class="apm-head-text">
+                    <h2 class="modal-title">Post details</h2>
+                    <span class="apm-head-sub">Review this post and take an action</span>
+                </div>
+                <button class="close-modal" type="button" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="post-header">
-                    <div class="post-avatar" id="modalAvatarContainer" style="width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;"></div>
+                    <div class="post-avatar" id="modalAvatarContainer"></div>
                     <div class="post-user-info">
                         <h3 id="modalAuthor"></h3>
                         <p>
-                            @<span id="modalUsername"></span>
-                            <span class="post-time">
-                                <i class="bi bi-clock"></i>
-                                <span id="modalCreatedAt"></span>
-                            </span>
+                            <span class="apm-username-pill">@<span id="modalUsername"></span></span>
+                            <span class="apm-date-pill" id="modalCreatedAt"></span>
                         </p>
                     </div>
+                    <span class="apm-status-pill posted" id="modalStatusPill">
+                        <span class="apm-dot"></span>
+                        <span id="modalStatusText">Pending review</span>
+                    </span>
                 </div>
                 
                 <div class="post-content" id="modalContent"></div>
@@ -2006,53 +2012,53 @@ function formatDate($date) {
                     <img src="" alt="Post image" class="post-image" id="modalImage">
                 </div>
                 
-                <!-- Post actions matching homepage.php format -->
-                <div class="post-actions" id="modalPostActions">
-                    <div class="post-action like-button" id="modalLikeButton">
-                        <i class="bi bi-heart" id="modalLikeIcon"></i>
-                        <span id="modalLikeText">Like</span>
-                        <small class="text-muted like-count" style="margin-left: 5px;" id="modalLikeCount">
-                            0
-                        </small>
-                    </div>
-                    <div class="post-action comment-trigger" id="modalCommentButton">
-                        <i class="bi bi-chat-dots"></i>
-                        <span>Comment</span>
-                        <small class="text-muted comment-count" style="margin-left: 5px;" id="modalCommentCount">
-                            0
-                        </small>
+                <div class="apm-engagement">
+                    <span class="apm-engagement-label">Engagement</span>
+                    <div class="post-actions" id="modalPostActions">
+                        <div class="post-action like-button" id="modalLikeButton">
+                            <i class="bi bi-heart" id="modalLikeIcon"></i>
+                            <span id="modalLikeText">Like</span>
+                            <small class="text-muted like-count" id="modalLikeCount">0</small>
+                        </div>
+                        <div class="post-action comment-trigger" id="modalCommentButton">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>Comment</span>
+                            <small class="text-muted comment-count" id="modalCommentCount">0</small>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="post-actions-section">
-                    <h3 class="section-title">Admin Actions</h3>
                     <form class="action-form" id="postActionForm">
                         <input type="hidden" id="actionPostId" name="post_id">
                         
                         <div class="form-group">
-                            <label for="actionComment">Comments / Reason for Action:</label>
-                            <textarea id="actionComment" name="comment" placeholder="Enter your comments or reason for taking this action..."></textarea>
+                            <label for="actionComment">Comments / Reason for action</label>
+                            <textarea id="actionComment" name="comment" maxlength="500" placeholder="Enter your comments or reason for taking this action..."></textarea>
+                            <div class="apm-counter"><span id="actionCommentCount">0</span> / 500</div>
                         </div>
                         
-                        <div class="action-buttons">
-                            <button type="button" class="action-btn btn-approve" data-action="approve">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Approve Post
-                            </button>
-                            <button type="button" class="action-btn btn-hold" data-action="hold">
-                                <i class="bi bi-pause-circle-fill"></i>
-                                Hold Post
-                            </button>
-                            <button type="button" class="action-btn btn-warn" data-action="warn">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                                Send Warning
-                            </button>
-                            <button type="button" class="action-btn btn-delete" data-action="delete">
-                                <i class="bi bi-trash-fill"></i>
-                                Delete Post
-                            </button>
-                        </div>
                     </form>
+                </div>
+            </div>
+            <div class="apm-footer">
+                <div class="action-buttons">
+                    <button type="button" class="action-btn btn-delete" data-action="delete">
+                        <i class="bi bi-trash3"></i>
+                        Delete
+                    </button>
+                    <button type="button" class="action-btn btn-hold" data-action="hold">
+                        <i class="bi bi-pause"></i>
+                        Hold
+                    </button>
+                    <button type="button" class="action-btn btn-warn" data-action="warn">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Send warning
+                    </button>
+                    <button type="button" class="action-btn btn-approve" data-action="approve">
+                        <i class="bi bi-check-lg"></i>
+                        Approve
+                    </button>
                 </div>
             </div>
         </div>
@@ -2256,6 +2262,15 @@ function formatDate($date) {
             const modalCommentCount = document.getElementById('modalCommentCount');
             const actionPostId = document.getElementById('actionPostId');
             
+            // Live character counter for the reason field
+            const actionCommentInput = document.getElementById('actionComment');
+            const actionCommentCounterEl = document.getElementById('actionCommentCount');
+            if (actionCommentInput && actionCommentCounterEl) {
+                actionCommentInput.addEventListener('input', function() {
+                    actionCommentCounterEl.textContent = this.value.length;
+                });
+            }
+            
             // Get post data
             const posts = <?php echo json_encode($posts); ?>;
             
@@ -2344,6 +2359,26 @@ function formatDate($date) {
                     } else {
                         modalImageContainer.style.display = 'none';
                     }
+                    
+                    // Status pill
+                    const modalStatusPill = document.getElementById('modalStatusPill');
+                    const modalStatusText = document.getElementById('modalStatusText');
+                    if (modalStatusPill && modalStatusText) {
+                        const st = (post.status || 'posted').toString().toLowerCase();
+                        let statusLabel = 'Pending review';
+                        let statusClass = 'posted';
+                        if (st === 'approved') { statusLabel = 'Approved'; statusClass = 'approved'; }
+                        else if (st === 'on-hold') { statusLabel = 'On hold'; statusClass = 'on-hold'; }
+                        else if (st === 'warned') { statusLabel = 'Warned'; statusClass = 'warned'; }
+                        modalStatusPill.className = 'apm-status-pill ' + statusClass;
+                        modalStatusText.textContent = statusLabel;
+                    }
+                    
+                    // Reset the reason field and its character counter
+                    const actionCommentField = document.getElementById('actionComment');
+                    if (actionCommentField) actionCommentField.value = '';
+                    const actionCommentCounter = document.getElementById('actionCommentCount');
+                    if (actionCommentCounter) actionCommentCounter.textContent = '0';
                     
                     // Show modal
                     modal.style.display = 'flex';
@@ -2556,13 +2591,13 @@ function formatDate($date) {
                     buttons.forEach(btn => {
                         btn.disabled = false;
                         if (btn.dataset.action === 'approve') {
-                            btn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Approve Post`;
+                            btn.innerHTML = `<i class="bi bi-check-lg"></i> Approve`;
                         } else if (btn.dataset.action === 'warn') {
-                            btn.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Send Warning`;
+                            btn.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Send warning`;
                         } else if (btn.dataset.action === 'delete') {
-                            btn.innerHTML = `<i class="bi bi-trash-fill"></i> Delete Post`;
+                            btn.innerHTML = `<i class="bi bi-trash3"></i> Delete`;
                         } else if (btn.dataset.action === 'hold') {
-                            btn.innerHTML = `<i class="bi bi-pause-circle-fill"></i> Hold Post`;
+                            btn.innerHTML = `<i class="bi bi-pause"></i> Hold`;
                         }
                     });
                 });

@@ -305,10 +305,10 @@ function formatMessageTime($timestamp) {
         flex-direction: column;
         flex: 1;
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 0;
         overflow: hidden;
         height: calc(100vh - 65px); /* Adjust height to be closer to navbar */
-        border: 1px solid var(--color-primary);
+        border: none;
     }
 
     .chat-header {
@@ -759,7 +759,7 @@ function formatMessageTime($timestamp) {
         background-color: #ffffff;
         border-radius: 12px;
         padding: 0;
-        overflow: visible;
+        overflow: hidden;
         height: calc(100vh - 100px);
         position: relative;
         border: 1px solid var(--color-primary);

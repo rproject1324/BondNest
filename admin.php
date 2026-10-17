@@ -17,7 +17,7 @@ if (!function_exists('getInitialsHtml')) {
         $name = trim($first . $last);
         for ($i = 0; $i < mb_strlen($name); $i++) { $hash = ($hash * 31 + mb_ord(mb_substr($name, $i, 1))) & 0x7FFFFFFF; }
         $bg = $colors[$hash % count($colors)];
-        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;font-family:Poppins,sans-serif;flex-shrink:0;">'.$initials.'</div>';
+        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;flex-shrink:0;">'.$initials.'</div>';
     }
 }
 
@@ -353,7 +353,7 @@ function formatDate($date) {
     <title>BondNest Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <?php include 'font-head.php'; ?>
     
     <!-- Store posts data for JavaScript to use -->
     <script id="posts-data" type="application/json">
@@ -381,8 +381,7 @@ function formatDate($date) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+            }
 
         body {
             background-color: #f5f7fb;
@@ -1205,8 +1204,7 @@ function formatDate($date) {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-    }
+        }
 
     /* Navbar styles */
     .navbar {
@@ -2308,7 +2306,7 @@ function formatDate($date) {
                         for (let i = 0; i < n.length; i++) { h = (h * 31 + n.charCodeAt(i)) & 0x7FFFFFFF; }
                         const colors = ['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50'];
                         const bg = colors[h % colors.length];
-                        avatarContainer.innerHTML = '<div style="width:100%;height:100%;background:' + bg + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;font-family:Poppins,sans-serif;">' + (fn + ln).toUpperCase() + '</div>';
+                        avatarContainer.innerHTML = '<div style="width:100%;height:100%;background:' + bg + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;">' + (fn + ln).toUpperCase() + '</div>';
                     }
                     modalAuthor.textContent = post.first_name + ' ' + post.last_name;
                     modalUsername.textContent = post.username;
@@ -2789,7 +2787,7 @@ function formatDate($date) {
                     // Format profile picture
                     const profilePicHtml = post.profile_picture
                         ? `<img src="${post.profile_picture}" alt="User" class="user-avatar">`
-                        : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;font-family:Poppins,sans-serif;">${(fn+ln).toUpperCase()}</div>`; })()
+                        : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">${(fn+ln).toUpperCase()}</div>`; })()
                     
                     return `
                     <tr class="${animate ? 'animate-new-row' : ''}" data-post-id="${post.id}">
@@ -3285,7 +3283,7 @@ function formatDate($date) {
                     // Format profile picture
                     const profilePicHtml = post.profile_picture
                         ? `<img src="${post.profile_picture}" alt="User" class="user-avatar">`
-                        : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;font-family:Poppins,sans-serif;">${(fn+ln).toUpperCase()}</div>`; })()
+                        : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">${(fn+ln).toUpperCase()}</div>`; })()
                     
                     // Determine if this row should be highlighted as new
                     const highlightClass = (highlightNewRows && isNewPost) ? 'highlight-new-row' : '';

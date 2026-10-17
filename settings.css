@@ -21,7 +21,6 @@
 
 body.settings-page {
     background-color: var(--color-light, #f0f2f5);
-    font-family: 'Poppins', sans-serif;
     color: var(--color-dark);
     margin: 0;
     padding: 0;

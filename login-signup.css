@@ -1,5 +1,4 @@
 body {
-    font-family: 'Poppins', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -467,7 +466,6 @@ align-items: center;
     color: #2F3E36;
     background-color: #fff;
     transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
     height: 44px;
     line-height: 44px;
     box-sizing: border-box;

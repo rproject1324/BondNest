@@ -209,11 +209,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BondNest - Sign Up</title>
     <link rel="stylesheet" href="login-signup.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <?php include 'font-head.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -363,7 +362,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .terms-header{background:linear-gradient(135deg,#f0f7f7 0%,#e8f4f3 100%);border-bottom:1px solid rgba(43,158,158,0.12);padding:18px 22px;display:flex;align-items:center;justify-content:space-between}
         .terms-header-left{display:flex;align-items:center;gap:10px}
         .terms-header-icon{width:36px;height:36px;background:linear-gradient(135deg,#2B9E9E,#3CB5A6);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px}
-        .terms-header h2{font-size:1.05rem;font-weight:600;color:#1A3A3A;margin:0;font-family:'Poppins',sans-serif}
+        .terms-header h2{font-size:1.05rem;font-weight:600;color:#1A3A3A;margin:0;}
         .terms-close-btn{background:none;border:none;font-size:18px;color:#6B8F8F;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .2s;line-height:1}.terms-close-btn:hover{background:rgba(43,158,158,0.08);color:#2B9E9E}
         .terms-progress{padding:10px 22px 0;display:flex;align-items:center;gap:8px}
         .terms-progress-bar{flex:1;height:3px;background:rgba(43,158,158,0.10);border-radius:2px;overflow:hidden}
@@ -389,7 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .terms-check-label{display:flex;align-items:flex-start;gap:10px;font-size:.82rem;color:#2F3E36;cursor:pointer;line-height:1.45}
         .terms-checkbox{accent-color:#2B9E9E;width:16px;height:16px;margin-top:2px;flex-shrink:0;cursor:pointer}
         .terms-actions{display:flex;gap:10px;justify-content:flex-end}
-        .terms-btn{padding:9px 20px;border-radius:8px;font-size:.84rem;font-weight:500;cursor:pointer;transition:all .2s;border:none;font-family:'Poppins',sans-serif}
+        .terms-btn{padding:9px 20px;border-radius:8px;font-size:.84rem;font-weight:500;cursor:pointer;transition:all .2s;border:none;}
         .terms-btn--cancel{background:#fff;color:#6B8F8F;border:1px solid #D5DFD9}.terms-btn--cancel:hover{background:#f0f4f2;border-color:#bcc9c0}
         .terms-btn--agree{background:#2B9E9E;color:#fff}.terms-btn--agree:hover{background:#248C8C}
         .terms-btn--agree:disabled{background:#A8D4D4;color:rgba(255,255,255,0.8);cursor:not-allowed;opacity:.7}

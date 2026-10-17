@@ -46,7 +46,7 @@ if (!function_exists('getInitialsHtml')) {
         $name = trim($first . $last);
         for ($i = 0; $i < mb_strlen($name); $i++) { $hash = ($hash * 31 + mb_ord(mb_substr($name, $i, 1))) & 0x7FFFFFFF; }
         $bg = $colors[$hash % count($colors)];
-        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;font-family:Poppins,sans-serif;flex-shrink:0;letter-spacing:0.5px;">'.$initials.'</div>';
+        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;flex-shrink:0;letter-spacing:0.5px;">'.$initials.'</div>';
     }
 }
 ?>
@@ -239,8 +239,7 @@ if (!function_exists('getInitialsHtml')) {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-    }
+        }
 
     /* Navbar styles */
     .navbar {
@@ -307,7 +306,6 @@ if (!function_exists('getInitialsHtml')) {
         background: transparent !important;
         outline: none !important;
         width: 100% !important;
-        font-family: 'Poppins', sans-serif !important;
         font-size: 1rem !important;
         padding: 5px 0 !important;
         color: #333 !important;

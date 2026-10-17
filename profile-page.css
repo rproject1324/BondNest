@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
 /* Global Styles */
 :root {
     --primary: #008080;
@@ -59,7 +59,6 @@
 
 
 body {
-    font-family: "Poppins", sans-serif;
     color: var(--color-dark);
     background: var(--color-light);
     overflow-x: clip;
@@ -1599,8 +1598,7 @@ nav .create .profile_picture img {
 
 nav .search-bar input[type="search"]::placeholder {
     color: var(--color-gray);
-    font-family: "Poppins", sans-serif;
-}
+    }
 /* search-bar */
 nav .search-bar {
     margin-left: -48.5rem; /* push it right next to BondNest */

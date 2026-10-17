@@ -41,7 +41,7 @@ if (!function_exists('getInitialsHtml')) {
         $name = trim($first . $last);
         for ($i = 0; $i < mb_strlen($name); $i++) { $hash = ($hash * 31 + mb_ord(mb_substr($name, $i, 1))) & 0x7FFFFFFF; }
         $bg = $colors[$hash % count($colors)];
-        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;font-family:Poppins,sans-serif;flex-shrink:0;letter-spacing:0.5px;">'.$initials.'</div>';
+        return '<div class="initials-avatar" style="width:'.$size.'px;height:'.$size.'px;border-radius:50%;background:'.$bg.';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:'.($size * 0.38).'px;flex-shrink:0;letter-spacing:0.5px;">'.$initials.'</div>';
     }
 }
 ?>
@@ -199,7 +199,6 @@ main .container .left .profile .profile_picture img {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
     letter-spacing: 0.5px;
     flex-shrink: 0;
     border-radius: 50%;

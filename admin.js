@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let i = 0; i < n.length; i++) { h = (h * 31 + n.charCodeAt(i)) & 0x7FFFFFFF; }
                 const colors = ['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50'];
                 const bg = colors[h % colors.length];
-                modalAvatarContainer.innerHTML = '<div style="width:100%;height:100%;background:' + bg + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;font-family:Poppins,sans-serif;">' + (fn + ln).toUpperCase() + '</div>';
+                modalAvatarContainer.innerHTML = '<div style="width:100%;height:100%;background:' + bg + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;">' + (fn + ln).toUpperCase() + '</div>';
             }
         }
         modalAuthor.textContent = `${post.first_name || ''} ${post.last_name || ''}`.trim();

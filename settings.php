@@ -497,6 +497,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BondNest | Settings</title>
+    <?php include 'font-head.php'; ?>
     <!-- Bootstrap Icons & FontAwesome -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1043,7 +1044,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                         const name = firstName + lastName;
                         for (let i = 0; i < name.length; i++) { hash = (hash * 31 + name.charCodeAt(i)) & 0x7FFFFFFF; }
                         const bg = colors[hash % colors.length];
-                        avatarPreviewContainer.innerHTML = `<div class="initials-avatar" style="width:100px;height:100px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:2.2rem;font-family:Poppins,sans-serif;">${initials}</div>`;
+                        avatarPreviewContainer.innerHTML = `<div class="initials-avatar" style="width:100px;height:100px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:2.2rem;">${initials}</div>`;
                         showToast(data.message, 'success');
                         btn.remove();
                         // Update navbar and sidebar avatars
@@ -1077,7 +1078,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             const name = firstName + lastName;
             for (let i = 0; i < name.length; i++) { hash = (hash * 31 + name.charCodeAt(i)) & 0x7FFFFFFF; }
             const bg = colors[hash % colors.length];
-            const initialsHtml = `<div class="initials-avatar" style="width:40px;height:40px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;font-family:Poppins,sans-serif;">${initials}</div>`;
+            const initialsHtml = `<div class="initials-avatar" style="width:40px;height:40px;border-radius:50%;background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;">${initials}</div>`;
             // Navbar avatar
             const navProfilePic = document.querySelector('.navbar-right .profile-picture');
             if (navProfilePic) navProfilePic.innerHTML = initialsHtml;

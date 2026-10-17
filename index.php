@@ -323,7 +323,8 @@ $loggedIn = isset($_SESSION['user_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BondNest - Log In / Sign Up</title>
-    <link rel="stylesheet" href="login-signup.css"> <link rel="stylesheet" href="login.css"> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login-signup.css"> <link rel="stylesheet" href="login.css">
+    <?php include 'font-head.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
 </head>
@@ -572,7 +573,7 @@ $loggedIn = isset($_SESSION['user_id']);
         toast.innerHTML = '<i class="fas ' + icon + '" aria-hidden="true"></i><span></span>';
         var span = toast.querySelector('span');
         if (span) span.textContent = String(message || '');
-        toast.style.cssText = 'position:fixed;top:24px;right:24px;padding:14px 20px;border-radius:10px;display:flex;align-items:center;gap:10px;font-weight:500;font-size:.88rem;z-index:13000;box-shadow:0 4px 20px rgba(0,0,0,0.15);transform:translateX(calc(100% + 28px));transition:transform .3s ease,opacity .3s ease;max-width:400px;word-wrap:break-word;opacity:0;font-family:Poppins,sans-serif;';
+        toast.style.cssText = 'position:fixed;top:24px;right:24px;padding:14px 20px;border-radius:10px;display:flex;align-items:center;gap:10px;font-weight:500;font-size:.88rem;z-index:13000;box-shadow:0 4px 20px rgba(0,0,0,0.15);transform:translateX(calc(100% + 28px));transition:transform .3s ease,opacity .3s ease;max-width:400px;word-wrap:break-word;opacity:0;';
         if (kind === 'success') { toast.style.backgroundColor = '#008080'; toast.style.color = '#fff'; }
         else if (kind === 'error') { toast.style.backgroundColor = '#e74c3c'; toast.style.color = '#fff'; }
         else { toast.style.backgroundColor = '#5a9068'; toast.style.color = '#fff'; }

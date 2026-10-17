@@ -505,6 +505,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
     <link rel="stylesheet" href="homepage2.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="sidebar.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="settings.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="settings-profile-card.css?v=<?php echo time(); ?>">
     <style>
     :root {
         --primary-color-hue: 180;
@@ -550,9 +551,13 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                     <!-- 1. Personal Information Panel -->
                     <div class="settings-panel active" id="personalPanel">
                         <div class="settings-card">
-                            <h2 class="settings-card-title">
-                                <i class="bi bi-person-badge"></i> Profile Details
-                            </h2>
+                            <div class="settings-card-head">
+                                <span class="settings-card-icon"><i class="bi bi-person-vcard"></i></span>
+                                <div class="settings-card-heading">
+                                    <h2 class="settings-card-title">Profile Details</h2>
+                                    <p class="settings-card-subtitle">Update your photo and personal information</p>
+                                </div>
+                            </div>
 
                             <!-- Avatar Changer -->
                             <div class="settings-avatar-section">
@@ -583,6 +588,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                             <!-- Personal Details Form -->
                             <form id="personalInfoForm">
                                 <div class="settings-form-grid">
+                                    <div class="settings-group-label">Basic Information</div>
                                     <div class="settings-field">
                                         <label class="settings-label" for="firstName">First Name</label>
                                         <div class="settings-input-wrap">
@@ -611,7 +617,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                     </div>
 
                                     <div class="settings-field">
-                                        <label class="settings-label" for="email">Email Address <small>(Verification required if changed)</small></label>
+                                        <label class="settings-label settings-label--split" for="email"><span>Email Address</span> <small><i class="bi bi-info-circle"></i> Verification required if changed</small></label>
                                         <div class="settings-input-wrap">
                                             <i class="bi bi-envelope settings-input-icon"></i>
                                             <input type="email" id="email" name="email" class="settings-input" value="<?php echo $email; ?>" required>
@@ -619,6 +625,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                         <div class="custom-error" id="email-error"></div>
                                     </div>
 
+                                    <div class="settings-group-label">Personal Details</div>
                                     <div class="settings-field">
                                         <label class="settings-label" for="gender">Gender</label>
                                         <div class="settings-input-wrap">
@@ -656,6 +663,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                         </div>
                                     </div>
 
+                                    <div class="settings-group-label">Interests &amp; Links</div>
                                     <div class="settings-field">
                                         <label class="settings-label" for="interests">Interests</label>
                                         <div class="settings-input-wrap">
@@ -672,10 +680,11 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                         </div>
                                     </div>
 
+                                    <div class="settings-group-label">About You</div>
                                     <div class="settings-field full-width">
-                                        <label class="settings-label" for="bio">Bio <small>(Minimum 10 characters)</small></label>
+                                        <label class="settings-label settings-label--split" for="bio"><span>Bio</span> <small><i class="bi bi-info-circle"></i> Minimum 10 characters</small></label>
                                         <textarea id="bio" name="bio" class="settings-input no-icon" rows="4" minlength="10" placeholder="Tell us about yourself..."><?php echo $bio; ?></textarea>
-                                        <div class="char-counter"><span id="bioCharCount"><?php echo strlen($bio); ?></span>/10 characters min</div>
+                                        <div class="char-counter"><i class="bi bi-check2"></i> <span id="bioCharCount"><?php echo strlen($bio); ?></span> / 10 min</div>
                                         <div class="custom-error" id="bio-error"></div>
                                     </div>
                                 </div>

@@ -17,6 +17,13 @@
     --epm-placeholder: #9aa6ad;
     --epm-danger: #e5484d;
     --epm-danger-soft: #fdecec;
+    overflow: hidden !important;
+}
+
+/* No oversized fixed backdrop (avoids a horizontal scrollbar) */
+#editPostModal .modal-backdrop {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* ---- Card ---- */

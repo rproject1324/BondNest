@@ -6,7 +6,8 @@
    body 16/400, helper 13/400, labels 14/500, buttons 15/500).
    ===================================================================== */
 
-#createPostModal {
+#createPostModal,
+#createPostModal.modal-container {
     --cpm-teal: #0e8b7f;
     --cpm-teal-dark: #0b6f66;
     --cpm-teal-soft: #e7f5f2;
@@ -16,11 +17,21 @@
     --cpm-border: #e4eceb;
     --cpm-placeholder: #9aa6ad;
 
-    /* Consistent gap between the navbar and the modal (matches the profile page) */
+    /* Fill the area below the navbar, no overlay scrollbars */
     align-items: flex-start !important;
+    justify-content: center !important;
+    top: 74px !important;
+    height: calc(100% - 74px) !important;
     padding-top: 50px !important;
     padding-bottom: 50px !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* No oversized fixed backdrop (avoids a horizontal scrollbar) */
+#createPostModal .modal-backdrop {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* ---- Card ---- */
@@ -34,9 +45,18 @@
     width: 100% !important;
     max-width: 500px !important;
     height: auto !important;
-    max-height: 90vh !important;
+    max-height: calc(100vh - 174px) !important;
     margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
     box-shadow: 0 24px 60px rgba(15, 45, 45, 0.22) !important;
+}
+
+/* Body scrolls internally instead of the overlay */
+#createPostModal .modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
 }
 
 #createPostModal #postForm {

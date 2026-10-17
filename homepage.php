@@ -1726,6 +1726,34 @@ if (menuTrigger) {
                     }
                 })();
                 </script>
+                <script>
+                (function () {
+                    var ids = ['createPostModal', 'editPostModal'];
+                    function sync() {
+                        var open = false;
+                        ids.forEach(function (id) {
+                            var el = document.getElementById(id);
+                            if (!el) { return; }
+                            var d = window.getComputedStyle(el).display;
+                            if (d && d !== 'none') { open = true; }
+                        });
+                        document.body.style.overflow = open ? 'hidden' : '';
+                    }
+                    function init() {
+                        ids.forEach(function (id) {
+                            var el = document.getElementById(id);
+                            if (!el) { return; }
+                            new MutationObserver(sync).observe(el, { attributes: true, attributeFilter: ['style'] });
+                        });
+                        sync();
+                    }
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', init);
+                    } else {
+                        init();
+                    }
+                })();
+                </script>
                 <!------------------------------------------- FEED SECTION -------------------------------------------->
 <!------------------------------------------- FEED SECTION -------------------------------------------->
 <div class="feeds">

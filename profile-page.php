@@ -2391,8 +2391,9 @@ unset($_SESSION['form_data']);
         margin-top: 5px;
         }
     </style>
-    <link rel="stylesheet" href="create-post-modal.css?v=<?php echo time(); ?>">
-</head>
+  <link rel="stylesheet" href="create-post-modal.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="comments-modal.css?v=<?php echo time(); ?>">
+  </head>
 <body class="profile-page">
 <?php include 'navbar.php'; ?>
 <?php include 'mobile-nav.php'; ?>
@@ -2959,8 +2960,11 @@ unset($_SESSION['form_data']);
 <div class="comment-modal" id="commentModal" style="display:none;">
     <div class="comment-modal-content">
         <div class="comment-header">
-            <h3>Comments</h3>
-            <span class="close-comment" id="closeCommentModal">&times;</span>
+            <div class="comment-header-left">
+                <h3>Comments</h3>
+                <span class="comment-count-badge" id="commentCountBadge">0</span>
+            </div>
+            <button type="button" class="close-comment" id="closeCommentModal" aria-label="Close">&times;</button>
         </div>
         <div class="comments-container">
             <div class="comment-list" id="commentList"></div>
@@ -2971,8 +2975,17 @@ unset($_SESSION['form_data']);
                 </div>
                 <input type="hidden" name="parent_id" id="replyParentId" value="">
                 <input type="hidden" name="post_id" value="">
-                <textarea class="comment-input" placeholder="Write a comment..." name="comment-content" required rows="2" maxlength="1000"></textarea>
-                <button type="submit" class="btn btn-primary">Post Comment</button>
+                <div class="comment-compose">
+                    <span class="comment-compose-avatar">
+                        <?php if (!empty($user['profile_picture'])): ?>
+                            <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="Your profile">
+                        <?php else: ?>
+                            <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 40); ?>
+                        <?php endif; ?>
+                    </span>
+                    <textarea class="comment-input" placeholder="Write a comment..." name="comment-content" required rows="1" maxlength="1000"></textarea>
+                    <button type="submit" class="post-comment-btn">Post Comment</button>
+                </div>
             </form>
         </div>
     </div>
@@ -3492,29 +3505,10 @@ document.addEventListener('click', function(e) {
             overflow: auto !important;
         `;
 
+        // Layout/styling is handled by comments-modal.css; only force display mode here.
         const modalContent = commentModal.querySelector('.comment-modal-content');
         if (modalContent) {
-            modalContent.style.cssText = `
-                background: white !important;
-                border-radius: 10px !important;
-                margin: 50px auto !important;
-                padding: 20px !important;
-                width: 90% !important;
-                max-width: 600px !important;
-                max-height: 80vh !important;
-                overflow: hidden !important;
-                display: flex !important;
-                flex-direction: column !important;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2) !important;
-            `;
-            const commentsContainer = modalContent.querySelector('.comments-container');
-            if (commentsContainer) {
-                commentsContainer.style.cssText = `flex: 1 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; background: transparent !important;`;
-            }
-            const commentList = modalContent.querySelector('.comment-list');
-            if (commentList) {
-                commentList.style.cssText = `flex: 1 !important; overflow-y: auto !important; padding: 0 15px !important; margin-bottom: 60px !important; background: transparent !important;`;
-            }
+            modalContent.style.cssText = `display: flex !important; flex-direction: column !important;`;
         }
 
         void commentModal.offsetWidth;
@@ -3661,15 +3655,17 @@ function loadComments(postId) {
             if (data.error) throw new Error(data.error);
             commentList.innerHTML = '';
             clearReply();
+
+            const badge = document.getElementById('commentCountBadge');
+            const totalComments = (data.comments || []).reduce(
+                (sum, c) => sum + 1 + (c.replies ? c.replies.length : 0), 0
+            );
+            if (badge) badge.textContent = totalComments;
+
             if (!data.comments || data.comments.length === 0) {
                 commentList.innerHTML = '<div class="no-comments" style="text-align: center; padding: 40px; color: #888;">No comments yet. Be the first to comment!</div>';
                 return;
             }
-            commentList.style.maxHeight = '400px';
-            commentList.style.overflowY = 'auto';
-            commentList.style.padding = '0 15px';
-            commentList.style.marginBottom = '60px';
-            commentList.style.background = 'transparent';
             data.comments.forEach(comment => {
                 try {
                     commentList.appendChild(createCommentElement(comment));
@@ -3697,44 +3693,30 @@ function createCommentElement(comment) {
         : (() => { const f = (comment.first_name||'')[0]||''; const l = (comment.last_name||'')[0]||''; const n = (comment.first_name||'')+(comment.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="comment-avatar initials-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">${(f+l).toUpperCase()}</div>`; })()
 
     const replyToHtml = comment.reply_to_name 
-        ? `<div style="font-size:0.75rem;color:#008080;margin-bottom:2px;display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg> Replying to <strong>${comment.reply_to_name}</strong></div>`
+        ? `<div class="comment-reply-to"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg> Replying to <strong>${comment.reply_to_name}</strong></div>`
         : '';
 
     div.innerHTML = `
         <div class="comment-content">
             ${avatarHtml}
             <div class="comment-body">
-                ${replyToHtml}
-                <div style="display: flex; width: 100%; background: transparent;">
-                    <h4 class="comment-author" style="background: transparent; margin: 0; padding: 0;">${comment.first_name} ${comment.last_name}</h4>
+                <div class="comment-meta-row">
+                    <h4 class="comment-author">${comment.first_name} ${comment.last_name}</h4>
+                    <small class="comment-time" data-timestamp="${comment.created_at}">${formatTimeAgo(comment.created_at)}</small>
                 </div>
+                ${replyToHtml}
                 <p class="comment-text">${formattedContent}</p>
                 <div class="comment-time-row">
-                    <small class="comment-time" style="font-size: 0.75rem; color: #999;" data-timestamp="${comment.created_at}">${formatTimeAgo(comment.created_at)}</small>
                     <button class="reply-btn" data-comment-id="${comment.id}" data-author="${comment.first_name} ${comment.last_name}">Reply</button>
                 </div>
             </div>
             ${isCommentAuthor ? `
-            <div class="comment-actions" style="position: absolute; right: 5px; top: 5px; z-index: 100;">
-                <i class="bi bi-three-dots-vertical comment-menu-trigger" data-comment-id="${comment.id}" style="cursor: pointer; padding: 8px; border-radius: 50%; transition: background-color 0.2s;"></i>
+            <div class="comment-actions">
+                <i class="bi bi-three-dots-vertical comment-menu-trigger" data-comment-id="${comment.id}"></i>
             </div>
             ` : ''}
         </div>
     `;
-
-    const commentText = div.querySelector('.comment-text');
-    if (commentText) {
-        commentText.style.cssText = `position: relative !important; background: #f0f2f5 !important; padding: 8px 12px !important; border-radius: 18px !important; word-wrap: break-word !important; overflow-wrap: break-word !important; width: fit-content !important; max-width: 100% !important; margin: 2px 0 !important; line-height: 1.4 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;`;
-    }
-    const commentContent = div.querySelector('.comment-content');
-    if (commentContent) {
-        commentContent.style.cssText = `display: flex !important; align-items: flex-start !important; width: 100% !important; background: transparent !important; position: relative !important;`;
-    }
-    div.style.background = 'transparent';
-    const commentBody = div.querySelector('.comment-body');
-    if (commentBody) {
-        commentBody.style.cssText = `flex: 1 !important; max-width: calc(100% - 50px) !important; display: flex !important; flex-direction: column !important; background: transparent !important;`;
-    }
 
     // Reply button click
     const replyBtn = div.querySelector('.reply-btn');
@@ -3801,40 +3783,35 @@ function createCommentElement(comment) {
         });
     }
 
-    // If this comment has replies, render them nested with "View replies" toggle
+    // If this comment has replies, render them nested with a "Hide/View replies" toggle
     if (comment.replies && comment.replies.length > 0) {
         const repliesContainer = document.createElement('div');
         repliesContainer.className = 'replies-container';
-        
+        comment.replies.forEach(reply => {
+            repliesContainer.appendChild(createCommentElement(reply));
+        });
+        div.appendChild(repliesContainer);
+
+        // Place the toggle next to "Reply" in the parent's action row
         if (comment.replies.length > 1) {
-            const hiddenReplies = document.createElement('div');
-            hiddenReplies.className = 'hidden-replies';
-            hiddenReplies.style.display = 'none';
-            comment.replies.forEach(reply => {
-                hiddenReplies.appendChild(createCommentElement(reply));
-            });
-            repliesContainer.appendChild(hiddenReplies);
-            
             const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
             toggleBtn.className = 'view-replies-btn';
-            toggleBtn.textContent = `View ${comment.replies.length} replies`;
-            toggleBtn.style.cssText = 'background:none;border:none;color:#008080;font-size:0.8rem;cursor:pointer;padding:4px 0;margin-top:4px;font-weight:500;display:block;';
-            let expanded = false;
+            let expanded = true;
+            const updateLabel = () => {
+                toggleBtn.textContent = expanded
+                    ? `Hide ${comment.replies.length} replies`
+                    : `View ${comment.replies.length} replies`;
+            };
+            updateLabel();
             toggleBtn.addEventListener('click', () => {
                 expanded = !expanded;
-                hiddenReplies.style.display = expanded ? 'block' : 'none';
-                toggleBtn.textContent = expanded 
-                    ? 'Hide replies' 
-                    : `View ${comment.replies.length} replies`;
+                repliesContainer.style.display = expanded ? '' : 'none';
+                updateLabel();
             });
-            repliesContainer.appendChild(toggleBtn);
-        } else {
-            comment.replies.forEach(reply => {
-                repliesContainer.appendChild(createCommentElement(reply));
-            });
+            const actionRow = div.querySelector('.comment-time-row');
+            if (actionRow) actionRow.appendChild(toggleBtn);
         }
-        
-        div.appendChild(repliesContainer);
     }
 
     return div;

@@ -3139,9 +3139,12 @@ unset($_SESSION['form_data']);
 <div class="edit-post-modal" id="editPostModal" style="display:none;">
     <div class="edit-post-modal-content" style="position:relative; z-index:1001;">
         <div class="edit-post-header">
-            <div class="edit-post-header-text">
-                <h2>Edit post</h2>
-                <p class="edit-post-subtitle">Update your caption or photo</p>
+            <div class="edit-post-header-main">
+                <span class="edit-post-header-icon"><i class="bi bi-pencil"></i></span>
+                <div class="edit-post-header-text">
+                    <h2>Edit post</h2>
+                    <p class="edit-post-subtitle">Update your caption or photo</p>
+                </div>
             </div>
             <button type="button" class="edit-post-close" id="closeEditPost" aria-label="Close">&times;</button>
         </div>

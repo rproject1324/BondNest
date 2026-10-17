@@ -23,6 +23,7 @@
 #editPostModal .edit-post-modal-content {
     background: #ffffff !important;
     border: none !important;
+    border-top: 5px solid var(--epm-teal) !important;
     border-radius: 20px !important;
     padding: 0 !important;
     overflow: hidden !important;
@@ -52,6 +53,27 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 4px !important;
+}
+
+/* ---- Header icon badge ---- */
+#editPostModal .edit-post-header-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+}
+
+#editPostModal .edit-post-header-icon {
+    flex: 0 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: var(--epm-teal-soft) !important;
+    color: var(--epm-teal) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
 }
 
 #editPostModal .edit-post-header h2 {
@@ -365,6 +387,9 @@
 }
 
 #editPostModal .edit-post-actions .post-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
     width: auto !important;
     padding: 11px 30px !important;
     border: none !important;
@@ -377,6 +402,13 @@
     cursor: pointer !important;
     box-shadow: 0 6px 16px rgba(14, 139, 127, 0.22) !important;
     transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+#editPostModal .edit-post-actions .post-button::before {
+    content: '\2713' !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
 }
 
 #editPostModal .edit-post-actions .post-button:hover {

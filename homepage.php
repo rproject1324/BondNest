@@ -2006,9 +2006,12 @@ if (menuTrigger) {
     <div class="modal-backdrop" style="position:fixed; top:0; left:0; width:100vw; height:100vh; cursor:pointer; z-index:1000;" onclick="document.getElementById('editPostModal').style.display='none';"></div>
     <div class="edit-post-modal-content" style="position:relative; z-index:1001;">
         <div class="edit-post-header">
-            <div class="edit-post-header-text">
-                <h2>Edit post</h2>
-                <p class="edit-post-subtitle">Update your caption or photo</p>
+            <div class="edit-post-header-main">
+                <span class="edit-post-header-icon"><i class="bi bi-pencil"></i></span>
+                <div class="edit-post-header-text">
+                    <h2>Edit post</h2>
+                    <p class="edit-post-subtitle">Update your caption or photo</p>
+                </div>
             </div>
             <button type="button" class="edit-post-close" id="closeEditPost" aria-label="Close">&times;</button>
         </div>

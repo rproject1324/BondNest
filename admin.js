@@ -161,29 +161,42 @@ document.addEventListener('DOMContentLoaded', function() {
             const highlightClass = highlightNewRows ? 'highlight-new-row' : '';
             
             return `
-            <div class="post-row ${highlightClass}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
-                <div class="pr-thumb ${hasImage}">
-                    <i class="bi bi-${imageIcon}"></i>
-                </div>
-                <div class="pr-main">
-                    <div class="pr-author">
-                        <span class="pr-name user-name">${escapeHTML(post.first_name || '')} ${escapeHTML(post.last_name || '')}</span>
-                        <span class="pr-username username">@${escapeHTML(post.username || '')}</span>
-                        <span class="pr-id">#${post.id}</span>
+            <tr class="${highlightClass}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
+                <td>${post.id}</td>
+                <td>
+                    <div class="user-cell">
+                        <img src="${escapeHTML(profilePic)}" alt="User" class="user-avatar">
+                        <div class="user-info">
+                            <div class="user-name">${escapeHTML(post.first_name || '')} ${escapeHTML(post.last_name || '')}</div>
+                            <div class="username">@${escapeHTML(post.username || '')}</div>
+                        </div>
                     </div>
-                    <div class="pr-content content-cell" title="${escapeHTML(post.content || '')}">${escapeHTML(contentPreview)}</div>
-                    <div class="pr-date">${formatDate(post.created_at)}</div>
-                </div>
-                <div class="pr-actions">
-                    <span class="engagement-count like-count">
+                </td>
+                <td class="content-cell" title="${escapeHTML(post.content || '')}">
+                    ${escapeHTML(contentPreview)}
+                </td>
+                <td class="image-cell">
+                    <span class="${hasImage}">
+                        <i class="bi bi-${imageIcon}"></i>
+                    </span>
+                </td>
+                <td>${formatDate(post.created_at)}</td>
+                <td>
+                    <span class="engagement-count">
                         ${parseInt(post.likes) > 0 ? '<i class="bi bi-heart-fill" style="color:#e63946;"></i>' : '<i class="bi bi-heart"></i>'}
                         ${post.likes || 0}
                     </span>
-                    <span class="engagement-count comment-count">
+                </td>
+                <td>
+                    <span class="engagement-count">
                         <i class="bi bi-chat-dots"></i>
                         ${post.comment_count || 0}
                     </span>
+                </td>
+                <td>
                     ${statusBadge}
+                </td>
+                <td>
                     <div class="action-btns">
                         <button class="btn btn-view btn-sm view-btn" data-post-id="${post.id}">
                             <i class="bi bi-eye-fill"></i>
@@ -194,13 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             Warn
                         </button>
                     </div>
-                </div>
-            </div>
+                </td>
+            </tr>
             `;
         }).join('');
         
-        // Update the list
-        postsTableBody.innerHTML = html || '<div class="empty-state"><i class="bi bi-file-earmark-excel"></i><h3>No Posts Found</h3><p>There are currently no posts to display.</p></div>';
+        // Update the table
+        postsTableBody.innerHTML = html;
     }
     
     /**
@@ -719,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('.post-row');
+            const rows = document.querySelectorAll('.post-table tbody tr');
             
             rows.forEach(row => {
                 const content = row.querySelector('.content-cell').textContent.toLowerCase();
@@ -727,9 +740,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const name = row.querySelector('.user-name').textContent.toLowerCase();
                 
                 if (content.includes(searchTerm) || username.includes(searchTerm) || name.includes(searchTerm)) {
-                    row.classList.remove('is-hidden');
+                    row.style.display = '';
                 } else {
-                    row.classList.add('is-hidden');
+                    row.style.display = 'none';
                 }
             });
         });

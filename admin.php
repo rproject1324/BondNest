@@ -1698,10 +1698,11 @@ function formatDate($date) {
         </div>
         <nav class="admin-menu">
             <a href="admin.php" class="admin-menu-item active"><i class="bi bi-grid"></i> Overview</a>
-            <a href="admin.php" class="admin-menu-item"><i class="bi bi-file-earmark-text"></i> Posts</a>
-            <a href="#" class="admin-menu-item"><i class="bi bi-people"></i> Users</a>
-            <a href="#" class="admin-menu-item"><i class="bi bi-activity"></i> Activity</a>
+            <span class="admin-menu-item is-soon"><i class="bi bi-file-earmark-text"></i> Posts <span class="admin-menu-badge">In Development</span></span>
+            <span class="admin-menu-item is-soon"><i class="bi bi-people"></i> Users <span class="admin-menu-badge">In Development</span></span>
+            <span class="admin-menu-item is-soon"><i class="bi bi-activity"></i> Activity <span class="admin-menu-badge">In Development</span></span>
         </nav>
+        <p class="admin-nav-note">More features are in development to help you manage your community faster.</p>
         <a href="index.php" class="admin-logout" id="logoutButton"><i class="bi bi-box-arrow-right"></i> Log Out</a>
     </aside>
     <main class="admin-main">
@@ -1784,75 +1785,110 @@ function formatDate($date) {
             <div class="post-table-container">
                 <div class="table-header">
                     <h2 class="section-title">Recent Posts</h2>
-                    <div class="admin-tabs">
-                        <button type="button" class="admin-tab active" data-tab="all">All</button>
-                        <button type="button" class="admin-tab" data-tab="posted">Posted</button>
-                        <button type="button" class="admin-tab" data-tab="flagged">Flagged</button>
-                    </div>
                 </div>
 
-                <div class="posts-list" id="posts-table-body">
-                    <?php if (!empty($posts)): ?>
-                        <?php foreach ($posts as $post): ?>
-                        <div class="post-row" data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo strtolower($post['status']); ?>">
-                            <div class="pr-thumb <?php echo !empty($post['image_path']) ? 'has-image' : 'no-image'; ?>">
-                                <i class="bi bi-<?php echo !empty($post['image_path']) ? 'image-fill' : 'image'; ?>"></i>
-                            </div>
-                            <div class="pr-main">
-                                <div class="pr-author">
-                                    <span class="pr-name user-name"><?php echo htmlspecialchars(($post['first_name'] ?? '') . ' ' . ($post['last_name'] ?? '')); ?></span>
-                                    <span class="pr-username username">@<?php echo htmlspecialchars($post['username'] ?? ''); ?></span>
-                                    <span class="pr-id">#<?php echo $post['id']; ?></span>
-                                </div>
-                                <div class="pr-content content-cell" title="<?php echo htmlspecialchars($post['content']); ?>">
+                <div class="table-responsive">
+                    <table class="post-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Content</th>
+                                <th>Image</th>
+                                <th>Created</th>
+                                <th>Likes</th>
+                                <th>Comments</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="posts-table-body">
+                        <?php if (!empty($posts)): ?>
+                            <?php foreach ($posts as $post): ?>
+                            <tr data-post-id="<?php echo $post['id']; ?>" data-status="<?php echo strtolower($post['status']); ?>">
+                                <td><?php echo $post['id']; ?></td>
+                                <td>
+                                    <div class="user-cell">
+                                        <?php if (!empty($post['profile_picture'])): ?>
+                                            <img src="<?php echo htmlspecialchars($post['profile_picture']); ?>" alt="User" class="user-avatar">
+                                        <?php else: ?>
+                                            <?php echo getInitialsHtml($post['first_name'] ?? '', $post['last_name'] ?? '', 40); ?>
+                                        <?php endif; ?>
+                                        <div class="user-info">
+                                            <div class="user-name"><?php echo htmlspecialchars($post['first_name'] . ' ' . $post['last_name']); ?></div>
+                                            <div class="username">@<?php echo htmlspecialchars($post['username']); ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="content-cell" title="<?php echo htmlspecialchars($post['content']); ?>">
                                     <?php echo htmlspecialchars(substr($post['content'], 0, 50)) . (strlen($post['content']) > 50 ? '...' : ''); ?>
-                                </div>
-                                <div class="pr-date"><?php echo formatDate($post['created_at']); ?></div>
-                            </div>
-                            <div class="pr-actions">
-                                <span class="engagement-count like-count">
-                                    <?php if (($post['likes'] ?? 0) > 0): ?>
-                                        <i class="bi bi-heart-fill" style="color: #e63946;"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-heart"></i>
-                                    <?php endif; ?>
-                                    <?php echo $post['likes'] ?? 0; ?>
-                                </span>
-                                <span class="engagement-count comment-count">
-                                    <i class="bi bi-chat-dots"></i>
-                                    <?php echo $post['comment_count'] ?? 0; ?>
-                                </span>
-                                <span class="status-badge status-<?php echo strtolower($post['status']); ?>">
-                                    <?php if($post['status'] === 'on-hold'): ?>
-                                        <i class="bi bi-pause-circle-fill"></i> On Hold
-                                    <?php elseif($post['status'] === 'approved'): ?>
-                                        <i class="bi bi-check-circle-fill"></i> Approved
-                                    <?php elseif($post['status'] === 'posted'): ?>
-                                        <i class="bi bi-file-post"></i> Posted
-                                    <?php else: ?>
-                                        <i class="bi bi-clock"></i> <?php echo ucfirst($post['status']); ?>
-                                    <?php endif; ?>
-                                </span>
-                                <div class="action-btns">
-                                    <button class="btn btn-view btn-sm view-btn" data-post-id="<?php echo $post['id']; ?>">
-                                        <i class="bi bi-eye-fill"></i>
-                                        View
-                                    </button>
-                                    <button class="btn btn-warn btn-sm warn-btn" data-post-id="<?php echo $post['id']; ?>">
-                                        <i class="bi bi-exclamation-triangle-fill"></i>
-                                        Warn
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="bi bi-file-earmark-excel"></i>
-                            <h3>No Posts Found</h3>
-                            <p>There are currently no posts to display. Check back later or encourage users to create content.</p>
-                        </div>
-                    <?php endif; ?>
+                                </td>
+                                <td class="image-cell">
+                                    <span class="<?php echo $post['image_path'] ? 'has-image' : 'no-image'; ?>">
+                                        <i class="bi bi-<?php echo $post['image_path'] ? 'image-fill' : 'image'; ?>"></i>
+                                    </span>
+                                </td>
+                                <td><?php echo formatDate($post['created_at']); ?></td>
+                                <td>
+                                    <span class="engagement-count">
+                                        <?php if (($post['likes'] ?? 0) > 0): ?>
+                                            <i class="bi bi-heart-fill" style="color: #e63946;"></i>
+                                        <?php else: ?>
+                                            <i class="bi bi-heart"></i>
+                                        <?php endif; ?>
+                                        <?php echo $post['likes'] ?? 0; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="engagement-count">
+                                        <i class="bi bi-chat-dots"></i>
+                                        <?php echo $post['comment_count'] ?? 0; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<?php echo strtolower($post['status']); ?>">
+                                        <?php if($post['status'] === 'on-hold'): ?>
+                                            <i class="bi bi-pause-circle-fill"></i>
+                                            On Hold
+                                        <?php elseif($post['status'] === 'approved'): ?>
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            Approved
+                                        <?php elseif($post['status'] === 'posted'): ?>
+                                            <i class="bi bi-file-post"></i>
+                                            Posted
+                                        <?php else: ?>
+                                            <i class="bi bi-clock"></i>
+                                            <?php echo ucfirst($post['status']); ?>
+                                        <?php endif; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="btn btn-view btn-sm view-btn" data-post-id="<?php echo $post['id']; ?>">
+                                            <i class="bi bi-eye-fill"></i>
+                                            View
+                                        </button>
+                                        <button class="btn btn-warn btn-sm warn-btn" data-post-id="<?php echo $post['id']; ?>">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            Warn
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9">
+                                    <div class="empty-state">
+                                        <i class="bi bi-file-earmark-excel"></i>
+                                        <h3>No Posts Found</h3>
+                                        <p>There are currently no posts to display. Check back later or encourage users to create content.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="pagination" <?php echo ($total_posts == 0) ? 'style="display: none;"' : ''; ?>>
@@ -1939,28 +1975,31 @@ function formatDate($date) {
             ?>
             <aside class="admin-engagement">
                 <h3>Engagement</h3>
-                <div class="eng-item eng-likes">
-                    <div class="eng-item-top">
-                        <span>Likes</span>
-                        <span class="eng-val"><?php echo $eng_likes; ?></span>
+                <p class="eng-subtitle">Across the <?php echo $eng_total; ?> post<?php echo ($eng_total == 1) ? '' : 's'; ?> shown</p>
+                <div class="eng-list">
+                    <div class="eng-item eng-likes">
+                        <div class="eng-item-top">
+                            <span class="eng-name"><i class="bi bi-heart-fill"></i> Likes</span>
+                            <span class="eng-val"><?php echo $eng_likes; ?></span>
+                        </div>
+                        <div class="eng-track"><div class="eng-fill" style="width: <?php echo $eng_likes_pct; ?>%;"></div></div>
                     </div>
-                    <div class="eng-bar"><span style="width: <?php echo $eng_likes_pct; ?>%;"></span></div>
-                </div>
-                <div class="eng-item eng-comments">
-                    <div class="eng-item-top">
-                        <span>Comments</span>
-                        <span class="eng-val"><?php echo $eng_comments; ?></span>
+                    <div class="eng-item eng-comments">
+                        <div class="eng-item-top">
+                            <span class="eng-name"><i class="bi bi-chat-dots-fill"></i> Comments</span>
+                            <span class="eng-val"><?php echo $eng_comments; ?></span>
+                        </div>
+                        <div class="eng-track"><div class="eng-fill" style="width: <?php echo $eng_comments_pct; ?>%;"></div></div>
                     </div>
-                    <div class="eng-bar"><span style="width: <?php echo $eng_comments_pct; ?>%;"></span></div>
-                </div>
-                <div class="eng-item eng-images">
-                    <div class="eng-item-top">
-                        <span>Posts with images</span>
-                        <span class="eng-val"><?php echo $eng_images; ?> of <?php echo $eng_total; ?></span>
+                    <div class="eng-item eng-images">
+                        <div class="eng-item-top">
+                            <span class="eng-name"><i class="bi bi-image-fill"></i> Posts with images</span>
+                            <span class="eng-val"><?php echo $eng_images; ?> of <?php echo $eng_total; ?></span>
+                        </div>
+                        <div class="eng-track"><div class="eng-fill" style="width: <?php echo $eng_images_pct; ?>%;"></div></div>
                     </div>
-                    <div class="eng-bar"><span style="width: <?php echo $eng_images_pct; ?>%;"></span></div>
                 </div>
-                <p class="eng-note">Across the <?php echo $eng_total; ?> post<?php echo ($eng_total == 1) ? '' : 's'; ?> shown. <?php echo $eng_note; ?></p>
+                <p class="eng-note"><?php echo $eng_note; ?></p>
             </aside>
         </div>
     </main>
@@ -2819,31 +2858,44 @@ function formatDate($date) {
                         : (() => { const fn=(post.first_name||'')[0]||''; const ln=(post.last_name||'')[0]||''; const n=(post.first_name||'')+(post.last_name||''); let h=0; for(let i=0;i<n.length;i++){h=(h*31+n.charCodeAt(i))&0x7FFFFFFF;} const c=['#2B9E9E','#3CB5A6','#E67E22','#3498DB','#9B59B6','#E74C3C','#1ABC9C','#2C3E50']; return `<div class="user-avatar" style="background:${c[h%c.length]};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;">${(fn+ln).toUpperCase()}</div>`; })()
                     
                     return `
-                    <div class="post-row ${animate ? 'animate-new-row' : ''}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
-                        <div class="pr-thumb ${hasImage}">
-                            <i class="bi bi-${imageIcon}"></i>
-                        </div>
-                        <div class="pr-main">
-                            <div class="pr-author">
-                                <span class="pr-name user-name">${post.first_name || ''} ${post.last_name || ''}</span>
-                                <span class="pr-username username">@${post.username || ''}</span>
-                                <span class="pr-id">#${post.id}</span>
+                    <tr class="${animate ? 'animate-new-row' : ''}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
+                        <td>${post.id}</td>
+                        <td>
+                            <div class="user-cell">
+                                ${profilePicHtml}
+                                <div class="user-info">
+                                    <div class="user-name">${post.first_name} ${post.last_name}</div>
+                                    <div class="username">@${post.username}</div>
+                                </div>
                             </div>
-                            <div class="pr-content content-cell" title="${post.content || ''}">${contentPreview}</div>
-                            <div class="pr-date">${formatDate(post.created_at)}</div>
-                        </div>
-                        <div class="pr-actions">
-                            <span class="engagement-count like-count">
+                        </td>
+                        <td class="content-cell" title="${post.content || ''}">
+                            ${contentPreview}
+                        </td>
+                        <td class="image-cell">
+                            <span class="${hasImage}">
+                                <i class="bi bi-${imageIcon}"></i>
+                            </span>
+                        </td>
+                        <td>${formatDate(post.created_at)}</td>
+                        <td>
+                            <span class="engagement-count">
                                 ${parseInt(post.likes) > 0 
                                     ? `<i class="bi bi-heart-fill" style="color: #e63946;"></i>` 
                                     : `<i class="bi bi-heart"></i>`}
                                 ${post.likes || 0}
                             </span>
-                            <span class="engagement-count comment-count">
+                        </td>
+                        <td>
+                            <span class="engagement-count">
                                 <i class="bi bi-chat-dots"></i>
                                 ${post.comment_count || 0}
                             </span>
+                        </td>
+                        <td>
                             ${statusBadge}
+                        </td>
+                        <td>
                             <div class="action-btns">
                                 <button class="btn btn-view btn-sm view-btn" data-post-id="${post.id}">
                                     <i class="bi bi-eye-fill"></i>
@@ -2854,8 +2906,8 @@ function formatDate($date) {
                                     Warn
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                     `;
                 }).join('');
                 
@@ -3220,9 +3272,9 @@ function formatDate($date) {
              function highlightUpdatedCells(updatedLikes, updatedComments) {
                  // Highlight like count updates
                  updatedLikes.forEach(update => {
-                     const row = document.querySelector(`.post-row[data-post-id="${update.id}"]`);
+                     const row = document.querySelector(`tr[data-post-id="${update.id}"]`);
                      if (row) {
-                         const likeCell = row.querySelector('.like-count');
+                         const likeCell = row.querySelector('td:nth-child(6)');
                          if (likeCell) {
                              // Add flash animation class
                              likeCell.classList.add('flash-update');
@@ -3236,9 +3288,9 @@ function formatDate($date) {
                  
                  // Highlight comment count updates
                  updatedComments.forEach(update => {
-                     const row = document.querySelector(`.post-row[data-post-id="${update.id}"]`);
+                     const row = document.querySelector(`tr[data-post-id="${update.id}"]`);
                      if (row) {
-                         const commentCell = row.querySelector('.comment-count');
+                         const commentCell = row.querySelector('td:nth-child(7)');
                          if (commentCell) {
                              // Add flash animation class
                              commentCell.classList.add('flash-update');
@@ -3307,31 +3359,44 @@ function formatDate($date) {
                     const highlightClass = (highlightNewRows && isNewPost) ? 'highlight-new-row' : '';
                     
                     return `
-                    <div class="post-row ${highlightClass}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
-                        <div class="pr-thumb ${hasImage}">
-                            <i class="bi bi-${imageIcon}"></i>
-                        </div>
-                        <div class="pr-main">
-                            <div class="pr-author">
-                                <span class="pr-name user-name">${post.first_name || ''} ${post.last_name || ''}</span>
-                                <span class="pr-username username">@${post.username || ''}</span>
-                                <span class="pr-id">#${post.id}</span>
+                    <tr class="${highlightClass}" data-post-id="${post.id}" data-status="${(post.status || 'posted').toLowerCase()}">
+                        <td>${post.id}</td>
+                        <td>
+                            <div class="user-cell">
+                                ${profilePicHtml}
+                                <div class="user-info">
+                                    <div class="user-name">${post.first_name} ${post.last_name}</div>
+                                    <div class="username">@${post.username}</div>
+                                </div>
                             </div>
-                            <div class="pr-content content-cell" title="${post.content || ''}">${contentPreview}</div>
-                            <div class="pr-date">${formatDate(post.created_at)}</div>
-                        </div>
-                        <div class="pr-actions">
-                            <span class="engagement-count like-count">
+                        </td>
+                        <td class="content-cell" title="${post.content || ''}">
+                            ${contentPreview}
+                        </td>
+                        <td class="image-cell">
+                            <span class="${hasImage}">
+                                <i class="bi bi-${imageIcon}"></i>
+                            </span>
+                        </td>
+                        <td>${formatDate(post.created_at)}</td>
+                        <td>
+                            <span class="engagement-count">
                                 ${parseInt(post.likes) > 0 
                                     ? `<i class="bi bi-heart-fill" style="color: #e63946;"></i>` 
                                     : `<i class="bi bi-heart"></i>`}
                                 ${post.likes || 0}
                             </span>
-                            <span class="engagement-count comment-count">
+                        </td>
+                        <td>
+                            <span class="engagement-count">
                                 <i class="bi bi-chat-dots"></i>
                                 ${post.comment_count || 0}
                             </span>
+                        </td>
+                        <td>
                             ${statusBadge}
+                        </td>
+                        <td>
                             <div class="action-btns">
                                 <button class="btn btn-view btn-sm view-btn" data-post-id="${post.id}">
                                     <i class="bi bi-eye-fill"></i>
@@ -3342,13 +3407,13 @@ function formatDate($date) {
                                     Warn
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                     `;
                 }).join('');
                 
                 // Update table content
-                postsTableBody.innerHTML = html || '<div class="empty-state"><i class="bi bi-file-earmark-excel"></i><h3>No Posts Found</h3><p>There are currently no posts to display.</p></div>';
+                postsTableBody.innerHTML = html;
                 
                 // Reattach event handlers for the new buttons
                 reattachButtonEventHandlers();
@@ -3510,10 +3575,12 @@ function storePostStatusChange(postId, status) {
                          // Show loading indicator
                          const postsTableBody = document.getElementById('posts-table-body');
                          postsTableBody.innerHTML = `
-                             <div class="loading-state">
-                                 <i class="bi bi-arrow-repeat spinning"></i>
-                                 <p>Loading page ${pageNum}...</p>
-                             </div>
+                             <tr>
+                                 <td colspan="9" style="text-align: center; padding: 30px;">
+                                     <i class="bi bi-arrow-repeat spinning" style="font-size: 2rem; color: var(--primary);"></i>
+                                     <p>Loading page ${pageNum}...</p>
+                                 </td>
+                             </tr>
                          `;
                          
                          // Fetch the data for the requested page
@@ -3666,34 +3733,6 @@ function storePostStatusChange(postId, status) {
                     }
                 });
             }
-        });
-    </script>
-
-    <!-- Dashboard tab filtering -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.admin-tab');
-            const applyTab = (tab) => {
-                const list = document.getElementById('posts-table-body');
-                if (!list) return;
-                list.querySelectorAll('.post-row').forEach(row => {
-                    const status = (row.getAttribute('data-status') || '').toLowerCase();
-                    let show = true;
-                    if (tab === 'posted') {
-                        show = (status === 'posted' || status === 'approved');
-                    } else if (tab === 'flagged') {
-                        show = (status === 'on-hold' || status === 'warned');
-                    }
-                    row.classList.toggle('is-hidden', !show);
-                });
-            };
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    applyTab(this.getAttribute('data-tab'));
-                });
-            });
         });
     </script>
 </body>

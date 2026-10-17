@@ -2260,31 +2260,44 @@ function formatMessageTime($timestamp) {
                     const editInput = document.createElement('textarea');
                     editInput.value = currentText; // Set the current text as the input value
                     editInput.classList.add('chat-input');
-                    editInput.style.width = 'min(420px, 70vw)';
-                    editInput.style.height = '0px'; // Start with zero height
+                    // Match the sent bubble's exact size so the whole message stays readable
+                    const bubbleRect = messageContent.getBoundingClientRect();
+                    const bubbleWidth = Math.max(Math.round(bubbleRect.width), 120);
+                    const bubbleHeight = Math.round(bubbleRect.height);
+
+                    editInput.style.width = bubbleWidth + 'px';
+                    editInput.style.height = bubbleHeight + 'px';
                     editInput.style.minHeight = '40px';
-                    editInput.style.maxHeight = '200px'; // Add a maximum height but we'll try to avoid needing it
-                    editInput.style.overflow = 'hidden'; // Hide scrollbar initially
-                    editInput.style.resize = 'none'; // Disable manual resizing
+                    editInput.style.maxHeight = 'none';
+                    editInput.style.overflow = 'hidden';
+                    editInput.style.resize = 'none';
+                    editInput.style.flex = '0 0 auto';
                     editInput.style.marginBottom = '10px';
-                    editInput.style.padding = '10px';
+                    editInput.style.padding = '12px 16px';
                     editInput.style.boxSizing = 'border-box';
                     editInput.style.border = '1px solid var(--color-primary)';
-                    editInput.style.borderRadius = '8px';
-                    editInput.style.lineHeight = '1.5';
+                    editInput.style.borderRadius = '18px';
+                    editInput.style.lineHeight = '1.4';
+                    editInput.style.fontSize = '15px';
                     
                     // Create an invisible clone div for perfect height calculation
                     const clone = document.createElement('div');
                     clone.style.visibility = 'hidden';
                     clone.style.position = 'absolute';
                     clone.style.top = '-9999px';
-                    clone.style.width = editInput.offsetWidth + 'px';
-                    clone.style.padding = '10px';
+                    clone.style.left = '-9999px';
+                    clone.style.width = bubbleWidth + 'px';
+                    clone.style.padding = '12px 16px';
                     clone.style.boxSizing = 'border-box';
-                    clone.style.lineHeight = '1.5';
+                    clone.style.border = '1px solid transparent';
+                    clone.style.borderRadius = '18px';
+                    clone.style.lineHeight = '1.4';
+                    clone.style.fontSize = '15px';
+                    clone.style.fontFamily = window.getComputedStyle(editInput).fontFamily;
                     clone.style.whiteSpace = 'pre-wrap';
                     clone.style.wordWrap = 'break-word';
-                    clone.style.font = window.getComputedStyle(editInput).font;
+                    clone.style.overflowWrap = 'anywhere';
+                    clone.style.wordBreak = 'break-word';
                     document.body.appendChild(clone);
                     
                     // Replace message content with textarea
@@ -2294,7 +2307,7 @@ function formatMessageTime($timestamp) {
                     // Function to auto-resize the textarea using clone div
                     const autoResizeTextarea = function() {
                         // Update clone with current textarea content
-                        clone.textContent = editInput.value + '\n'; // Add extra line to ensure proper height
+                        clone.textContent = editInput.value;
                         
                         // Calculate exact height needed
                         let newHeight = clone.offsetHeight;
@@ -2302,16 +2315,9 @@ function formatMessageTime($timestamp) {
                         // Ensure minimum height
                         newHeight = Math.max(newHeight, 40);
                         
-                        // Set height - no need to clamp to max height as we'll use overflow
+                        // Never clamp: keep the full message height so nothing needs scrolling
                         editInput.style.height = newHeight + 'px';
-                        
-                        // Only show scrollbar if exceeding max height
-                        if (newHeight > 200) {
-                            editInput.style.height = '200px';
-                            editInput.style.overflow = 'auto';
-                        } else {
-                            editInput.style.overflow = 'hidden';
-                        }
+                        editInput.style.overflow = 'hidden';
                         
                         console.log('Resized textarea to height:', newHeight, 'px');
                     };

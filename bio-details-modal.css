@@ -20,9 +20,19 @@
     border-radius: 18px !important;
     max-width: 510px !important;
     padding: 0 !important;
-    overflow-y: auto !important;
+    max-height: calc(100vh - 40px) !important;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
+    /* Hide the scrollbar entirely (content still scrolls if it ever overflows) */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
     box-shadow: 0 24px 60px rgba(15, 45, 45, 0.28) !important;
+}
+
+#bioDetailsModal .bio-details-card::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 /* ---- Header (soft teal gradient) ---- */
@@ -165,54 +175,72 @@
     color: var(--bd-muted) !important;
 }
 
-/* ---- Details list card ---- */
-#bioDetailsModal .bio-details-list {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 1px solid var(--bd-border) !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    overflow: hidden !important;
+/* ---- Details grid (2-column cards) ---- */
+#bioDetailsModal .bio-details-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
 }
 
-#bioDetailsModal .bio-details-list li {
+#bioDetailsModal .bio-details-item {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    margin: 0 !important;
-    padding: 12px 16px !important;
-    border-bottom: 1px solid #eef2f1 !important;
-    font-size: 14px !important;
-    color: #4a5a5a !important;
+    gap: 14px !important;
+    padding: 16px !important;
+    border: 1px solid var(--bd-border) !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    min-width: 0 !important;
 }
 
-#bioDetailsModal .bio-details-list li:last-child {
-    border-bottom: none !important;
-}
-
-#bioDetailsModal .bio-details-list li i {
+#bioDetailsModal .bio-details-item-icon {
     flex: 0 0 auto !important;
-    width: 28px !important;
-    height: 28px !important;
+    width: 44px !important;
+    height: 44px !important;
     border-radius: 50% !important;
     background: var(--bd-teal-soft) !important;
     color: var(--bd-teal) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 12px !important;
-    margin: 0 !important;
-    text-align: center !important;
+    font-size: 16px !important;
 }
 
-#bioDetailsModal .bio-details-list a {
+#bioDetailsModal .bio-details-item-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+}
+
+#bioDetailsModal .bio-details-label {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: var(--bd-muted) !important;
+    line-height: 1.3 !important;
+}
+
+#bioDetailsModal .bio-details-value {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--bd-text) !important;
+    line-height: 1.35 !important;
+    word-break: break-word !important;
+}
+
+#bioDetailsModal .bio-details-value a {
     color: var(--bd-teal) !important;
     font-weight: 600 !important;
     text-decoration: none !important;
     word-break: break-all !important;
 }
 
-#bioDetailsModal .bio-details-list a:hover {
+#bioDetailsModal .bio-details-value a:hover {
     text-decoration: underline !important;
+}
+
+@media (max-width: 480px) {
+    #bioDetailsModal .bio-details-grid {
+        grid-template-columns: 1fr !important;
+    }
 }

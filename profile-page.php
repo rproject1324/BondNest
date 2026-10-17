@@ -276,7 +276,7 @@ $user_id = $_SESSION['user_id'];
 $profile_user_id = isset($_GET['id']) ? intval($_GET['id']) : $user_id;
 
 $sql = "SELECT first_name, last_name, username, profile_picture,
-               age, gender, birthday, location, interests, website, bio 
+               age, gender, birthday, location, interests, website, email, bio 
         FROM users WHERE id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$profile_user_id]);
@@ -3103,14 +3103,50 @@ unset($_SESSION['form_data']);
                 <?php endif; ?>
             </p>
             <h4 class="bio-details-section"><i class="fas fa-id-card"></i> Details</h4>
-            <ul class="bio-details-list">
-                <li><i class="fas fa-user"></i><span><?php echo htmlspecialchars($user['age']); ?> years old</span></li>
-                <li><i class="fas fa-venus-mars"></i><span><?php echo htmlspecialchars($user['gender']); ?></span></li>
-                <li><i class="fas fa-birthday-cake"></i><span>Born on <?php echo date('F j, Y', strtotime($user['birthday'])); ?></span></li>
-                <li><i class="fas fa-home"></i><span><?php echo !empty($user['location']) ? 'Lives in ' . htmlspecialchars($user['location']) : 'Location not set'; ?></span></li>
-                <li><i class="fas fa-heart"></i><span><?php echo !empty($user['interests']) ? 'Interested in ' . htmlspecialchars($user['interests']) : 'Interests not set'; ?></span></li>
-                <li><i class="fas fa-link"></i><span><?php if (!empty($user['website'])): ?><a href="<?php echo htmlspecialchars($user['website']); ?>" target="_blank" rel="noopener noreferrer"><?php echo htmlspecialchars($user['website']); ?></a><?php else: ?>Website not set<?php endif; ?></span></li>
-            </ul>
+            <div class="bio-details-grid">
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-user"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Age</span>
+                        <span class="bio-details-value"><?php echo htmlspecialchars($user['age']); ?> years old</span>
+                    </div>
+                </div>
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-venus-mars"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Gender</span>
+                        <span class="bio-details-value"><?php echo htmlspecialchars($user['gender']); ?></span>
+                    </div>
+                </div>
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-birthday-cake"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Birthday</span>
+                        <span class="bio-details-value"><?php echo date('F j, Y', strtotime($user['birthday'])); ?></span>
+                    </div>
+                </div>
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-home"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Lives in</span>
+                        <span class="bio-details-value"><?php echo !empty($user['location']) ? htmlspecialchars($user['location']) : 'Not set'; ?></span>
+                    </div>
+                </div>
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-heart"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Interested in</span>
+                        <span class="bio-details-value"><?php echo !empty($user['interests']) ? htmlspecialchars($user['interests']) : 'Not set'; ?></span>
+                    </div>
+                </div>
+                <div class="bio-details-item">
+                    <span class="bio-details-item-icon"><i class="fas fa-link"></i></span>
+                    <div class="bio-details-item-text">
+                        <span class="bio-details-label">Email</span>
+                        <span class="bio-details-value"><?php if (!empty($user['email'])): ?><a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a><?php else: ?>Not set<?php endif; ?></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -506,6 +506,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
     <link rel="stylesheet" href="sidebar.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="settings.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="settings-profile-card.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="settings-security-card.css?v=<?php echo time(); ?>">
     <style>
     :root {
         --primary-color-hue: 180;
@@ -702,17 +703,25 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                     <!-- 2. Security Panel -->
                     <div class="settings-panel" id="securityPanel">
                         <div class="settings-card">
-                            <h2 class="settings-card-title">
-                                <i class="bi bi-shield-lock"></i> Password & Security
-                            </h2>
+                            <div class="settings-card-head">
+                                <span class="settings-card-icon"><i class="bi bi-shield-lock"></i></span>
+                                <div class="settings-card-heading">
+                                    <h2 class="settings-card-title">Password &amp; Security</h2>
+                                    <p class="settings-card-subtitle">Keep your account safe with a strong password</p>
+                                </div>
+                            </div>
 
                             <div class="security-status-banner">
-                                <i class="bi bi-shield-check"></i>
-                                <span>Your account is protected. Use a strong, unique password to maintain account security.</span>
+                                <span class="security-banner-icon"><i class="bi bi-shield-check"></i></span>
+                                <div class="security-banner-text">
+                                    <strong>Your account is protected</strong>
+                                    <span>Use a strong, unique password to maintain account security.</span>
+                                </div>
                             </div>
 
                             <form id="securityForm">
                                 <div class="settings-form-grid">
+                                    <div class="settings-section-label">Verify Your Identity</div>
                                     <div class="settings-field full-width">
                                         <label class="settings-label" for="currentPassword">Current Password</label>
                                         <div class="settings-input-wrap">
@@ -725,6 +734,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                                         <div class="custom-error" id="currentPassword-error"></div>
                                     </div>
 
+                                    <div class="settings-section-label">Set a New Password</div>
                                     <div class="settings-field">
                                         <label class="settings-label" for="newPassword">New Password</label>
                                         <div class="settings-input-wrap">
@@ -751,7 +761,16 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
 
                                     <!-- Password Policy Checklist -->
                                     <div class="password-policy-card">
-                                        <h4 class="password-policy-title">Password Requirements:</h4>
+                                        <div class="policy-head">
+                                            <h4 class="password-policy-title">Password Requirements</h4>
+                                            <span class="policy-count" id="policyCount">0 of 6 met</span>
+                                        </div>
+                                        <div class="policy-meter" id="policyMeter" aria-hidden="true">
+                                            <span class="policy-meter-seg"></span>
+                                            <span class="policy-meter-seg"></span>
+                                            <span class="policy-meter-seg"></span>
+                                            <span class="policy-meter-seg"></span>
+                                        </div>
                                         <ul class="password-policy-list">
                                             <li class="policy-item" id="rule-length"><i class="bi bi-circle"></i> At least 8 characters</li>
                                             <li class="policy-item" id="rule-upper"><i class="bi bi-circle"></i> 1 uppercase letter</li>
@@ -1180,6 +1199,15 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             el.querySelector('i').className = 'bi bi-' + (valid ? 'check-circle-fill' : 'circle');
         }
 
+        function updatePolicyMeter(rules) {
+            const met = rules.filter(el => el && el.classList.contains('valid')).length;
+            const countEl = document.getElementById('policyCount');
+            if (countEl) countEl.textContent = met + ' of ' + rules.length + ' met';
+            const segs = document.querySelectorAll('#policyMeter .policy-meter-seg');
+            const filled = met === 0 ? 0 : Math.ceil(met / rules.length * segs.length);
+            segs.forEach((s, i) => s.classList.toggle('on', i < filled));
+        }
+
         function validatePasswordRules() {
             const val = newPasswordInput ? newPasswordInput.value : '';
             const conf = confirmPasswordInput ? confirmPasswordInput.value : '';
@@ -1191,6 +1219,8 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             setRule(ruleNumber, /[0-9]/.test(val));
             setRule(ruleSpecial, /[\W_]/.test(val));
             setRule(ruleMatch, val.length > 0 && val === conf);
+
+            updatePolicyMeter([ruleLength, ruleUpper, ruleLower, ruleNumber, ruleSpecial, ruleMatch]);
 
             // Live inline check (same as forgot-password flow): new password must
             // differ from the current one. Shown as-you-type under New Password.

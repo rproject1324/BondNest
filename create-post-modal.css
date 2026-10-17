@@ -311,13 +311,93 @@
     opacity: 1 !important;
 }
 
-/* ---- Image preview (kept consistent with the rounded card) ---- */
-#createPostModal .image-preview-container {
+/* ---- Compose columns ---- */
+#createPostModal .compose-left {
+    min-width: 0 !important;
+}
+
+#createPostModal .compose-right {
+    display: none !important;
+}
+
+#createPostModal .attached-photo-label {
+    display: block !important;
+    margin: 2px 0 10px 2px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--cpm-muted) !important;
+}
+
+/* ---- Expanded two-column state (photo attached) ---- */
+#createPostModal.has-image .modal-content {
+    max-width: 900px !important;
+}
+
+#createPostModal.has-image #postForm {
+    max-width: 900px !important;
+}
+
+#createPostModal.has-image .modal-body {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 340px !important;
+    column-gap: 24px !important;
+    align-items: stretch !important;
+}
+
+#createPostModal.has-image .compose-right {
+    display: block !important;
+    padding-left: 24px !important;
+    border-left: 1px solid var(--cpm-border) !important;
+}
+
+/* ---- Attached photo preview ---- */
+#createPostModal .compose-right .image-preview-container {
     margin: 0 !important;
 }
 
+#createPostModal .image-preview-wrapper {
+    position: relative !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+}
+
 #createPostModal .image-preview {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 300px !important;
+    object-fit: cover !important;
     border-radius: 14px !important;
+}
+
+#createPostModal .remove-image-btn {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: rgba(24, 34, 34, 0.55) !important;
+    color: #ffffff !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    transition: background 0.2s ease, transform 0.2s ease !important;
+    z-index: 10 !important;
+}
+
+#createPostModal .remove-image-btn:hover {
+    background: rgba(24, 34, 34, 0.8) !important;
+    transform: scale(1.06) !important;
 }
 
 /* ---- Mobile ---- */
@@ -327,4 +407,21 @@
     #createPostModal .modal-footer { padding: 14px 18px !important; }
     #createPostModal .modal-header h2 { font-size: 22px !important; }
     #createPostModal .add-to-post { flex-wrap: wrap !important; }
+}
+
+@media (max-width: 760px) {
+    #createPostModal.has-image .modal-content,
+    #createPostModal.has-image #postForm { max-width: 520px !important; }
+
+    #createPostModal.has-image .modal-body {
+        display: block !important;
+    }
+
+    #createPostModal.has-image .compose-right {
+        margin-top: 18px !important;
+        padding-left: 0 !important;
+        padding-top: 16px !important;
+        border-left: none !important;
+        border-top: 1px solid var(--cpm-border) !important;
+    }
 }

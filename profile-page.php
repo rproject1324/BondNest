@@ -2909,33 +2909,38 @@ unset($_SESSION['form_data']);
                     <button type="button" class="close-button" id="createPostCloseBtn" aria-label="Close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div class="user-info">
-                        <div class="profile-picture">
-                            <?php if (!empty($user['profile_picture'])): ?>
-                                <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture">
-                            <?php else: ?>
-                                <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 44); ?>
-                            <?php endif; ?>
+                    <div class="compose-left">
+                        <div class="user-info">
+                            <div class="profile-picture">
+                                <?php if (!empty($user['profile_picture'])): ?>
+                                    <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture">
+                                <?php else: ?>
+                                    <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 44); ?>
+                                <?php endif; ?>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+                                <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
+                            </div>
                         </div>
-                        <div class="user-details">
-                            <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
-                            <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
+                        <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
+                        <div class="add-to-post">
+                            <span class="add-to-post-label">Add to your post</span>
+                            <div class="icons">
+                                <label for="post-image" class="icon-pill media-pill">
+                                    <i class="bi bi-plus-square-dotted"></i> Media
+                                </label>
+                                <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
+                                <button type="button" class="icon-pill emoji-pill">
+                                    <i class="fa-regular fa-face-smile-beam"></i> Emoji
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
-                    <div class="add-to-post">
-                        <span class="add-to-post-label">Add to your post</span>
-                        <div class="icons">
-                            <label for="post-image" class="icon-pill media-pill">
-                                <i class="bi bi-plus-square-dotted"></i> Media
-                            </label>
-                            <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
-                            <button type="button" class="icon-pill emoji-pill">
-                                <i class="fa-regular fa-face-smile-beam"></i> Emoji
-                            </button>
-                        </div>
+                    <div class="compose-right">
+                        <span class="attached-photo-label">Attached photo</span>
+                        <div class="image-preview-container" id="imagePreviewContainer"></div>
                     </div>
-                    <div class="image-preview-container" id="imagePreviewContainer"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="cancel-button">Cancel</button>
@@ -5395,18 +5400,45 @@ document.addEventListener('DOMContentLoaded', function() {
     // Image preview for create post modal
     const imageInput = document.getElementById('post-image');
     const imagePreview = document.getElementById('imagePreviewContainer');
+
+    function updatePreview() {
+        const hasImage = !!(imagePreview && imagePreview.children.length > 0);
+        if (imagePreview) imagePreview.style.display = hasImage ? 'grid' : 'none';
+        if (modal) modal.classList.toggle('has-image', hasImage);
+    }
+
     if (imageInput && imagePreview) {
         imageInput.addEventListener('change', function() {
             imagePreview.innerHTML = '';
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'image-preview-wrapper';
+
                     const img = document.createElement('img');
+                    img.className = 'image-preview';
                     img.src = e.target.result;
-                    img.style.cssText = 'max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;display:block;';
-                    imagePreview.appendChild(img);
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'remove-image-btn';
+                    removeBtn.setAttribute('aria-label', 'Remove photo');
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.addEventListener('click', function() {
+                        wrapper.remove();
+                        imageInput.value = '';
+                        updatePreview();
+                    });
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    imagePreview.appendChild(wrapper);
+                    updatePreview();
                 };
                 reader.readAsDataURL(this.files[0]);
+            } else {
+                updatePreview();
             }
         });
     }

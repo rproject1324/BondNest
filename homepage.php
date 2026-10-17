@@ -1620,33 +1620,38 @@ if (menuTrigger) {
                         <button type="button" class="close-button" aria-label="Close">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="user-info">
-                            <div class="profile-picture">
-                                <?php if (!empty($user['profile_picture'])): ?>
-                                    <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture">
-                                <?php else: ?>
-                                    <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 44); ?>
-                                <?php endif; ?>
+                        <div class="compose-left">
+                            <div class="user-info">
+                                <div class="profile-picture">
+                                    <?php if (!empty($user['profile_picture'])): ?>
+                                        <img src="<?php echo $user['profile_picture']; ?>" alt="Profile Picture">
+                                    <?php else: ?>
+                                        <?php echo getInitialsHtml($user['first_name'], $user['last_name'], 44); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
+                                    <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
+                                </div>
                             </div>
-                            <div class="user-details">
-                                <span class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></span>
-                                <span class="privacy-chip"><i class="bi bi-globe"></i> Public</span>
+                            <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
+                            <div class="add-to-post">
+                                <span class="add-to-post-label">Add to your post</span>
+                                <div class="icons">
+                                    <label for="post-image" class="icon-pill media-pill">
+                                        <i class="bi bi-plus-square-dotted"></i> Media
+                                    </label>
+                                    <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
+                                    <button type="button" class="icon-pill emoji-pill">
+                                        <i class="fa-regular fa-face-smile-beam"></i> Emoji
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <textarea placeholder="What's on your mind, <?php echo htmlspecialchars($user['first_name']); ?>?" name="post-content" id="postContent"></textarea>
-                        <div class="add-to-post">
-                            <span class="add-to-post-label">Add to your post</span>
-                            <div class="icons">
-                                <label for="post-image" class="icon-pill media-pill">
-                                    <i class="bi bi-plus-square-dotted"></i> Media
-                                </label>
-                                <input type="file" id="post-image" name="post-image" accept="image/*" style="display: none;">
-                                <button type="button" class="icon-pill emoji-pill">
-                                    <i class="fa-regular fa-face-smile-beam"></i> Emoji
-                                </button>
-                            </div>
+                        <div class="compose-right">
+                            <span class="attached-photo-label">Attached photo</span>
+                            <div class="image-preview-container" id="imagePreviewContainer"></div>
                         </div>
-                        <div class="image-preview-container" id="imagePreviewContainer"></div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="cancel-button">Cancel</button>
@@ -2193,10 +2198,11 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const updatePreviewContainerVisibility = () => {
-        if (imagePreviewContainer) {
-            imagePreviewContainer.style.display = 
-                imagePreviewContainer.children.length > 0 ? 'grid' : 'none';
-        }
+        if (!imagePreviewContainer) return;
+        const hasImage = imagePreviewContainer.children.length > 0;
+        imagePreviewContainer.style.display = hasImage ? 'grid' : 'none';
+        const modalEl = document.getElementById('createPostModal');
+        if (modalEl) modalEl.classList.toggle('has-image', hasImage);
     };
 
     // Handle image upload

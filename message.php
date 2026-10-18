@@ -1546,6 +1546,7 @@ function formatMessageTime($timestamp) {
         }
     }
 </style>
+    <link rel="stylesheet" href="delete-message-modal.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <?php include 'navbar.php'; ?>
@@ -2655,17 +2656,23 @@ function formatMessageTime($timestamp) {
     <div class="delete-modal" id="deleteModal">
         <div class="delete-modal-content">
             <div class="delete-modal-header">
-                <h3>Delete Message</h3>
-                <button class="delete-modal-close" id="closeDeleteModal">&times;</button>
+                <span class="delete-modal-icon"><i class="bi bi-trash"></i></span>
+                <div class="delete-modal-header-text">
+                    <h3>Delete message</h3>
+                    <p class="delete-modal-subtitle">This action cannot be undone</p>
+                </div>
+                <button class="delete-modal-close" id="closeDeleteModal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="delete-modal-body">
-                <p>Are you sure you want to delete this message?</p>
-                <div class="delete-modal-message" id="deleteMessageContent"></div>
-                <p>This action cannot be undone.</p>
+                <p class="delete-modal-question">Are you sure you want to delete this message?</p>
+                <div class="delete-modal-message-wrap">
+                    <span class="delete-modal-message-label">Message</span>
+                    <div class="delete-modal-message" id="deleteMessageContent"></div>
+                </div>
             </div>
             <div class="delete-modal-footer">
                 <button class="delete-modal-cancel" id="cancelDelete">Cancel</button>
-                <button class="delete-modal-confirm" id="confirmDelete">Delete</button>
+                <button class="delete-modal-confirm" id="confirmDelete"><i class="bi bi-trash"></i> Delete</button>
             </div>
         </div>
     </div>

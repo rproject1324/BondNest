@@ -191,6 +191,57 @@
     margin: 0 !important;
 }
 
+/* ---------- Pagination ---------- */
+.apn-pagination {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 18px 0 6px !important;
+}
+
+.apn-page-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    background: #ffffff !important;
+    border: 1px solid #cfe6e1 !important;
+    color: #0e8b7f !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+}
+
+.apn-page-btn:hover {
+    background: #f2fbf8 !important;
+    border-color: #0e8b7f !important;
+}
+
+.apn-page-btn.is-active {
+    background: #0e8b7f !important;
+    border-color: #0e8b7f !important;
+    color: #ffffff !important;
+    cursor: default !important;
+}
+
+.apn-page-btn.is-disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}
+
+.apn-page-ellipsis {
+    color: #9fb3af !important;
+    font-size: 13px !important;
+    padding: 0 2px !important;
+}
+
 /* ---------- Footer ---------- */
 .apn-foot {
     display: flex !important;

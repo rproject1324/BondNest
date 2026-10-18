@@ -61,6 +61,7 @@
     wireCard('.apn-card', '.apn-body', '.apn-pagination');
     wireCard('.wrn-card', '.wrn-body', '.wrn-pagination');
     wireCard('.hrn-card', '.hrn-body', '.hrn-pagination');
+    wireCard('.dpn-card', '.dpn-body', '.dpn-pagination');
 
     window.addEventListener('popstate', function () {
         window.location.reload();

@@ -3143,8 +3143,8 @@ unset($_SESSION['form_data']);
                 <div class="bio-details-item">
                     <span class="bio-details-item-icon"><i class="fas fa-link"></i></span>
                     <div class="bio-details-item-text">
-                        <span class="bio-details-label">Email</span>
-                        <span class="bio-details-value"><?php if (!empty($user['email'])): ?><a href="mailto:<?php echo htmlspecialchars($user['email']); ?>"><?php echo htmlspecialchars($user['email']); ?></a><?php else: ?>Not set<?php endif; ?></span>
+                        <span class="bio-details-label">Website</span>
+                        <span class="bio-details-value"><?php if (!empty($user['website'])): ?><a href="<?php echo htmlspecialchars($user['website']); ?>" target="_blank" rel="noopener noreferrer"><?php echo htmlspecialchars($user['website']); ?></a><?php else: ?>Not set<?php endif; ?></span>
                     </div>
                 </div>
             </div>

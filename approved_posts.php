@@ -211,6 +211,7 @@ if (isset($_GET['notification_id'])) {
     <?php include 'font-head.php'; ?>
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
+    <link rel="stylesheet" href="approved-posts-card.css">
     
     <style>
         /* Custom modal dimensions - ADJUST THESE VALUES TO CHANGE THE CONTAINER SIZE */
@@ -760,83 +761,89 @@ if (isset($_GET['notification_id'])) {
     <?php unset($_SESSION['notification_message']); ?>
     <?php endif; ?>
     
-    <div class="notifications-list">
-        <h2 class="page-title">
-            Approved Posts Notifications
-            <span class="notification-count"><?php echo $total_count; ?> notifications</span>
-        </h2>
-        
-        <div class="notifications-container">
-            <?php
-            // Get approved post notifications
-            $stmt = $pdo->prepare("
-                SELECT * FROM notifications 
-                WHERE user_id = ? 
-                AND type = 'post_approved' 
-                ORDER BY created_at DESC
-                LIMIT 25
-            ");
-            $stmt->execute([$user_id]);
-            
-            $has_notifications = false;
-            
-            if ($stmt->rowCount() > 0) {
-                $has_notifications = true;
-                while ($notification = $stmt->fetch()) {
+    <?php $new_count = max(0, $total_count - $read_count); ?>
+    <div class="apn-wrap">
+        <div class="apn-card">
+            <div class="apn-head">
+                <span class="apn-head-icon"><i class="bi bi-check2-circle"></i></span>
+                <div class="apn-head-text">
+                    <h2 class="apn-title">Approved posts</h2>
+                    <p class="apn-subtitle">Posts that passed review</p>
+                </div>
+                <?php if ($new_count > 0): ?>
+                <span class="apn-new-pill"><span class="apn-dot"></span><?php echo $new_count; ?> new</span>
+                <?php endif; ?>
+            </div>
+
+            <div class="apn-body">
+                <?php
+                // Get approved post notifications
+                $stmt = $pdo->prepare("
+                    SELECT * FROM notifications 
+                    WHERE user_id = ? 
+                    AND type = 'post_approved' 
+                    ORDER BY created_at DESC
+                    LIMIT 25
+                ");
+                $stmt->execute([$user_id]);
+
+                if ($stmt->rowCount() > 0) {
                     ?>
-                    <div class="notification-card" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
-                        <div class="notification-message">
-                            <i class="bi bi-check-circle-fill" style="color: #28a745;"></i>
-                            <?php 
-                            // Display message without the post content part for cleaner display
-                            $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
-                            // Also hide the JSON data
-                            $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
-                            echo htmlspecialchars($display_message); 
-                            ?>
-                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="view-details-btn">
-                                <i class="bi bi-eye"></i> View Details
+                    <div class="apn-list">
+                        <?php while ($notification = $stmt->fetch()): ?>
+                        <div class="apn-item" role="button" tabindex="0" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
+                            <span class="apn-item-icon"><i class="bi bi-check-lg"></i></span>
+                            <div class="apn-item-text">
+                                <div class="apn-item-title">
+                                    <?php
+                                    // Display message without the post content / snapshot data
+                                    $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
+                                    $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
+                                    echo htmlspecialchars(trim($display_message));
+                                    ?>
+                                </div>
+                                <div class="apn-item-time">
+                                    <i class="bi bi-clock"></i> <?php echo time_elapsed_string($notification['created_at']); ?>
+                                </div>
+                            </div>
+                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="apn-view-btn" onclick="event.stopPropagation();">
+                                <i class="bi bi-eye"></i> View details
                             </a>
                         </div>
-                        <div class="notification-time">
-                            <?php echo time_elapsed_string($notification['created_at']); ?>
-                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class="apn-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h3>No approval notifications</h3>
+                        <p>When administrators approve your posts, notifications will appear here.</p>
                     </div>
                     <?php
                 }
-            } else {
                 ?>
-                <div class="empty-state">
-                    <i class="bi bi-inbox"></i>
-                    <h3>No Approval Notifications</h3>
-                    <p>When administrators approve your posts, notifications will appear here.</p>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-        
-        <div class="notification-actions">
-            <a href="homepage.php" class="back-btn">
-                <i class="bi bi-arrow-left"></i> Back to Home
-            </a>
-            
-            <div class="notification-buttons">
+            </div>
+
+            <div class="apn-foot">
+                <a href="homepage.php" class="apn-back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+
                 <?php if ($read_count > 0): ?>
                 <form method="post" action="approved_posts.php" id="clearReadForm">
-                    <button type="button" class="clear-btn" id="openClearConfirmBtn">
-                        <i class="bi bi-trash"></i> Clear All Read Notifications
+                    <button type="button" class="apn-clear-btn" id="openClearConfirmBtn">
+                        <i class="bi bi-trash"></i> Clear all read notifications
                     </button>
                 </form>
                 <?php else: ?>
-                <button disabled class="clear-btn">
-                    <i class="bi bi-trash"></i> Clear All Read Notifications
+                <button disabled class="apn-clear-btn">
+                    <i class="bi bi-trash"></i> Clear all read notifications
                 </button>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-    
     <!-- Clear Read Notifications Confirm Modal -->
     <div class="modal-overlay" id="clearConfirmModal">
         <div class="clear-confirm-dialog">

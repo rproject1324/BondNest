@@ -220,6 +220,25 @@
     color: #5b4b34 !important;
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
+    max-height: 170px !important;
+    overflow-y: auto !important;
+    padding-right: 6px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #eccf92 #faf3e2 !important;
+}
+
+#detailModal .wpd-reason-text::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#detailModal .wpd-reason-text::-webkit-scrollbar-track {
+    background: #faf3e2 !important;
+    border-radius: 8px !important;
+}
+
+#detailModal .wpd-reason-text::-webkit-scrollbar-thumb {
+    background: #eccf92 !important;
+    border-radius: 8px !important;
 }
 
 #detailModal .wpd-author {

@@ -237,6 +237,57 @@
     margin-top: 14px !important;
 }
 
+/* ---------- Pagination ---------- */
+.wrn-pagination {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 18px 0 6px !important;
+}
+
+.wrn-page-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    border-radius: 9px !important;
+    background: #ffffff !important;
+    border: 1px solid #ecd9b0 !important;
+    color: #b26a00 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+}
+
+.wrn-page-btn:hover {
+    background: #fff7e8 !important;
+    border-color: #f59f0b !important;
+}
+
+.wrn-page-btn.is-active {
+    background: #f59f0b !important;
+    border-color: #f59f0b !important;
+    color: #ffffff !important;
+    cursor: default !important;
+}
+
+.wrn-page-btn.is-disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}
+
+.wrn-page-ellipsis {
+    color: #b9ac93 !important;
+    font-size: 13px !important;
+    padding: 0 2px !important;
+}
+
 /* ---------- Footer ---------- */
 .wrn-foot {
     display: flex !important;

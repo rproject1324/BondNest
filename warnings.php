@@ -908,13 +908,22 @@ if (isset($_GET['notification_id'])) {
 
             <div class="wrn-body">
                 <?php
-                // Get warning notifications
+                // Pagination (3 per page)
+                $per_page = 3;
+                $total_pages = max(1, (int)ceil($total_count / $per_page));
+                $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+                if ($current_page > $total_pages) {
+                    $current_page = $total_pages;
+                }
+                $offset = ($current_page - 1) * $per_page;
+
+                // Get warning notifications for this page
                 $stmt = $pdo->prepare("
                     SELECT * FROM notifications 
                     WHERE user_id = ? 
                     AND type = 'post_warning' 
                     ORDER BY created_at DESC
-                    LIMIT 25
+                    LIMIT " . (int)$per_page . " OFFSET " . (int)$offset . "
                 ");
                 $stmt->execute([$user_id]);
 
@@ -954,6 +963,45 @@ if (isset($_GET['notification_id'])) {
                         </div>
                         <?php endwhile; ?>
                     </div>
+
+                    <?php if ($total_pages > 1): ?>
+                    <div class="wrn-pagination">
+                        <?php if ($current_page > 1): ?>
+                            <a class="wrn-page-btn" href="?page=<?php echo $current_page - 1; ?>" aria-label="Previous"><i class="bi bi-chevron-left"></i></a>
+                        <?php else: ?>
+                            <span class="wrn-page-btn is-disabled"><i class="bi bi-chevron-left"></i></span>
+                        <?php endif; ?>
+
+                        <?php
+                        $start_page = max(1, $current_page - 2);
+                        $end_page = min($total_pages, $start_page + 4);
+                        $start_page = max(1, $end_page - 4);
+                        ?>
+                        <?php if ($start_page > 1): ?>
+                            <a class="wrn-page-btn" href="?page=1">1</a>
+                            <?php if ($start_page > 2): ?><span class="wrn-page-ellipsis">&hellip;</span><?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php for ($p = $start_page; $p <= $end_page; $p++): ?>
+                            <?php if ($p == $current_page): ?>
+                                <span class="wrn-page-btn is-active"><?php echo $p; ?></span>
+                            <?php else: ?>
+                                <a class="wrn-page-btn" href="?page=<?php echo $p; ?>"><?php echo $p; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+
+                        <?php if ($end_page < $total_pages): ?>
+                            <?php if ($end_page < $total_pages - 1): ?><span class="wrn-page-ellipsis">&hellip;</span><?php endif; ?>
+                            <a class="wrn-page-btn" href="?page=<?php echo $total_pages; ?>"><?php echo $total_pages; ?></a>
+                        <?php endif; ?>
+
+                        <?php if ($current_page < $total_pages): ?>
+                            <a class="wrn-page-btn" href="?page=<?php echo $current_page + 1; ?>" aria-label="Next"><i class="bi bi-chevron-right"></i></a>
+                        <?php else: ?>
+                            <span class="wrn-page-btn is-disabled"><i class="bi bi-chevron-right"></i></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
                     <?php
                 } else {
                     ?>

@@ -232,6 +232,7 @@ if (isset($_GET['notification_id'])) {
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
     <link rel="stylesheet" href="deleted-posts-card.css">
+    <link rel="stylesheet" href="deleted-detail-modal.css">
     
     <style>
         /* Custom modal dimensions - ADJUST THESE VALUES TO CHANGE THE CONTAINER SIZE */
@@ -944,242 +945,183 @@ if (isset($_GET['notification_id'])) {
 
     <!-- Notification Detail Modal -->
     <div class="modal-overlay" id="detailModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Your Deleted Post Details</h3>
-                    <button class="modal-close" onclick="hideModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <?php if ($selected_notification): ?>
-                        <?php
-                        // Debug output to see what's in the notification message
-                        $debug_message = htmlspecialchars($selected_notification['message']);
-                        
-                        // Extract the deletion reason
-                        $reason = "";
-                        if (preg_match('/Reason: (.*?)(?=Post content:|$)/s', $selected_notification['message'], $reason_matches)) {
-                            $reason = trim($reason_matches[1]);
-                        }
+        <div class="dld-card">
+            <?php if ($selected_notification): ?>
+                <?php
+                // Extract the deletion reason
+                $reason = "";
+                if (preg_match('/Reason: (.*?)(?=Post content:|$)/s', $selected_notification['message'], $reason_matches)) {
+                    $reason = trim($reason_matches[1]);
+                }
 
-                        // Extract the post content from the message
-                        $post_content = "";
-                        if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $matches)) {
-                            $post_content = $matches[1];
-                        } else {
-                            // Alternative pattern if the first one fails
-                            if (preg_match('/Post content: (.*?)(?=Post data:|$)/s', $selected_notification['message'], $matches)) {
-                                $post_content = trim($matches[1]);
-                            }
-                        }
-                        
-                        // Extract the post data JSON - using a more reliable pattern
-                        $post_data = null;
-                        
-                        // More aggressive pattern to extract JSON
-                        if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $data_matches)) {
-                            $json_string = $data_matches[1];
-                            // Clean up the JSON string
-                            $json_string = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $json_string));
-                            $post_data = json_decode($json_string, true);
-                            
-                            // Fallback if json_decode fails
-                            if (json_last_error() !== JSON_ERROR_NONE) {
-                                // Try to manually extract key values
-                                preg_match('/\"image_path\":\"(.*?)\"/s', $json_string, $img_match);
-                                preg_match('/\"likes\":(.*?),/s', $json_string, $likes_match);
-                                preg_match('/\"comment_count\":(.*?),/s', $json_string, $comments_match);
-                                preg_match('/\"profile_picture\":\"(.*?)\"/s', $json_string, $pfp_match);
-                                preg_match('/\"first_name\":\"(.*?)\"/s', $json_string, $fname_match);
-                                preg_match('/\"last_name\":\"(.*?)\"/s', $json_string, $lname_match);
-                                
-                                $post_data = [
-                                    'image_path' => $img_match[1] ?? '',
-                                    'likes' => (int)($likes_match[1] ?? 0),
-                                    'comment_count' => (int)($comments_match[1] ?? 0),
-                                    'profile_picture' => $pfp_match[1] ?? './web-images/default_profile.png',
-                                    'first_name' => $fname_match[1] ?? 'Your',
-                                    'last_name' => $lname_match[1] ?? 'Post'
-                                ];
-                            }
-                        }
-                        
-                        // Last resort - check if we can find the JSON directly
-                        if (!$post_data && strpos($selected_notification['message'], '{') !== false && strpos($selected_notification['message'], '}') !== false) {
-                            $start = strpos($selected_notification['message'], '{');
-                            $end = strrpos($selected_notification['message'], '}');
-                            if ($start !== false && $end !== false && $end > $start) {
-                                $json_string = substr($selected_notification['message'], $start, $end - $start + 1);
-                                $post_data = json_decode($json_string, true);
-                            }
-                        }
-                        
-                        // If still no data, create a basic structure
-                        if (!$post_data) {
-                            $post_data = [
-                                'image_path' => '',
-                                'likes' => 0,
-                                'comment_count' => 0,
-                                'profile_picture' => './web-images/default_profile.png',
-                                'first_name' => 'Your',
-                                'last_name' => 'Post'
-                            ];
-                        }
-                        
-                        // Debug data
-                        $debug_data = [
-                            'post_content_found' => !empty($post_content),
-                            'post_data_found' => $post_data !== null,
-                            'json_error' => json_last_error_msg(),
-                            'extracted_data' => $post_data
+                // Extract the post content from the message
+                $post_content = "";
+                if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $matches)) {
+                    $post_content = $matches[1];
+                } elseif (preg_match('/Post content: (.*?)(?=Post data:|$)/s', $selected_notification['message'], $matches)) {
+                    $post_content = trim($matches[1]);
+                }
+
+                // Extract post data JSON if available
+                $post_data = null;
+                if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $data_matches)) {
+                    $json_string = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $data_matches[1]));
+                    $post_data = json_decode($json_string, true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        preg_match('/\"image_path\":\"(.*?)\"/s', $json_string, $img_match);
+                        preg_match('/\"likes\":(.*?),/s', $json_string, $likes_match);
+                        preg_match('/\"comment_count\":(.*?),/s', $json_string, $comments_match);
+                        preg_match('/\"profile_picture\":\"(.*?)\"/s', $json_string, $pfp_match);
+                        preg_match('/\"first_name\":\"(.*?)\"/s', $json_string, $fname_match);
+                        preg_match('/\"last_name\":\"(.*?)\"/s', $json_string, $lname_match);
+                        $post_data = [
+                            'image_path' => $img_match[1] ?? '',
+                            'likes' => (int)($likes_match[1] ?? 0),
+                            'comment_count' => (int)($comments_match[1] ?? 0),
+                            'profile_picture' => $pfp_match[1] ?? './web-images/default_profile.png',
+                            'first_name' => $fname_match[1] ?? 'Your',
+                            'last_name' => $lname_match[1] ?? 'Post'
                         ];
-                        ?>
-                        
-                        <!-- Hidden debug info that can be viewed in page source -->
-                        <!-- DEBUG: <?php echo json_encode(['message' => $debug_message, 'data' => $debug_data]); ?> -->
-                        
-                        <!-- Deletion banner -->
-                        <div class="deletion-banner">
+                    }
+                }
+
+                // Last resort - find the JSON directly
+                if (!$post_data && strpos($selected_notification['message'], '{') !== false && strpos($selected_notification['message'], '}') !== false) {
+                    $json_start = strpos($selected_notification['message'], '{');
+                    $json_end = strrpos($selected_notification['message'], '}');
+                    if ($json_start !== false && $json_end !== false && $json_end > $json_start) {
+                        $json_string = substr($selected_notification['message'], $json_start, $json_end - $json_start + 1);
+                        $post_data = json_decode($json_string, true);
+                    }
+                }
+
+                // If still no data, create a basic structure
+                if (!$post_data) {
+                    $post_data = [
+                        'image_path' => '',
+                        'likes' => 0,
+                        'comment_count' => 0,
+                        'profile_picture' => './web-images/default_profile.png',
+                        'first_name' => 'Your',
+                        'last_name' => 'Post'
+                    ];
+                }
+
+                // Author / image / counts
+                if ($deleted_post_data) {
+                    $has_profile_pic = !empty($deleted_post_data['profile_picture']);
+                    $profile_pic = $has_profile_pic ? htmlspecialchars($deleted_post_data['profile_picture']) : '';
+                    $author_first = $deleted_post_data['first_name'] ?? '';
+                    $author_last = $deleted_post_data['last_name'] ?? '';
+                    $author_name = !empty($author_first) && !empty($author_last)
+                        ? htmlspecialchars($author_first . ' ' . $author_last)
+                        : 'Your Post';
+                    $post_content = $deleted_post_data['content'] ?? '';
+                    $post_image = $deleted_post_data['image_path'] ?? '';
+                    $post_likes = $deleted_post_data['likes'] ?? 0;
+                    $post_comments = $deleted_post_data['comment_count'] ?? 0;
+                    $post_created = $deleted_post_data['created_at'] ?? $selected_notification['created_at'];
+                    $post_deleted = $deleted_post_data['deleted_at'] ?? $selected_notification['created_at'];
+                } else {
+                    $has_profile_pic = isset($post_data['profile_picture']) && !empty($post_data['profile_picture']);
+                    $profile_pic = $has_profile_pic ? htmlspecialchars($post_data['profile_picture']) : '';
+                    $author_first = $post_data['first_name'] ?? '';
+                    $author_last = $post_data['last_name'] ?? '';
+                    $author_name = '';
+                    if (isset($post_data['first_name']) && isset($post_data['last_name'])) {
+                        $author_name = htmlspecialchars($post_data['first_name'] . ' ' . $post_data['last_name']);
+                    }
+                    if (empty(trim($author_name))) {
+                        $author_name = 'Your Post';
+                    }
+                    $post_image = $post_data['image_path'] ?? '';
+                    $post_likes = $post_data['likes'] ?? 0;
+                    $post_comments = $post_data['comment_count'] ?? 0;
+                    $post_created = $selected_notification['created_at'];
+                    $post_deleted = $selected_notification['created_at'];
+                }
+
+                $display_content = $deleted_post_data ? $deleted_post_data['content'] : $post_content;
+                $image_src = ($deleted_post_data && !empty($deleted_post_data['image_path']))
+                    ? $deleted_post_data['image_path']
+                    : ($post_data['image_path'] ?? '');
+                $likes_count = $deleted_post_data ? intval($deleted_post_data['likes']) : (isset($post_data['likes']) ? intval($post_data['likes']) : 0);
+                $comments_count = $deleted_post_data ? intval($deleted_post_data['comment_count']) : (isset($post_data['comment_count']) ? intval($post_data['comment_count']) : 0);
+                $deletion_reason = ($deleted_post_data && !empty($deleted_post_data['deletion_reason']))
+                    ? $deleted_post_data['deletion_reason']
+                    : $reason;
+                ?>
+
+                <div class="dld-media">
+                    <?php if (!empty(trim($display_content))): ?>
+                    <div class="dld-caption-label">Caption</div>
+                    <div class="dld-content"><?php echo nl2br(htmlspecialchars($display_content)); ?></div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($image_src)): ?>
+                        <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image" class="dld-media-img">
+                    <?php else: ?>
+                        <div class="dld-media-empty"><i class="bi bi-image"></i></div>
+                    <?php endif; ?>
+
+                    <div class="dld-media-actions">
+                        <span class="dld-pill">
+                            <i class="bi bi-heart<?php echo $likes_count > 0 ? '-fill' : ''; ?>"></i>
+                            Like <strong><?php echo $likes_count; ?></strong>
+                        </span>
+                        <span class="dld-pill">
+                            <i class="bi bi-chat"></i>
+                            Comment <strong><?php echo $comments_count; ?></strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="dld-detail">
+                    <div class="dld-head">
+                        <span class="dld-head-icon"><i class="bi bi-trash"></i></span>
+                        <div class="dld-head-text">
+                            <h3 class="dld-title">Deleted post details</h3>
+                            <p class="dld-subtitle">Removed by an administrator</p>
+                        </div>
+                        <button type="button" class="dld-close" onclick="hideModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="dld-body">
+                        <div class="dld-banner">
                             <i class="bi bi-trash-fill"></i>
                             <span>This post was deleted by an administrator</span>
                         </div>
-                        
-                        <!-- Deletion reason if available -->
-                        <?php 
-                        // Get reason from deleted_posts table if available, otherwise parse from notification
-                        $deletion_reason = $deleted_post_data && !empty($deleted_post_data['deletion_reason']) 
-                            ? $deleted_post_data['deletion_reason'] 
-                            : $reason;
-                            
-                        if (!empty($deletion_reason)): 
-                        ?>
-                        <div class="deletion-reason">
-                            <div class="reason-header">Reason for Deletion:</div>
-                            <div class="reason-text"><?php echo htmlspecialchars($deletion_reason); ?></div>
+
+                        <?php if (!empty($deletion_reason)): ?>
+                        <div class="dld-reason">
+                            <div class="dld-reason-label">Reason for deletion</div>
+                            <div class="dld-reason-text"><?php echo htmlspecialchars($deletion_reason); ?></div>
                         </div>
                         <?php endif; ?>
-                        
-                        <!-- Begin post structure that matches admin.php -->
-                        <div class="post-display">
-                            <div class="post-author-info">
-                                <?php 
-                                if ($deleted_post_data) {
-                                    // Use data from deleted_posts table
-                                    $has_profile_pic = !empty($deleted_post_data['profile_picture']);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($deleted_post_data['profile_picture'])
-                                        : '';
-                                    
-                                    $author_first = $deleted_post_data['first_name'] ?? '';
-                                    $author_last = $deleted_post_data['last_name'] ?? '';
-                                    $author_name = !empty($author_first) && !empty($author_last)
-                                        ? htmlspecialchars($author_first . ' ' . $author_last)
-                                        : 'Your Post';
-                                    
-                                    $post_content = $deleted_post_data['content'] ?? '';
-                                    $post_image = $deleted_post_data['image_path'] ?? '';
-                                    $post_likes = $deleted_post_data['likes'] ?? 0;
-                                    $post_comments = $deleted_post_data['comment_count'] ?? 0;
-                                    $deletion_reason = $deleted_post_data['deletion_reason'] ?? '';
-                                    $post_created = $deleted_post_data['created_at'] ?? $selected_notification['created_at'];
-                                    $post_deleted = $deleted_post_data['deleted_at'] ?? $selected_notification['created_at'];
-                                } else {
-                                    // Fallback to old method of parsing from notification message
-                                    $has_profile_pic = isset($post_data['profile_picture']) && !empty($post_data['profile_picture']);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($post_data['profile_picture'])
-                                        : '';
-                                    
-                                    $author_first = $post_data['first_name'] ?? '';
-                                    $author_last = $post_data['last_name'] ?? '';
-                                    $author_name = '';
-                                    if (isset($post_data['first_name']) && isset($post_data['last_name'])) {
-                                        $author_name = htmlspecialchars($post_data['first_name'] . ' ' . $post_data['last_name']);
-                                    }
-                                    if (empty(trim($author_name))) {
-                                        $author_name = 'Your Post';
-                                    }
-                                    
-                                    $post_image = $post_data['image_path'] ?? '';
-                                    $post_likes = $post_data['likes'] ?? 0;
-                                    $post_comments = $post_data['comment_count'] ?? 0;
-                                    $post_created = $selected_notification['created_at'];
-                                    $post_deleted = $selected_notification['created_at'];
-                                }
-                                ?>
-                                <?php if ($has_profile_pic): ?>
-                                    <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="avatar">
-                                <?php else: ?>
-                                    <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 48); ?>
-                                <?php endif; ?>
-                                <div>
-                                    <strong><?php echo $author_name; ?></strong>
-                                    <div class="post-meta">
-                                        <span><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="post-content-display">
-                                <?php 
-                                // Use the content from deleted_posts table if available, otherwise use the parsed content
-                                $display_content = $deleted_post_data ? $deleted_post_data['content'] : $post_content;
-                                
-                                if (!empty($display_content)): 
-                                ?>
-                                    <?php echo nl2br(htmlspecialchars($display_content)); ?>
-                                <?php else: ?>
-                                    <em>No content available</em>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <?php 
-                            // Check for image in deleted_posts table first, then fall back to parsed data
-                            $image_src = $deleted_post_data && !empty($deleted_post_data['image_path']) 
-                                ? $deleted_post_data['image_path'] 
-                                : ($post_data['image_path'] ?? '');
-                                
-                            if (!empty($image_src)): 
-                            ?>
-                            <div class="post-media">
-                                <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image">
-                            </div>
+
+                        <div class="dld-author">
+                            <?php if ($has_profile_pic): ?>
+                                <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="dld-avatar">
+                            <?php else: ?>
+                                <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 44); ?>
                             <?php endif; ?>
-                            
-                            <div class="post-actions-bar">
-                                <div class="post-action">
-                                    <?php 
-                                    // Get like count
-                                    $likes_count = $deleted_post_data ? intval($deleted_post_data['likes']) : (isset($post_data['likes']) ? intval($post_data['likes']) : 0);
-                                    
-                                    // Display filled heart icon if there are likes, empty heart if zero
-                                    if ($likes_count > 0): 
-                                    ?>
-                                        <i class="bi bi-heart-fill"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-heart"></i>
-                                    <?php endif; ?>
-                                    Like
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $likes_count; ?>
-                                    </small>
-                                </div>
-                                <div class="post-action">
-                                    <i class="bi bi-chat"></i> Comment
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $deleted_post_data ? intval($deleted_post_data['comment_count']) : (isset($post_data['comment_count']) ? intval($post_data['comment_count']) : '0'); ?>
-                                    </small>
-                                </div>
+                            <div class="dld-author-meta">
+                                <div class="dld-author-name"><?php echo $author_name; ?></div>
+                                <div class="dld-author-time"><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></div>
                             </div>
                         </div>
-                        
-                        <div class="deletion-timestamp">
-                            <i class="bi bi-clock-history"></i> 
+
+                        <div class="dld-issued">
+                            <i class="bi bi-clock-history"></i>
                             Post was deleted <?php echo time_elapsed_string($deleted_post_data ? $deleted_post_data['deleted_at'] : $selected_notification['created_at'], true); ?>
                         </div>
-                    <?php endif; ?>
+                    </div>
+
+                    <div class="dld-foot">
+                        <button type="button" class="dld-close-btn" onclick="hideModal()">Close</button>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
     

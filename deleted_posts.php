@@ -231,6 +231,7 @@ if (isset($_GET['notification_id'])) {
     <?php include 'font-head.php'; ?>
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
+    <link rel="stylesheet" href="deleted-posts-card.css">
     
     <style>
         /* Custom modal dimensions - ADJUST THESE VALUES TO CHANGE THE CONTAINER SIZE */
@@ -822,98 +823,101 @@ if (isset($_GET['notification_id'])) {
     <?php unset($_SESSION['notification_message']); ?>
     <?php endif; ?>
     
-    <div class="notifications-list">
-        <h2 class="page-title">
-            Deleted Posts Notifications
-            <span class="notification-count"><?php echo $total_count; ?> notifications</span>
-            <?php if ($_SESSION['is_admin'] ?? false): ?>
-            <a href="?create_test=1" style="font-size: 0.8rem; margin-left: 15px; color: #666;" title="Create a test notification"><i class="bi bi-plus-circle"></i> Test</a>
-            <?php endif; ?>
-        </h2>
-        
-        <div class="notifications-container">
-            <?php
-            // Get deleted post notifications
-            $stmt = $pdo->prepare("
-                SELECT * FROM notifications 
-                WHERE user_id = ? 
-                AND type = 'post_deleted' 
-                ORDER BY created_at DESC
-                LIMIT 25
-            ");
-            $stmt->execute([$user_id]);
-            
-            $has_notifications = false;
-            
-            if ($stmt->rowCount() > 0) {
-                $has_notifications = true;
-                while ($notification = $stmt->fetch()) {
-                    // Extract the post content from the message
-                    $post_content = "";
-                    if (preg_match('/Post content: "(.*?)"/s', $notification['message'], $matches)) {
-                        $post_content = $matches[1];
-                    }
+    <?php $new_count = max(0, $total_count - $read_count); ?>
+    <div class="dpn-wrap">
+        <div class="dpn-card">
+            <div class="dpn-head">
+                <span class="dpn-head-icon"><i class="bi bi-trash"></i></span>
+                <div class="dpn-head-text">
+                    <h2 class="dpn-title">Deleted posts</h2>
+                    <p class="dpn-subtitle">Posts removed by administrators</p>
+                </div>
+                <?php if ($_SESSION['is_admin'] ?? false): ?>
+                <a href="?create_test=1" class="dpn-test-link" title="Create a test notification"><i class="bi bi-plus-circle"></i> Test</a>
+                <?php endif; ?>
+                <?php if ($new_count > 0): ?>
+                <span class="dpn-new-pill"><span class="dpn-dot"></span><?php echo $new_count; ?> new</span>
+                <?php endif; ?>
+            </div>
+
+            <div class="dpn-body">
+                <?php
+                // Get deleted post notifications
+                $stmt = $pdo->prepare("
+                    SELECT * FROM notifications 
+                    WHERE user_id = ? 
+                    AND type = 'post_deleted' 
+                    ORDER BY created_at DESC
+                    LIMIT 25
+                ");
+                $stmt->execute([$user_id]);
+
+                if ($stmt->rowCount() > 0) {
                     ?>
-                    <div class="notification-card" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
-                        <div class="notification-message">
-                            <i class="bi bi-trash-fill" style="color: #d62839;"></i>
-                            <?php 
-                            // Display message without the post content part for cleaner display
-                            $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
-                            // Also hide the JSON data
-                            $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
-                            // Split off a trailing "Reason: ..." into its own ellipsis-truncated
-                            // preview span. The full note is shown in the details modal.
-                            $reason_preview = '';
-                            if (preg_match('/^(.*?)Reason:\s*(.+)$/s', $display_message, $rm)) {
-                                $display_message = trim($rm[1]);
-                                $reason_preview = trim($rm[2]);
-                            }
-                            echo htmlspecialchars($display_message);
-                            if ($reason_preview !== '') {
-                                echo ' Reason: <span class="notif-reason-preview">' . htmlspecialchars($reason_preview) . '</span>';
-                            }
-                            ?>
-                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="view-details-btn">
-                                <i class="bi bi-eye"></i> View Details
+                    <div class="dpn-list">
+                        <?php while ($notification = $stmt->fetch()): ?>
+                        <?php
+                        // Display message without the post content part for cleaner display
+                        $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
+                        // Also hide the JSON data
+                        $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
+                        // Split off a trailing "Reason: ..." into its own box
+                        $reason_preview = '';
+                        if (preg_match('/^(.*?)Reason:\s*(.+)$/s', $display_message, $rm)) {
+                            $display_message = trim($rm[1]);
+                            $reason_preview = trim($rm[2]);
+                        }
+                        ?>
+                        <div class="dpn-item" role="button" tabindex="0" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
+                            <span class="dpn-item-icon"><i class="bi bi-trash"></i></span>
+                            <div class="dpn-item-text">
+                                <div class="dpn-item-title"><?php echo htmlspecialchars($display_message); ?></div>
+                                <?php if ($reason_preview !== ''): ?>
+                                <div class="dpn-reason">
+                                    <div class="dpn-reason-label">Reason</div>
+                                    <div class="dpn-reason-box"><?php echo htmlspecialchars($reason_preview); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <div class="dpn-item-time">
+                                    <i class="bi bi-clock"></i> <?php echo time_elapsed_string($notification['created_at']); ?>
+                                </div>
+                            </div>
+                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="dpn-view-btn" onclick="event.stopPropagation();">
+                                <i class="bi bi-eye"></i> View details
                             </a>
                         </div>
-                        <div class="notification-time">
-                            <?php echo time_elapsed_string($notification['created_at']); ?>
-                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class="dpn-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h3>No deleted post notifications</h3>
+                        <p>When administrators delete your posts, notifications will appear here.</p>
+                        <?php if ($_SESSION['is_admin'] ?? false): ?>
+                        <p><a href="?create_test=1" class="dpn-view-btn"><i class="bi bi-plus-circle"></i> Create test notification</a></p>
+                        <?php endif; ?>
                     </div>
                     <?php
                 }
-            } else {
                 ?>
-                <div class="empty-state">
-                    <i class="bi bi-inbox"></i>
-                    <h3>No Deleted Post Notifications</h3>
-                    <p>When administrators delete your posts, notifications will appear here.</p>
-                    <?php if ($_SESSION['is_admin'] ?? false): ?>
-                    <p><a href="?create_test=1" class="view-details-btn"><i class="bi bi-plus-circle"></i> Create Test Notification</a></p>
-                    <?php endif; ?>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-        
-        <div class="notification-actions">
-            <a href="homepage.php" class="back-btn">
-                <i class="bi bi-arrow-left"></i> Back to Home
-            </a>
-            
-            <div class="notification-buttons">
+            </div>
+
+            <div class="dpn-foot">
+                <a href="homepage.php" class="dpn-back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+
                 <?php if ($read_count > 0): ?>
                 <form method="post" action="deleted_posts.php" id="clearReadForm">
-                    <button type="button" class="clear-btn" id="openClearConfirmBtn">
-                        <i class="bi bi-trash"></i> Clear All Read Notifications
+                    <button type="button" class="dpn-clear-btn" id="openClearConfirmBtn">
+                        <i class="bi bi-trash"></i> Clear all read notifications
                     </button>
                 </form>
                 <?php else: ?>
-                <button disabled class="clear-btn">
-                    <i class="bi bi-trash"></i> Clear All Read Notifications
+                <button disabled class="dpn-clear-btn">
+                    <i class="bi bi-trash"></i> Clear all read notifications
                 </button>
                 <?php endif; ?>
             </div>

@@ -1,0 +1,327 @@
+/* ============================================================
+   Deleted Posts notifications card redesign (red / pink theme)
+   Loaded last on deleted_posts.php and overrides the legacy
+   notification list markup.
+   ============================================================ */
+
+.dpn-wrap {
+    max-width: 690px !important;
+    margin: 32px auto 60px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+}
+
+.dpn-card {
+    background: #ffffff !important;
+    border: 1px solid #f7e1e7 !important;
+    border-top: 4px solid #0e8b7f !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(190, 30, 70, 0.08) !important;
+    overflow: hidden !important;
+}
+
+/* ---------- Header ---------- */
+.dpn-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 22px 24px !important;
+    border-bottom: 1px solid #f7e1e7 !important;
+}
+
+.dpn-head-icon {
+    flex: 0 0 auto !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #fde8ee !important;
+    color: #d62839 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+}
+
+.dpn-head-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.dpn-title {
+    margin: 0 !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #3d2530 !important;
+    line-height: 1.3 !important;
+}
+
+.dpn-subtitle {
+    margin: 2px 0 0 !important;
+    font-size: 12.5px !important;
+    color: #a98b96 !important;
+}
+
+.dpn-new-pill {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #fde8ee !important;
+    color: #c81e3c !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    padding: 5px 12px !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+}
+
+.dpn-dot {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background: #e0245e !important;
+}
+
+.dpn-test-link {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    color: #a98b96 !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    padding: 4px 8px !important;
+    border-radius: 8px !important;
+    transition: background 0.18s ease, color 0.18s ease !important;
+}
+
+.dpn-test-link:hover {
+    background: #fdf1f5 !important;
+    color: #c81e3c !important;
+}
+
+/* ---------- Body / list ---------- */
+.dpn-body {
+    padding: 20px 24px 8px !important;
+}
+
+.dpn-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+.dpn-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    background: #fdf3f5 !important;
+    border-left: 4px solid #e0245e !important;
+    border-radius: 10px !important;
+    padding: 16px 18px !important;
+    cursor: pointer !important;
+    transition: box-shadow 0.18s ease !important;
+}
+
+.dpn-item:hover {
+    box-shadow: 0 4px 14px rgba(190, 30, 70, 0.08) !important;
+}
+
+.dpn-item-icon {
+    flex: 0 0 auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: #fde8ee !important;
+    color: #d62839 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 17px !important;
+}
+
+.dpn-item-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.dpn-item-title {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #4a2532 !important;
+    line-height: 1.4 !important;
+}
+
+.dpn-reason {
+    margin-top: 12px !important;
+}
+
+.dpn-reason-label {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.7px !important;
+    text-transform: uppercase !important;
+    color: #c81e3c !important;
+    margin-bottom: 6px !important;
+}
+
+.dpn-reason-box {
+    background: #ffffff !important;
+    border: 1px solid #f6d0da !important;
+    border-radius: 8px !important;
+    padding: 11px 14px !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    color: #7a3b4d !important;
+    /* Preview only — clamp to two lines with an ellipsis; the full
+       reason is shown in the details modal. */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+}
+
+.dpn-item-time {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+    font-size: 12.5px !important;
+    color: #a98b96 !important;
+}
+
+.dpn-view-btn {
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    background: #ffffff !important;
+    border: 1px solid #f2c3d0 !important;
+    color: #c81e3c !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: background 0.18s ease, border-color 0.18s ease !important;
+}
+
+.dpn-view-btn:hover {
+    background: #fdf1f5 !important;
+    border-color: #e0245e !important;
+}
+
+/* ---------- Empty state ---------- */
+.dpn-empty {
+    text-align: center !important;
+    padding: 40px 20px !important;
+    color: #a98b96 !important;
+}
+
+.dpn-empty i {
+    font-size: 42px !important;
+    color: #f3cdd7 !important;
+    display: block !important;
+    margin-bottom: 14px !important;
+}
+
+.dpn-empty h3 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #7a5566 !important;
+    margin: 0 0 6px !important;
+}
+
+.dpn-empty p {
+    font-size: 13.5px !important;
+    margin: 0 !important;
+}
+
+/* ---------- Footer ---------- */
+.dpn-foot {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 18px 24px 22px !important;
+    border-top: 1px solid #f7e1e7 !important;
+    margin-top: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+.dpn-foot form {
+    margin: 0 !important;
+}
+
+.dpn-back-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #ffffff !important;
+    border: 1px solid #e6d4da !important;
+    color: #4a2532 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 9px 18px !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    transition: background 0.18s ease !important;
+}
+
+.dpn-back-btn:hover {
+    background: #faf5f7 !important;
+}
+
+.dpn-clear-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #fde8ee !important;
+    border: none !important;
+    color: #c81e3c !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 10px 18px !important;
+    border-radius: 999px !important;
+    cursor: pointer !important;
+    transition: background 0.18s ease !important;
+}
+
+.dpn-clear-btn:hover {
+    background: #fbd5df !important;
+}
+
+.dpn-clear-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+    .dpn-head {
+        flex-wrap: wrap !important;
+    }
+
+    .dpn-item {
+        flex-wrap: wrap !important;
+    }
+
+    .dpn-view-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .dpn-foot {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .dpn-back-btn,
+    .dpn-clear-btn {
+        justify-content: center !important;
+    }
+}

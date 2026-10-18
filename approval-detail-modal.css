@@ -1,0 +1,283 @@
+/* ============================================================
+   Post approval details modal — two-column redesign
+   Scoped to #detailModal on approved_posts.php.
+   ============================================================ */
+
+#detailModal {
+    padding: 24px !important;
+    box-sizing: border-box !important;
+}
+
+#detailModal .apd-card {
+    display: flex !important;
+    flex-direction: row !important;
+    width: min(880px, 94vw) !important;
+    max-width: 880px !important;
+    max-height: 90vh !important;
+    background: #ffffff !important;
+    border-top: 4px solid #0e8b7f !important;
+    border-radius: 16px !important;
+    box-shadow: 0 24px 60px rgba(16, 42, 42, 0.28) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* ---------- Left media column ---------- */
+#detailModal .apd-media {
+    flex: 1 1 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 22px !important;
+    background: #ffffff !important;
+    border-right: 1px solid #eef2f1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#detailModal .apd-media-img {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    display: block !important;
+    background: #f3f5f5 !important;
+}
+
+#detailModal .apd-media-empty {
+    flex: 1 1 auto !important;
+    min-height: 280px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f3f5f5 !important;
+    border-radius: 12px !important;
+    color: #c7d4d2 !important;
+    font-size: 48px !important;
+}
+
+#detailModal .apd-media-actions {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+}
+
+#detailModal .apd-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #f1f4f4 !important;
+    color: #5b6b6b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+}
+
+#detailModal .apd-pill i {
+    font-size: 14px !important;
+}
+
+#detailModal .apd-pill strong {
+    font-weight: 700 !important;
+    color: #33413f !important;
+}
+
+/* ---------- Right detail column ---------- */
+#detailModal .apd-detail {
+    flex: 1 1 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#detailModal .apd-head {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 20px 22px !important;
+    border-bottom: 1px solid #eef2f1 !important;
+}
+
+#detailModal .apd-head-icon {
+    flex: 0 0 auto !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #e3f4ef !important;
+    color: #0e8b7f !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+}
+
+#detailModal .apd-head-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+#detailModal .apd-title {
+    margin: 0 !important;
+    font-size: 16.5px !important;
+    font-weight: 700 !important;
+    color: #1f2d2d !important;
+    line-height: 1.3 !important;
+}
+
+#detailModal .apd-subtitle {
+    margin: 2px 0 0 !important;
+    font-size: 12.5px !important;
+    color: #8a97a0 !important;
+}
+
+#detailModal .apd-close {
+    flex: 0 0 auto !important;
+    width: 34px !important;
+    height: 34px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: #f1f4f4 !important;
+    color: #5b6b6b !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+}
+
+#detailModal .apd-close:hover {
+    background: #e4e9e9 !important;
+    color: #1f2d2d !important;
+}
+
+#detailModal .apd-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 20px 22px !important;
+}
+
+#detailModal .apd-banner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: #eafaf0 !important;
+    color: #1f7a4d !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    padding: 14px 16px !important;
+    border-radius: 10px !important;
+}
+
+#detailModal .apd-banner i {
+    flex: 0 0 auto !important;
+    font-size: 18px !important;
+    color: #1e9e63 !important;
+}
+
+#detailModal .apd-author {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-top: 18px !important;
+}
+
+#detailModal .apd-avatar {
+    flex: 0 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+#detailModal .apd-author-meta {
+    min-width: 0 !important;
+}
+
+#detailModal .apd-author-name {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #1f2d2d !important;
+    line-height: 1.3 !important;
+}
+
+#detailModal .apd-author-time {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 5px !important;
+    background: #f1f4f4 !important;
+    color: #5b6b6b !important;
+    font-size: 12px !important;
+    padding: 4px 11px !important;
+    border-radius: 999px !important;
+}
+
+#detailModal .apd-content {
+    margin-top: 16px !important;
+    background: #f6f8f8 !important;
+    border-radius: 10px !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    color: #33413f !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
+
+#detailModal .apd-approved-at {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    margin-top: 16px !important;
+    font-size: 12.5px !important;
+    color: #8a97a0 !important;
+}
+
+#detailModal .apd-foot {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 16px 22px !important;
+    border-top: 1px solid #eef2f1 !important;
+}
+
+#detailModal .apd-close-btn {
+    background: #0e8b7f !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 11px 34px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: background 0.18s ease !important;
+}
+
+#detailModal .apd-close-btn:hover {
+    background: #0b6f66 !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+    #detailModal .apd-card {
+        flex-direction: column !important;
+        max-height: 88vh !important;
+    }
+
+    #detailModal .apd-media {
+        border-right: none !important;
+        border-bottom: 1px solid #eef2f1 !important;
+        flex: 0 0 auto !important;
+    }
+
+    #detailModal .apd-media-img {
+        max-height: 300px !important;
+        flex: 0 0 auto !important;
+    }
+}

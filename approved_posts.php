@@ -212,6 +212,7 @@ if (isset($_GET['notification_id'])) {
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
     <link rel="stylesheet" href="approved-posts-card.css">
+    <link rel="stylesheet" href="approval-detail-modal.css">
     
     <style>
         /* Custom modal dimensions - ADJUST THESE VALUES TO CHANGE THE CONTAINER SIZE */
@@ -862,189 +863,171 @@ if (isset($_GET['notification_id'])) {
         </div>
     </div>
 
-    <!-- Notification Detail Modal -->
+    <!-- Post approval details modal -->
     <div class="modal-overlay" id="detailModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Your Post Approval Details</h3>
-                    <button class="modal-close" onclick="hideModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <?php if ($selected_notification): ?>
-                        <?php
-                        // Get post data from the approved post
-                        $post_content = "";
-                        $post_data = null;
-                        
-                        if ($approved_post_data) {
-                            $post_content = $approved_post_data['content'] ?? '';
-                            $post_data = $approved_post_data;
+        <div class="apd-card">
+            <?php if ($selected_notification): ?>
+                <?php
+                // Get post data from the approved post
+                $post_content = "";
+                $post_data = null;
+
+                if ($approved_post_data) {
+                    $post_content = $approved_post_data['content'] ?? '';
+                    $post_data = $approved_post_data;
+                }
+
+                if ($approved_post_data) {
+                    // Use data from posts table
+                    $has_profile_pic = !empty($approved_post_data['profile_picture']);
+                    $profile_pic = $has_profile_pic
+                        ? htmlspecialchars($approved_post_data['profile_picture'])
+                        : '';
+
+                    $author_first = $approved_post_data['first_name'] ?? '';
+                    $author_last = $approved_post_data['last_name'] ?? '';
+                    $author_name = !empty($author_first) && !empty($author_last)
+                        ? htmlspecialchars($author_first . ' ' . $author_last)
+                        : 'Your Post';
+
+                    $post_content = $approved_post_data['content'] ?? '';
+                    $post_image = $approved_post_data['image_path'] ?? '';
+                    $post_likes = $approved_post_data['likes'] ?? 0;
+                    $post_comments = $approved_post_data['comment_count'] ?? 0;
+                    $post_created = $approved_post_data['created_at'] ?? $selected_notification['created_at'];
+                } else {
+                    // Fallback: parse the snapshot embedded in the notification
+                    // message (same format as hold/warning notifications),
+                    // then fall back to the owner's own profile.
+                    $parsed_content = '';
+                    if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $pc_match)) {
+                        $parsed_content = $pc_match[1];
+                    }
+                    $parsed_json = null;
+                    if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $pd_match)) {
+                        $js = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $pd_match[1]));
+                        $parsed_json = json_decode($js, true);
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            preg_match('/\"image_path\":\"(.*?)\"/s', $js, $im);
+                            preg_match('/\"likes\":(\d+)/s', $js, $lm);
+                            preg_match('/\"comment_count\":(\d+)/s', $js, $cm);
+                            preg_match('/\"profile_picture\":\"(.*?)\"/s', $js, $pm);
+                            preg_match('/\"first_name\":\"(.*?)\"/s', $js, $fm);
+                            preg_match('/\"last_name\":\"(.*?)\"/s', $js, $lm2);
+                            $parsed_json = [
+                                'image_path' => $im[1] ?? '',
+                                'likes' => (int)($lm[1] ?? 0),
+                                'comment_count' => (int)($cm[1] ?? 0),
+                                'profile_picture' => $pm[1] ?? '',
+                                'first_name' => $fm[1] ?? '',
+                                'last_name' => $lm2[1] ?? '',
+                            ];
                         }
-                        ?>
-                        
-                        <!-- Approval banner -->
-                        <div class="approval-banner">
+                    }
+                    $parsed_first = is_array($parsed_json) ? ($parsed_json['first_name'] ?? '') : '';
+                    $parsed_last = is_array($parsed_json) ? ($parsed_json['last_name'] ?? '') : '';
+                    $parsed_pfp = is_array($parsed_json) ? ($parsed_json['profile_picture'] ?? '') : '';
+                    if (empty($parsed_first) && empty($parsed_last) && $owner_info) {
+                        $parsed_first = $owner_info['first_name'] ?? '';
+                        $parsed_last = $owner_info['last_name'] ?? '';
+                    }
+                    if (empty($parsed_pfp) && $owner_info) {
+                        $parsed_pfp = $owner_info['profile_picture'] ?? '';
+                    }
+
+                    $has_profile_pic = !empty($parsed_pfp);
+                    $profile_pic = $has_profile_pic
+                        ? htmlspecialchars($parsed_pfp)
+                        : '';
+
+                    $author_first = $parsed_first;
+                    $author_last = $parsed_last;
+                    $author_name = (!empty($parsed_first) && !empty($parsed_last))
+                        ? htmlspecialchars($parsed_first . ' ' . $parsed_last)
+                        : 'Your Post';
+
+                    $post_content = $parsed_content;
+                    $post_image = is_array($parsed_json) ? ($parsed_json['image_path'] ?? '') : '';
+                    $post_likes = is_array($parsed_json) ? intval($parsed_json['likes'] ?? 0) : 0;
+                    $post_comments = is_array($parsed_json) ? intval($parsed_json['comment_count'] ?? 0) : 0;
+                    $post_created = $selected_notification['created_at'];
+                }
+
+                $display_content = $approved_post_data ? $approved_post_data['content'] : $post_content;
+                $image_src = ($approved_post_data && !empty($approved_post_data['image_path']))
+                    ? $approved_post_data['image_path']
+                    : ($post_image ?? '');
+                $likes_count = $approved_post_data ? intval($approved_post_data['likes']) : intval($post_likes ?? 0);
+                $comments_count = $approved_post_data ? intval($approved_post_data['comment_count']) : intval($post_comments ?? 0);
+                ?>
+
+                <div class="apd-media">
+                    <?php if (!empty($image_src)): ?>
+                        <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image" class="apd-media-img">
+                    <?php else: ?>
+                        <div class="apd-media-empty"><i class="bi bi-image"></i></div>
+                    <?php endif; ?>
+                    <div class="apd-media-actions">
+                        <span class="apd-pill">
+                            <i class="bi bi-heart<?php echo $likes_count > 0 ? '-fill' : ''; ?>"></i>
+                            Like <strong><?php echo $likes_count; ?></strong>
+                        </span>
+                        <span class="apd-pill">
+                            <i class="bi bi-chat"></i>
+                            Comment <strong><?php echo $comments_count; ?></strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="apd-detail">
+                    <div class="apd-head">
+                        <span class="apd-head-icon"><i class="bi bi-check-lg"></i></span>
+                        <div class="apd-head-text">
+                            <h3 class="apd-title">Post approval details</h3>
+                            <p class="apd-subtitle">Your post passed review</p>
+                        </div>
+                        <button type="button" class="apd-close" onclick="hideModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="apd-body">
+                        <div class="apd-banner">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>This post has been approved by an administrator</span>
                         </div>
-                        
-                        <!-- Begin post structure that matches admin.php -->
-                        <div class="post-display">
-                            <div class="post-author-info">
-                                <?php 
-                                if ($approved_post_data) {
-                                    // Use data from posts table
-                                    $has_profile_pic = !empty($approved_post_data['profile_picture']);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($approved_post_data['profile_picture'])
-                                        : '';
-                                    
-                                    $author_first = $approved_post_data['first_name'] ?? '';
-                                    $author_last = $approved_post_data['last_name'] ?? '';
-                                    $author_name = !empty($author_first) && !empty($author_last)
-                                        ? htmlspecialchars($author_first . ' ' . $author_last)
-                                        : 'Your Post';
-                                    
-                                    $post_content = $approved_post_data['content'] ?? '';
-                                    $post_image = $approved_post_data['image_path'] ?? '';
-                                    $post_likes = $approved_post_data['likes'] ?? 0;
-                                    $post_comments = $approved_post_data['comment_count'] ?? 0;
-                                    $post_created = $approved_post_data['created_at'] ?? $selected_notification['created_at'];
-                                } else {
-                                    // Fallback: parse the snapshot embedded in the notification
-                                    // message (same format as hold/warning notifications),
-                                    // then fall back to the owner's own profile.
-                                    $parsed_content = '';
-                                    if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $pc_match)) {
-                                        $parsed_content = $pc_match[1];
-                                    }
-                                    $parsed_json = null;
-                                    if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $pd_match)) {
-                                        $js = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $pd_match[1]));
-                                        $parsed_json = json_decode($js, true);
-                                        if (json_last_error() !== JSON_ERROR_NONE) {
-                                            preg_match('/\"image_path\":\"(.*?)\"/s', $js, $im);
-                                            preg_match('/\"likes\":(\d+)/s', $js, $lm);
-                                            preg_match('/\"comment_count\":(\d+)/s', $js, $cm);
-                                            preg_match('/\"profile_picture\":\"(.*?)\"/s', $js, $pm);
-                                            preg_match('/\"first_name\":\"(.*?)\"/s', $js, $fm);
-                                            preg_match('/\"last_name\":\"(.*?)\"/s', $js, $lm2);
-                                            $parsed_json = [
-                                                'image_path' => $im[1] ?? '',
-                                                'likes' => (int)($lm[1] ?? 0),
-                                                'comment_count' => (int)($cm[1] ?? 0),
-                                                'profile_picture' => $pm[1] ?? '',
-                                                'first_name' => $fm[1] ?? '',
-                                                'last_name' => $lm2[1] ?? '',
-                                            ];
-                                        }
-                                    }
-                                    $parsed_first = is_array($parsed_json) ? ($parsed_json['first_name'] ?? '') : '';
-                                    $parsed_last = is_array($parsed_json) ? ($parsed_json['last_name'] ?? '') : '';
-                                    $parsed_pfp = is_array($parsed_json) ? ($parsed_json['profile_picture'] ?? '') : '';
-                                    if (empty($parsed_first) && empty($parsed_last) && $owner_info) {
-                                        $parsed_first = $owner_info['first_name'] ?? '';
-                                        $parsed_last = $owner_info['last_name'] ?? '';
-                                    }
-                                    if (empty($parsed_pfp) && $owner_info) {
-                                        $parsed_pfp = $owner_info['profile_picture'] ?? '';
-                                    }
 
-                                    $has_profile_pic = !empty($parsed_pfp);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($parsed_pfp)
-                                        : '';
-
-                                    $author_first = $parsed_first;
-                                    $author_last = $parsed_last;
-                                    $author_name = (!empty($parsed_first) && !empty($parsed_last))
-                                        ? htmlspecialchars($parsed_first . ' ' . $parsed_last)
-                                        : 'Your Post';
-
-                                    $post_content = $parsed_content;
-                                    $post_image = is_array($parsed_json) ? ($parsed_json['image_path'] ?? '') : '';
-                                    $post_likes = is_array($parsed_json) ? intval($parsed_json['likes'] ?? 0) : 0;
-                                    $post_comments = is_array($parsed_json) ? intval($parsed_json['comment_count'] ?? 0) : 0;
-                                    $post_created = $selected_notification['created_at'];
-                                }
-                                ?>
-                                <?php if ($has_profile_pic): ?>
-                                    <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="avatar">
-                                <?php else: ?>
-                                    <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 48); ?>
-                                <?php endif; ?>
-                                <div>
-                                    <strong><?php echo $author_name; ?></strong>
-                                    <div class="post-meta">
-                                        <span><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="post-content-display">
-                                <?php 
-                                // Use the content from posts table if available, otherwise fallback
-                                $display_content = $approved_post_data ? $approved_post_data['content'] : $post_content;
-                                
-                                if (!empty($display_content)): 
-                                ?>
-                                    <?php echo nl2br(htmlspecialchars($display_content)); ?>
-                                <?php else: ?>
-                                    <em>No content available</em>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <?php
-                            // Check for image in posts table first, then the fallback snapshot
-                            $image_src = $approved_post_data && !empty($approved_post_data['image_path'])
-                                ? $approved_post_data['image_path']
-                                : ($post_image ?? '');
-                                
-                            if (!empty($image_src)): 
-                            ?>
-                            <div class="post-media">
-                                <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image">
-                            </div>
+                        <div class="apd-author">
+                            <?php if ($has_profile_pic): ?>
+                                <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="apd-avatar">
+                            <?php else: ?>
+                                <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 44); ?>
                             <?php endif; ?>
-                            
-                            <div class="post-actions-bar">
-                                <div class="post-action">
-                                    <?php
-                                    // Get like count
-                                    $likes_count = $approved_post_data ? intval($approved_post_data['likes']) : intval($post_likes ?? 0);
-                                    
-                                    // Display filled heart icon if there are likes, empty heart if zero
-                                    if ($likes_count > 0): 
-                                    ?>
-                                        <i class="bi bi-heart-fill"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-heart"></i>
-                                    <?php endif; ?>
-                                    Like
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $likes_count; ?>
-                                    </small>
-                                </div>
-                                <div class="post-action">
-                                    <i class="bi bi-chat"></i> Comment
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $approved_post_data ? intval($approved_post_data['comment_count']) : intval($post_comments ?? 0); ?>
-                                    </small>
-                                </div>
+                            <div class="apd-author-meta">
+                                <div class="apd-author-name"><?php echo $author_name; ?></div>
+                                <div class="apd-author-time"><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></div>
                             </div>
                         </div>
-                        
-                        <div class="approval-timestamp">
-                            <i class="bi bi-clock-history"></i> 
-                            Post was approved <?php echo time_elapsed_string($selected_notification['created_at'], true); ?>
+
+                        <div class="apd-content">
+                            <?php if (!empty($display_content)): ?>
+                                <?php echo nl2br(htmlspecialchars($display_content)); ?>
+                            <?php else: ?>
+                                <em>No content available</em>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
+
+                        <div class="apd-approved-at">
+                            <i class="bi bi-clock-history"></i>
+                            Approved <?php echo time_elapsed_string($selected_notification['created_at'], true); ?>
+                        </div>
+                    </div>
+
+                    <div class="apd-foot">
+                        <button type="button" class="apd-close-btn" onclick="hideModal()">Close</button>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
-    
     <script>
         // Show modal if notification_id is in URL
         document.addEventListener('DOMContentLoaded', function() {

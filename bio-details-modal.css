@@ -169,6 +169,26 @@
     color: #5a6a6a !important;
     font-size: 14px !important;
     line-height: 1.6 !important;
+    /* Cap the bio at roughly half its previous height; longer bios
+       scroll inside the box instead of stretching the modal down. */
+    max-height: 210px !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #bcd9d4 #eef4f3 !important;
+}
+
+#bioDetailsModal .bio-details-bio::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#bioDetailsModal .bio-details-bio::-webkit-scrollbar-track {
+    background: #eef4f3 !important;
+    border-radius: 8px !important;
+}
+
+#bioDetailsModal .bio-details-bio::-webkit-scrollbar-thumb {
+    background: #bcd9d4 !important;
+    border-radius: 8px !important;
 }
 
 #bioDetailsModal .bio-details-bio .empty-info {

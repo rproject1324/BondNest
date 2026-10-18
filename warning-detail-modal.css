@@ -1,0 +1,313 @@
+/* ============================================================
+   Post warning details modal — two-column redesign
+   Scoped to #detailModal on warnings.php.
+   ============================================================ */
+
+#detailModal {
+    padding: 24px !important;
+    box-sizing: border-box !important;
+}
+
+#detailModal .wpd-card {
+    display: flex !important;
+    flex-direction: row !important;
+    width: min(880px, 94vw) !important;
+    max-width: 880px !important;
+    max-height: 90vh !important;
+    background: #ffffff !important;
+    border-top: 4px solid #f59f0b !important;
+    border-radius: 16px !important;
+    box-shadow: 0 24px 60px rgba(60, 42, 10, 0.28) !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* ---------- Left media column ---------- */
+#detailModal .wpd-media {
+    flex: 1 1 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 22px !important;
+    background: #ffffff !important;
+    border-right: 1px solid #f4efe4 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#detailModal .wpd-content {
+    flex: 0 0 auto !important;
+    background: #ffffff !important;
+    border: 1px solid #e8e2d6 !important;
+    border-radius: 10px !important;
+    padding: 12px 15px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #33413f !important;
+    margin-bottom: 14px !important;
+    max-height: 110px !important;
+    overflow-y: auto !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
+
+#detailModal .wpd-media-img {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    display: block !important;
+    background: #f3f5f5 !important;
+}
+
+#detailModal .wpd-media-empty {
+    flex: 1 1 auto !important;
+    min-height: 240px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f3f5f5 !important;
+    border-radius: 12px !important;
+    color: #c7d4d2 !important;
+    font-size: 48px !important;
+}
+
+#detailModal .wpd-media-actions {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+}
+
+#detailModal .wpd-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #f1f4f4 !important;
+    color: #5b6b6b !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+}
+
+#detailModal .wpd-pill i {
+    font-size: 14px !important;
+}
+
+#detailModal .wpd-pill strong {
+    font-weight: 700 !important;
+    color: #33413f !important;
+}
+
+/* ---------- Right detail column ---------- */
+#detailModal .wpd-detail {
+    flex: 1 1 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#detailModal .wpd-head {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 20px 22px !important;
+    border-bottom: 1px solid #f4efe4 !important;
+}
+
+#detailModal .wpd-head-icon {
+    flex: 0 0 auto !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #fdf1da !important;
+    color: #e08b00 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 19px !important;
+}
+
+#detailModal .wpd-head-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+#detailModal .wpd-title {
+    margin: 0 !important;
+    font-size: 16.5px !important;
+    font-weight: 700 !important;
+    color: #3d3221 !important;
+    line-height: 1.3 !important;
+}
+
+#detailModal .wpd-subtitle {
+    margin: 2px 0 0 !important;
+    font-size: 12.5px !important;
+    color: #9a8f7c !important;
+}
+
+#detailModal .wpd-close {
+    flex: 0 0 auto !important;
+    width: 34px !important;
+    height: 34px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: #f1f2f2 !important;
+    color: #6b6b6b !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+}
+
+#detailModal .wpd-close:hover {
+    background: #e6e6e6 !important;
+    color: #1f2d2d !important;
+}
+
+#detailModal .wpd-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding: 20px 22px !important;
+}
+
+#detailModal .wpd-banner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: #fdf3dd !important;
+    border: 1px solid #f6e3b8 !important;
+    color: #b45309 !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.45 !important;
+    padding: 14px 16px !important;
+    border-radius: 10px !important;
+}
+
+#detailModal .wpd-banner i {
+    flex: 0 0 auto !important;
+    font-size: 17px !important;
+    color: #e08b00 !important;
+}
+
+#detailModal .wpd-reason {
+    margin-top: 16px !important;
+    background: #fff9ec !important;
+    border: 1px solid #f3ddb0 !important;
+    border-radius: 10px !important;
+    padding: 14px 16px !important;
+}
+
+#detailModal .wpd-reason-label {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.7px !important;
+    text-transform: uppercase !important;
+    color: #b45309 !important;
+    margin-bottom: 8px !important;
+}
+
+#detailModal .wpd-reason-text {
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    color: #5b4b34 !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+}
+
+#detailModal .wpd-author {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-top: 18px !important;
+}
+
+#detailModal .wpd-avatar {
+    flex: 0 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+#detailModal .wpd-author-meta {
+    min-width: 0 !important;
+}
+
+#detailModal .wpd-author-name {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #1f2d2d !important;
+    line-height: 1.3 !important;
+}
+
+#detailModal .wpd-author-time {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 5px !important;
+    background: #f1f4f4 !important;
+    color: #5b6b6b !important;
+    font-size: 12px !important;
+    padding: 4px 11px !important;
+    border-radius: 999px !important;
+}
+
+#detailModal .wpd-issued {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    margin-top: 16px !important;
+    font-size: 12.5px !important;
+    color: #9a8f7c !important;
+}
+
+#detailModal .wpd-foot {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 16px 22px !important;
+    border-top: 1px solid #f4efe4 !important;
+}
+
+#detailModal .wpd-close-btn {
+    background: #0e8b7f !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    padding: 11px 34px !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: background 0.18s ease !important;
+}
+
+#detailModal .wpd-close-btn:hover {
+    background: #0b6f66 !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+    #detailModal .wpd-card {
+        flex-direction: column !important;
+        max-height: 88vh !important;
+    }
+
+    #detailModal .wpd-media {
+        border-right: none !important;
+        border-bottom: 1px solid #f4efe4 !important;
+        flex: 0 0 auto !important;
+    }
+
+    #detailModal .wpd-media-img {
+        max-height: 300px !important;
+        flex: 0 0 auto !important;
+    }
+}

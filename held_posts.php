@@ -210,6 +210,7 @@ if (isset($_GET['notification_id'])) {
     <?php include 'font-head.php'; ?>
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
+    <link rel="stylesheet" href="held-posts-card.css">
     
     <style>
         /* Custom modal dimensions */
@@ -827,98 +828,100 @@ if (isset($_GET['notification_id'])) {
     <?php unset($_SESSION['notification_message']); ?>
     <?php endif; ?>
     
-    <div class="notifications-list">
-        <h2 class="page-title">
-            Held Posts Notifications
-            <span class="notification-count"><?php echo $total_count; ?> notifications</span>
-        </h2>
-        
-        <div class="notifications-container">
-            <?php
-            // Get hold notifications
-            $stmt = $pdo->prepare("
-                SELECT * FROM notifications 
-                WHERE user_id = ? 
-                AND type = 'post_on_hold' 
-                ORDER BY created_at DESC
-                LIMIT 25
-            ");
-            $stmt->execute([$user_id]);
-            
-            $has_notifications = false;
-            
-            if ($stmt->rowCount() > 0) {
-                $has_notifications = true;
-                while ($notification = $stmt->fetch()) {
-                    // Extract the post content from the message if possible
-                    $post_content = "";
-                    if (preg_match('/Post content: "(.*?)"/s', $notification['message'], $matches)) {
-                        $post_content = $matches[1];
-                    }
+    <?php $new_count = max(0, $total_count - $read_count); ?>
+    <div class="hrn-wrap">
+        <div class="hrn-card">
+            <div class="hrn-head">
+                <span class="hrn-head-icon"><i class="bi bi-pause-fill"></i></span>
+                <div class="hrn-head-text">
+                    <h2 class="hrn-title">Held posts</h2>
+                    <p class="hrn-subtitle">Posts placed on hold by administrators</p>
+                </div>
+                <?php if ($new_count > 0): ?>
+                <span class="hrn-new-pill"><span class="hrn-dot"></span><?php echo $new_count; ?> new</span>
+                <?php endif; ?>
+            </div>
+
+            <div class="hrn-body">
+                <?php
+                // Get hold notifications
+                $stmt = $pdo->prepare("
+                    SELECT * FROM notifications 
+                    WHERE user_id = ? 
+                    AND type = 'post_on_hold' 
+                    ORDER BY created_at DESC
+                    LIMIT 25
+                ");
+                $stmt->execute([$user_id]);
+
+                if ($stmt->rowCount() > 0) {
                     ?>
-                    <div class="notification-card" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
-                        <div class="notification-message">
-                            <i class="bi bi-pause-circle-fill" style="color: #f59f0b;"></i>
-                            <?php 
-                            // Display message without the post content part for cleaner display
-                            $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
-                            // Also hide any JSON data
-                            $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
-                            // Split off a trailing "Reason: ..." into its own ellipsis-truncated
-                            // preview span. The full note is shown in the details modal.
-                            $reason_preview = '';
-                            if (preg_match('/^(.*?)Reason:\s*(.+)$/s', $display_message, $rm)) {
-                                $display_message = trim($rm[1]);
-                                $reason_preview = trim($rm[2]);
-                            }
-                            echo htmlspecialchars($display_message);
-                            if ($reason_preview !== '') {
-                                echo ' Reason: <span class="notif-reason-preview">' . htmlspecialchars($reason_preview) . '</span>';
-                            }
-                            ?>
-                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="view-details-btn">
-                                <i class="bi bi-eye"></i> View Details
+                    <div class="hrn-list">
+                        <?php while ($notification = $stmt->fetch()): ?>
+                        <?php
+                        // Display message without the post content part for cleaner display
+                        $display_message = preg_replace('/Post content: ".*?"/s', '', $notification['message']);
+                        // Also hide any JSON data
+                        $display_message = preg_replace('/Post data: \{.*\}/s', '', $display_message);
+                        // Split off a trailing "Reason: ..." into its own box
+                        $reason_preview = '';
+                        if (preg_match('/^(.*?)Reason:\s*(.+)$/s', $display_message, $rm)) {
+                            $display_message = trim($rm[1]);
+                            $reason_preview = trim($rm[2]);
+                        }
+                        ?>
+                        <div class="hrn-item" role="button" tabindex="0" onclick="showNotificationDetails(<?php echo $notification['id']; ?>)">
+                            <span class="hrn-item-icon"><i class="bi bi-pause-fill"></i></span>
+                            <div class="hrn-item-text">
+                                <div class="hrn-item-title"><?php echo htmlspecialchars($display_message); ?></div>
+                                <?php if ($reason_preview !== ''): ?>
+                                <div class="hrn-reason">
+                                    <div class="hrn-reason-label">Reason</div>
+                                    <div class="hrn-reason-box"><?php echo htmlspecialchars($reason_preview); ?></div>
+                                </div>
+                                <?php endif; ?>
+                                <div class="hrn-item-time">
+                                    <i class="bi bi-clock"></i> <?php echo time_elapsed_string($notification['created_at']); ?>
+                                </div>
+                            </div>
+                            <a href="?notification_id=<?php echo $notification['id']; ?>" class="hrn-view-btn" onclick="event.stopPropagation();">
+                                <i class="bi bi-eye"></i> View details
                             </a>
                         </div>
-                        <div class="notification-time">
-                            <?php echo time_elapsed_string($notification['created_at']); ?>
-                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                    <?php
+                } else {
+                    ?>
+                    <div class="hrn-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h3>No hold notifications</h3>
+                        <p>When administrators place your posts on hold, notifications will appear here.</p>
                     </div>
                     <?php
                 }
-            } else {
                 ?>
-                <div class="empty-state">
-                    <i class="bi bi-inbox"></i>
-                    <h3>No Hold Notifications</h3>
-                    <p>When administrators place your posts on hold, notifications will appear here.</p>
-                </div>
-                <?php
-            }
-            ?>
-        </div>
-        
-        <div class="notification-actions">
-            <a href="homepage.php" class="back-btn">
-                <i class="bi bi-arrow-left"></i> Back to Home
-            </a>
-            
-            <div class="notification-buttons">
+            </div>
+
+            <div class="hrn-foot">
+                <a href="homepage.php" class="hrn-back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+
                 <?php if ($read_count > 0): ?>
                 <form method="post" action="held_posts.php" id="clearReadForm">
-                    <button type="button" class="clear-btn" id="openClearConfirmBtn">
-                        <i class="bi bi-trash"></i> Clear All Read Notifications
+                    <button type="button" class="hrn-clear-btn" id="openClearConfirmBtn">
+                        <i class="bi bi-trash"></i> Clear all read notifications
                     </button>
                 </form>
                 <?php else: ?>
-                <button disabled class="clear-btn">
-                    <i class="bi bi-trash"></i> Clear All Read Notifications
+                <button disabled class="hrn-clear-btn">
+                    <i class="bi bi-trash"></i> Clear all read notifications
                 </button>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-    
     <!-- Clear Read Notifications Confirm Modal -->
     <div class="modal-overlay" id="clearConfirmModal">
         <div class="clear-confirm-dialog">

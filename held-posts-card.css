@@ -1,0 +1,308 @@
+/* ============================================================
+   Held Posts notifications card redesign (amber theme)
+   Loaded last on held_posts.php (after homepage.css /
+   post-status-styles.css) and overrides the legacy markup.
+   ============================================================ */
+
+.hrn-wrap {
+    max-width: 690px !important;
+    margin: 32px auto 60px !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+}
+
+.hrn-card {
+    background: #ffffff !important;
+    border: 1px solid #f3ecdf !important;
+    border-top: 4px solid #f59f0b !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(120, 84, 16, 0.08) !important;
+    overflow: hidden !important;
+}
+
+/* ---------- Header ---------- */
+.hrn-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 22px 24px !important;
+    border-bottom: 1px solid #f4efe4 !important;
+}
+
+.hrn-head-icon {
+    flex: 0 0 auto !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #fdf1da !important;
+    color: #e08b00 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+}
+
+.hrn-head-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.hrn-title {
+    margin: 0 !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #3d3221 !important;
+    line-height: 1.3 !important;
+}
+
+.hrn-subtitle {
+    margin: 2px 0 0 !important;
+    font-size: 12.5px !important;
+    color: #9a8f7c !important;
+}
+
+.hrn-new-pill {
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #fdeccb !important;
+    color: #b26a00 !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    padding: 5px 12px !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+}
+
+.hrn-dot {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background: #f59f0b !important;
+}
+
+/* ---------- Body / list ---------- */
+.hrn-body {
+    padding: 20px 24px 8px !important;
+}
+
+.hrn-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+}
+
+.hrn-item {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    background: #fffaf0 !important;
+    border-left: 4px solid #f59f0b !important;
+    border-radius: 10px !important;
+    padding: 16px 18px !important;
+    cursor: pointer !important;
+    transition: box-shadow 0.18s ease !important;
+}
+
+.hrn-item:hover {
+    box-shadow: 0 4px 14px rgba(120, 84, 16, 0.08) !important;
+}
+
+.hrn-item-icon {
+    flex: 0 0 auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: #fdeccb !important;
+    color: #e08b00 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 17px !important;
+}
+
+.hrn-item-text {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.hrn-item-title {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #4a3d29 !important;
+    line-height: 1.4 !important;
+}
+
+.hrn-reason {
+    margin-top: 12px !important;
+}
+
+.hrn-reason-label {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.7px !important;
+    text-transform: uppercase !important;
+    color: #b45309 !important;
+    margin-bottom: 6px !important;
+}
+
+.hrn-reason-box {
+    background: #ffffff !important;
+    border: 1px solid #f3ddb0 !important;
+    border-radius: 8px !important;
+    padding: 11px 14px !important;
+    font-size: 13.5px !important;
+    line-height: 1.5 !important;
+    color: #5b4b34 !important;
+    /* Preview only — clamp to two lines with an ellipsis; the full
+       reason is shown in the details modal. */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+}
+
+.hrn-item-time {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+    font-size: 12.5px !important;
+    color: #9a8f7c !important;
+}
+
+.hrn-view-btn {
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    background: #ffffff !important;
+    border: 1px solid #ecd9b0 !important;
+    color: #b26a00 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: background 0.18s ease, border-color 0.18s ease !important;
+}
+
+.hrn-view-btn:hover {
+    background: #fff7e8 !important;
+    border-color: #f59f0b !important;
+}
+
+/* ---------- Empty state ---------- */
+.hrn-empty {
+    text-align: center !important;
+    padding: 40px 20px !important;
+    color: #9a8f7c !important;
+}
+
+.hrn-empty i {
+    font-size: 42px !important;
+    color: #e2d3b6 !important;
+    display: block !important;
+    margin-bottom: 14px !important;
+}
+
+.hrn-empty h3 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #6b5f4a !important;
+    margin: 0 0 6px !important;
+}
+
+.hrn-empty p {
+    font-size: 13.5px !important;
+    margin: 0 !important;
+}
+
+/* ---------- Footer ---------- */
+.hrn-foot {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 18px 24px 22px !important;
+    border-top: 1px solid #f4efe4 !important;
+    margin-top: 12px !important;
+    flex-wrap: wrap !important;
+}
+
+.hrn-foot form {
+    margin: 0 !important;
+}
+
+.hrn-back-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #ffffff !important;
+    border: 1px solid #e6e0d4 !important;
+    color: #4a3d29 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 9px 18px !important;
+    border-radius: 999px !important;
+    text-decoration: none !important;
+    transition: background 0.18s ease !important;
+}
+
+.hrn-back-btn:hover {
+    background: #faf7f0 !important;
+}
+
+.hrn-clear-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #fdeccb !important;
+    border: none !important;
+    color: #b26a00 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 10px 18px !important;
+    border-radius: 999px !important;
+    cursor: pointer !important;
+    transition: background 0.18s ease !important;
+}
+
+.hrn-clear-btn:hover {
+    background: #fbe1b3 !important;
+}
+
+.hrn-clear-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+    .hrn-head {
+        flex-wrap: wrap !important;
+    }
+
+    .hrn-item {
+        flex-wrap: wrap !important;
+    }
+
+    .hrn-view-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .hrn-foot {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .hrn-back-btn,
+    .hrn-clear-btn {
+        justify-content: center !important;
+    }
+}

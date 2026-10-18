@@ -211,6 +211,7 @@ if (isset($_GET['notification_id'])) {
     <link rel="stylesheet" href="homepage.css">
     <link rel="stylesheet" href="post-status-styles.css">
     <link rel="stylesheet" href="held-posts-card.css">
+    <link rel="stylesheet" href="held-detail-modal.css">
     
     <style>
         /* Custom modal dimensions */
@@ -990,260 +991,197 @@ if (isset($_GET['notification_id'])) {
 
     <!-- Notification Detail Modal -->
     <div class="modal-overlay" id="detailModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Your Post Hold Details</h3>
-                    <button class="modal-close" onclick="hideModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <?php if ($selected_notification): ?>
-                        <?php
-                        // Debug output to see what's in the notification message
-                        $debug_message = htmlspecialchars($selected_notification['message']);
-                        
-                        // Extract the hold reason
-                        $reason = "";
-                        if (preg_match('/Reason: (.*?)(?=Post content:|$)/s', $selected_notification['message'], $reason_matches)) {
-                            $reason = trim($reason_matches[1]);
-                        }
-                        
-                        // Extract the post content from the message
-                        $post_content = "";
-                        if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $matches)) {
-                            $post_content = $matches[1];
-                        } else {
-                            // Alternative pattern if the first one fails
-                            if (preg_match('/Post content: (.*?)(?=Post data:|$)/s', $selected_notification['message'], $matches)) {
-                                $post_content = trim($matches[1]);
-                            }
-                        }
-                        
-                        // Extract post data JSON if available
-                        $post_data = null;
-                        
-                        // More aggressive pattern to extract JSON
-                        if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $data_matches)) {
-                            $json_string = $data_matches[1];
-                            // Clean up the JSON string
-                            $json_string = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $json_string));
-                            $post_data = json_decode($json_string, true);
-                            
-                            // Fallback if json_decode fails
-                            if (json_last_error() !== JSON_ERROR_NONE) {
-                                // Try to manually extract key values
-                                preg_match('/\"image_path\":\"(.*?)\"/s', $json_string, $img_match);
-                                preg_match('/\"likes\":(.*?),/s', $json_string, $likes_match);
-                                preg_match('/\"comment_count\":(.*?),/s', $json_string, $comments_match);
-                                preg_match('/\"profile_picture\":\"(.*?)\"/s', $json_string, $pfp_match);
-                                preg_match('/\"first_name\":\"(.*?)\"/s', $json_string, $fname_match);
-                                preg_match('/\"last_name\":\"(.*?)\"/s', $json_string, $lname_match);
-                                
-                                $post_data = [
-                                    'image_path' => $img_match[1] ?? '',
-                                    'likes' => (int)($likes_match[1] ?? 0),
-                                    'comment_count' => (int)($comments_match[1] ?? 0),
-                                    'profile_picture' => $pfp_match[1] ?? './web-images/default_profile.png',
-                                    'first_name' => $fname_match[1] ?? 'Your',
-                                    'last_name' => $lname_match[1] ?? 'Post'
-                                ];
-                            }
-                        }
-                        
-                        // Last resort - check if we can find the JSON directly
-                        if (!$post_data && strpos($selected_notification['message'], '{') !== false && strpos($selected_notification['message'], '}') !== false) {
-                            $start = strpos($selected_notification['message'], '{');
-                            $end = strrpos($selected_notification['message'], '}');
-                            if ($start !== false && $end !== false && $end > $start) {
-                                $json_string = substr($selected_notification['message'], $start, $end - $start + 1);
-                                $post_data = json_decode($json_string, true);
-                            }
-                        }
-                        
-                        // If still no data, create a basic structure
-                        if (!$post_data) {
-                            $post_data = [
-                                'image_path' => '',
-                                'likes' => 0,
-                                'comment_count' => 0,
-                                'profile_picture' => './web-images/default_profile.png',
-                                'first_name' => 'Your',
-                                'last_name' => 'Post'
-                            ];
-                        }
+        <div class="hld-card">
+            <?php if ($selected_notification): ?>
+                <?php
+                // Extract the hold reason
+                $reason = "";
+                if (preg_match('/Reason: (.*?)(?=Post content:|$)/s', $selected_notification['message'], $reason_matches)) {
+                    $reason = trim($reason_matches[1]);
+                }
 
-                        // Owner fallback — hold notifications always belong to the
-                        // viewer, so prefer their real identity over placeholders.
-                        if ($owner_info) {
-                            $pd_first = trim($post_data['first_name'] ?? '');
-                            $pd_last = trim($post_data['last_name'] ?? '');
-                            if ($pd_first === '' || $pd_first === 'Your') {
-                                $post_data['first_name'] = $owner_info['first_name'] ?? $post_data['first_name'];
-                            }
-                            if ($pd_last === '' || $pd_last === 'Post') {
-                                $post_data['last_name'] = $owner_info['last_name'] ?? $post_data['last_name'];
-                            }
-                            $pd_pfp = trim($post_data['profile_picture'] ?? '');
-                            if ($pd_pfp === '' || $pd_pfp === './web-images/default_profile.png') {
-                                // Real photo when available, otherwise clear it so the
-                                // initials avatar (e.g. LT) renders instead of a logo.
-                                $post_data['profile_picture'] = $owner_info['profile_picture'] ?? '';
-                            }
-                        }
-                        
-                        // Debug data
-                        $debug_data = [
-                            'post_content_found' => !empty($post_content),
-                            'post_data_found' => $post_data !== null,
-                            'json_error' => json_last_error_msg(),
-                            'extracted_data' => $post_data
+                // Extract the post content from the message
+                $post_content = "";
+                if (preg_match('/Post content: "(.*?)"/s', $selected_notification['message'], $matches)) {
+                    $post_content = $matches[1];
+                } elseif (preg_match('/Post content: (.*?)(?=Post data:|$)/s', $selected_notification['message'], $matches)) {
+                    $post_content = trim($matches[1]);
+                }
+
+                // Extract post data JSON if available
+                $post_data = null;
+                if (preg_match('/Post data: (\{.*)/s', $selected_notification['message'], $data_matches)) {
+                    $json_string = trim(preg_replace('/[^\{]*(\{.*\})[^\}]*/', '$1', $data_matches[1]));
+                    $post_data = json_decode($json_string, true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        preg_match('/\"image_path\":\"(.*?)\"/s', $json_string, $img_match);
+                        preg_match('/\"likes\":(.*?),/s', $json_string, $likes_match);
+                        preg_match('/\"comment_count\":(.*?),/s', $json_string, $comments_match);
+                        preg_match('/\"profile_picture\":\"(.*?)\"/s', $json_string, $pfp_match);
+                        preg_match('/\"first_name\":\"(.*?)\"/s', $json_string, $fname_match);
+                        preg_match('/\"last_name\":\"(.*?)\"/s', $json_string, $lname_match);
+                        $post_data = [
+                            'image_path' => $img_match[1] ?? '',
+                            'likes' => (int)($likes_match[1] ?? 0),
+                            'comment_count' => (int)($comments_match[1] ?? 0),
+                            'profile_picture' => $pfp_match[1] ?? './web-images/default_profile.png',
+                            'first_name' => $fname_match[1] ?? 'Your',
+                            'last_name' => $lname_match[1] ?? 'Post'
                         ];
-                        ?>
-                        
-                        <!-- Hidden debug info that can be viewed in page source -->
-                        <!-- DEBUG: <?php echo json_encode(['message' => $debug_message, 'data' => $debug_data]); ?> -->
-                        
-                        <!-- Hold banner -->
-                        <div class="hold-banner">
+                    }
+                }
+
+                // Last resort - find the JSON directly
+                if (!$post_data && strpos($selected_notification['message'], '{') !== false && strpos($selected_notification['message'], '}') !== false) {
+                    $json_start = strpos($selected_notification['message'], '{');
+                    $json_end = strrpos($selected_notification['message'], '}');
+                    if ($json_start !== false && $json_end !== false && $json_end > $json_start) {
+                        $json_string = substr($selected_notification['message'], $json_start, $json_end - $json_start + 1);
+                        $post_data = json_decode($json_string, true);
+                    }
+                }
+
+                // If still no data, create a basic structure
+                if (!$post_data) {
+                    $post_data = [
+                        'image_path' => '',
+                        'likes' => 0,
+                        'comment_count' => 0,
+                        'profile_picture' => './web-images/default_profile.png',
+                        'first_name' => 'Your',
+                        'last_name' => 'Post'
+                    ];
+                }
+
+                // Owner fallback — hold notifications always belong to the viewer
+                if ($owner_info) {
+                    $pd_first = trim($post_data['first_name'] ?? '');
+                    $pd_last = trim($post_data['last_name'] ?? '');
+                    if ($pd_first === '' || $pd_first === 'Your') {
+                        $post_data['first_name'] = $owner_info['first_name'] ?? $post_data['first_name'];
+                    }
+                    if ($pd_last === '' || $pd_last === 'Post') {
+                        $post_data['last_name'] = $owner_info['last_name'] ?? $post_data['last_name'];
+                    }
+                    $pd_pfp = trim($post_data['profile_picture'] ?? '');
+                    if ($pd_pfp === '' || $pd_pfp === './web-images/default_profile.png') {
+                        $post_data['profile_picture'] = $owner_info['profile_picture'] ?? '';
+                    }
+                }
+
+                // Author / image / counts
+                if ($hold_data) {
+                    $has_profile_pic = !empty($hold_data['profile_picture']);
+                    $profile_pic = $has_profile_pic ? htmlspecialchars($hold_data['profile_picture']) : '';
+                    $author_first = $hold_data['first_name'] ?? '';
+                    $author_last = $hold_data['last_name'] ?? '';
+                    $author_name = !empty($author_first) && !empty($author_last)
+                        ? htmlspecialchars($author_first . ' ' . $author_last)
+                        : 'Your Post';
+                    $post_content = $hold_data['content'] ?? '';
+                    $post_image = $hold_data['image_path'] ?? '';
+                    $post_likes = $hold_data['likes'] ?? 0;
+                    $post_comments = $hold_data['comment_count'] ?? 0;
+                    $post_created = $hold_data['created_at'] ?? $selected_notification['created_at'];
+                } else {
+                    $has_profile_pic = isset($post_data['profile_picture']) && !empty($post_data['profile_picture']);
+                    $profile_pic = $has_profile_pic ? htmlspecialchars($post_data['profile_picture']) : '';
+                    $author_first = $post_data['first_name'] ?? '';
+                    $author_last = $post_data['last_name'] ?? '';
+                    $author_name = '';
+                    if (isset($post_data['first_name']) && isset($post_data['last_name'])) {
+                        $author_name = htmlspecialchars($post_data['first_name'] . ' ' . $post_data['last_name']);
+                    }
+                    if (empty(trim($author_name))) {
+                        $author_name = 'Your Post';
+                    }
+                    $post_image = $post_data['image_path'] ?? '';
+                    $post_likes = $post_data['likes'] ?? 0;
+                    $post_comments = $post_data['comment_count'] ?? 0;
+                    $post_created = $selected_notification['created_at'];
+                }
+
+                $display_content = $hold_data ? $hold_data['content'] : $post_content;
+                $image_src = ($hold_data && !empty($hold_data['image_path']))
+                    ? $hold_data['image_path']
+                    : ($post_data['image_path'] ?? '');
+                $likes_count = $hold_data ? intval($hold_data['likes']) : (isset($post_data['likes']) ? intval($post_data['likes']) : 0);
+                $comments_count = $hold_data ? intval($hold_data['comment_count']) : (isset($post_data['comment_count']) ? intval($post_data['comment_count']) : 0);
+                $hold_reason = ($hold_data && !empty($hold_data['hold_reason']))
+                    ? $hold_data['hold_reason']
+                    : $reason;
+                ?>
+
+                <div class="hld-media">
+                    <?php if (!empty(trim($display_content))): ?>
+                    <div class="hld-caption-label">Caption</div>
+                    <div class="hld-content"><?php echo nl2br(htmlspecialchars($display_content)); ?></div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($image_src)): ?>
+                        <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image" class="hld-media-img">
+                    <?php else: ?>
+                        <div class="hld-media-empty"><i class="bi bi-image"></i></div>
+                    <?php endif; ?>
+
+                    <div class="hld-media-actions">
+                        <span class="hld-pill">
+                            <i class="bi bi-heart<?php echo $likes_count > 0 ? '-fill' : ''; ?>"></i>
+                            Like <strong><?php echo $likes_count; ?></strong>
+                        </span>
+                        <span class="hld-pill">
+                            <i class="bi bi-chat"></i>
+                            Comment <strong><?php echo $comments_count; ?></strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="hld-detail">
+                    <div class="hld-head">
+                        <span class="hld-head-icon"><i class="bi bi-pause-fill"></i></span>
+                        <div class="hld-head-text">
+                            <h3 class="hld-title">Post hold details</h3>
+                            <p class="hld-subtitle">Placed on hold by an administrator</p>
+                        </div>
+                        <button type="button" class="hld-close" onclick="hideModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+                    </div>
+
+                    <div class="hld-body">
+                        <div class="hld-banner">
                             <i class="bi bi-pause-circle-fill"></i>
                             <span>This post has been placed on hold by an administrator</span>
                         </div>
-                        
-                        <!-- Hold reason if available -->
-                        <?php
-                        // Get reason from hold data if available, otherwise parse from notification
-                        $hold_reason = $hold_data && !empty($hold_data['hold_reason'])
-                            ? $hold_data['hold_reason']
-                            : $reason;
-                        
-                        if (!empty($hold_reason)):
-                        ?>
-                        <div class="hold-reason">
-                            <div class="reason-header">Reason for Hold:</div>
-                            <div class="reason-text"><?php echo htmlspecialchars($hold_reason); ?></div>
+
+                        <?php if (!empty($hold_reason)): ?>
+                        <div class="hld-reason">
+                            <div class="hld-reason-label">Reason for hold</div>
+                            <div class="hld-reason-text"><?php echo htmlspecialchars($hold_reason); ?></div>
                         </div>
                         <?php endif; ?>
-                        
-                        <!-- Begin post structure -->
-                        <div class="post-display">
-                            <div class="post-author-info">
-                                <?php
-                                if ($hold_data) {
-                                    // Use data from posts table joined with users
-                                    $has_profile_pic = !empty($hold_data['profile_picture']);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($hold_data['profile_picture'])
-                                        : '';
-                                    
-                                    $author_first = $hold_data['first_name'] ?? '';
-                                    $author_last = $hold_data['last_name'] ?? '';
-                                    $author_name = !empty($author_first) && !empty($author_last)
-                                        ? htmlspecialchars($author_first . ' ' . $author_last)
-                                        : 'Your Post';
-                                    
-                                    $post_content = $hold_data['content'] ?? '';
-                                    $post_image = $hold_data['image_path'] ?? '';
-                                    $post_likes = $hold_data['likes'] ?? 0;
-                                    $post_comments = $hold_data['comment_count'] ?? 0;
-                                    $post_created = $hold_data['created_at'] ?? $selected_notification['created_at'];
-                                    $post_held = $selected_notification['created_at'];
-                                } else {
-                                    // Fallback to old method of parsing from notification message
-                                    $has_profile_pic = isset($post_data['profile_picture']) && !empty($post_data['profile_picture']);
-                                    $profile_pic = $has_profile_pic
-                                        ? htmlspecialchars($post_data['profile_picture'])
-                                        : '';
-                                    
-                                    $author_first = $post_data['first_name'] ?? '';
-                                    $author_last = $post_data['last_name'] ?? '';
-                                    $author_name = '';
-                                    if (isset($post_data['first_name']) && isset($post_data['last_name'])) {
-                                        $author_name = htmlspecialchars($post_data['first_name'] . ' ' . $post_data['last_name']);
-                                    }
-                                    if (empty(trim($author_name))) {
-                                        $author_name = 'Your Post';
-                                    }
-                                    
-                                    $post_image = $post_data['image_path'] ?? '';
-                                    $post_likes = $post_data['likes'] ?? 0;
-                                    $post_comments = $post_data['comment_count'] ?? 0;
-                                    $post_created = $selected_notification['created_at'];
-                                    $post_held = $selected_notification['created_at'];
-                                }
-                                ?>
-                                <?php if ($has_profile_pic): ?>
-                                    <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="avatar">
-                                <?php else: ?>
-                                    <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 48); ?>
-                                <?php endif; ?>
-                                <div>
-                                    <strong><?php echo $author_name; ?></strong>
-                                    <div class="post-meta">
-                                        <span><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="post-content-display">
-                                <?php
-                                // Use the content from posts table if available, otherwise use the parsed content
-                                $display_content = $hold_data ? $hold_data['content'] : $post_content;
-                                
-                                if (!empty($display_content)):
-                                ?>
-                                    <?php echo nl2br(htmlspecialchars($display_content)); ?>
-                                <?php else: ?>
-                                    <em>No content available</em>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <?php
-                            // Check for image in posts table first, then fall back to parsed data
-                            $image_src = $hold_data && !empty($hold_data['image_path'])
-                                ? $hold_data['image_path']
-                                : ($post_data['image_path'] ?? '');
-                            
-                            if (!empty($image_src)):
-                            ?>
-                            <div class="post-media">
-                                <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Post image">
-                            </div>
+
+                        <div class="hld-author">
+                            <?php if ($has_profile_pic): ?>
+                                <img src="<?php echo $profile_pic; ?>" alt="Profile Picture" class="hld-avatar">
+                            <?php else: ?>
+                                <?php echo getInitialsHtml($author_first ?? '', $author_last ?? '', 44); ?>
                             <?php endif; ?>
-                            
-                            <div class="post-actions-bar">
-                                <div class="post-action">
-                                    <?php
-                                    // Get like count
-                                    $likes_count = $hold_data ? intval($hold_data['likes']) : (isset($post_data['likes']) ? intval($post_data['likes']) : 0);
-                                    
-                                    // Display filled heart icon if there are likes, empty heart if zero
-                                    if ($likes_count > 0):
-                                    ?>
-                                        <i class="bi bi-heart-fill"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-heart"></i>
-                                    <?php endif; ?>
-                                    Like
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $likes_count; ?>
-                                    </small>
-                                </div>
-                                <div class="post-action">
-                                    <i class="bi bi-chat"></i> Comment
-                                    <small class="text-muted" style="margin-left: 5px;">
-                                        <?php echo $hold_data ? intval($hold_data['comment_count']) : (isset($post_data['comment_count']) ? intval($post_data['comment_count']) : '0'); ?>
-                                    </small>
-                                </div>
+                            <div class="hld-author-meta">
+                                <div class="hld-author-name"><?php echo $author_name; ?></div>
+                                <div class="hld-author-time"><i class="bi bi-clock"></i> <?php echo formatManilaTime($post_created); ?></div>
                             </div>
                         </div>
-                        
-                        <div class="hold-timestamp">
+
+                        <div class="hld-issued">
                             <i class="bi bi-clock-history"></i>
-                             Post placed on hold <?php echo time_elapsed_string($selected_notification['created_at'], true); ?>
+                            Post placed on hold <?php echo time_elapsed_string($selected_notification['created_at'], true); ?>
                         </div>
-                    <?php endif; ?>
+                    </div>
+
+                    <div class="hld-foot">
+                        <button type="button" class="hld-close-btn" onclick="hideModal()">Close</button>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
     

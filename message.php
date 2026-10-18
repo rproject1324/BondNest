@@ -2435,19 +2435,55 @@ function formatMessageTime($timestamp) {
                         showChatToast('Message is still sending. Please wait a moment and try again.');
                         return;
                     }
-                    const messageContent = messageContainer.querySelector('.message').textContent;
-                    
+                    const messageEl = messageContainer.querySelector('.message');
+                    const messageContent = messageEl ? messageEl.textContent : '';
+                    const messageImages = messageEl
+                        ? Array.from(messageEl.querySelectorAll('img')).map(function (img) { return img.getAttribute('src'); }).filter(Boolean)
+                        : [];
+                    const timestampEl = messageContainer.querySelector('.timestamp');
+                    let messageTime = timestampEl ? timestampEl.textContent : '';
+                    messageTime = messageTime.replace(/\(edited\)/i, '').trim();
+
                     console.log('Preparing to delete message with ID:', messageId);
                     
                     // Show custom delete confirmation modal instead of browser alert
                     const deleteModal = document.getElementById('deleteModal');
                     const deleteMessageContent = document.getElementById('deleteMessageContent');
+                    const deleteModalTitle = document.getElementById('deleteModalTitle');
+                    const deleteModalQuestion = document.getElementById('deleteModalQuestion');
+                    const deleteModalPhotosPill = document.getElementById('deleteModalPhotosPill');
+                    const deleteModalPhotosCount = document.getElementById('deleteModalPhotosCount');
+                    const deleteModalMessageTime = document.getElementById('deleteModalMessageTime');
                     const confirmDeleteBtn = document.getElementById('confirmDelete');
                     const cancelDeleteBtn = document.getElementById('cancelDelete');
                     const closeDeleteModalBtn = document.getElementById('closeDeleteModal');
                     
-                    // Display the message content in the modal
-                    deleteMessageContent.textContent = messageContent;
+                    // Display the message content in the modal (photo vs text layout)
+                    if (messageImages.length > 0) {
+                        deleteModalTitle.textContent = 'Delete photos';
+                        deleteModalQuestion.textContent = 'Are you sure you want to delete this message and its photos?';
+                        deleteModalPhotosCount.textContent = messageImages.length;
+                        deleteModalPhotosPill.style.display = '';
+                        deleteMessageContent.classList.add('delete-modal-message--photos');
+                        deleteMessageContent.innerHTML = '<div class="delete-modal-thumbs">' +
+                            messageImages.map(function (src) {
+                                return '<img src="' + src.replace(/"/g, '&quot;') + '" alt="Photo">';
+                            }).join('') +
+                            '</div>';
+                        if (messageTime) {
+                            deleteModalMessageTime.querySelector('span').textContent = messageTime;
+                            deleteModalMessageTime.style.display = '';
+                        } else {
+                            deleteModalMessageTime.style.display = 'none';
+                        }
+                    } else {
+                        deleteModalTitle.textContent = 'Delete message';
+                        deleteModalQuestion.textContent = 'Are you sure you want to delete this message?';
+                        deleteModalPhotosPill.style.display = 'none';
+                        deleteModalMessageTime.style.display = 'none';
+                        deleteMessageContent.classList.remove('delete-modal-message--photos');
+                        deleteMessageContent.textContent = messageContent;
+                    }
                     
                     // Show the modal
                     deleteModal.classList.add('show');
@@ -2658,16 +2694,20 @@ function formatMessageTime($timestamp) {
             <div class="delete-modal-header">
                 <span class="delete-modal-icon"><i class="bi bi-trash"></i></span>
                 <div class="delete-modal-header-text">
-                    <h3>Delete message</h3>
+                    <h3 id="deleteModalTitle">Delete message</h3>
                     <p class="delete-modal-subtitle">This action cannot be undone</p>
                 </div>
                 <button class="delete-modal-close" id="closeDeleteModal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="delete-modal-body">
-                <p class="delete-modal-question">Are you sure you want to delete this message?</p>
+                <p class="delete-modal-question" id="deleteModalQuestion">Are you sure you want to delete this message?</p>
                 <div class="delete-modal-message-wrap">
-                    <span class="delete-modal-message-label">Message</span>
+                    <div class="delete-modal-message-head">
+                        <span class="delete-modal-message-label">Message</span>
+                        <span class="delete-modal-photos-pill" id="deleteModalPhotosPill" style="display:none;"><i class="bi bi-images"></i> <span id="deleteModalPhotosCount">0</span> photos</span>
+                    </div>
                     <div class="delete-modal-message" id="deleteMessageContent"></div>
+                    <div class="delete-modal-message-time" id="deleteModalMessageTime" style="display:none;"><i class="bi bi-clock"></i> <span></span></div>
                 </div>
             </div>
             <div class="delete-modal-footer">

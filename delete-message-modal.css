@@ -112,7 +112,57 @@
     letter-spacing: 0.7px !important;
     text-transform: uppercase !important;
     color: #c81e3c !important;
-    margin-bottom: 6px !important;
+    margin: 0 !important;
+}
+
+#deleteModal .delete-modal-message-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+}
+
+#deleteModal .delete-modal-photos-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #fde8ee !important;
+    color: #c81e3c !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 4px 12px !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+}
+
+#deleteModal .delete-modal-message--photos {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+#deleteModal .delete-modal-thumbs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+#deleteModal .delete-modal-thumbs img {
+    width: 64px !important;
+    height: 64px !important;
+    object-fit: cover !important;
+    border-radius: 8px !important;
+    border: 1px solid #f6d0da !important;
+    display: block !important;
+}
+
+#deleteModal .delete-modal-message-time {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+    font-size: 12.5px !important;
+    color: #a98b96 !important;
 }
 
 #deleteModal .delete-modal-message {

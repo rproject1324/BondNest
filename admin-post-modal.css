@@ -259,6 +259,26 @@
     line-height: 1.5 !important;
     color: #3a4a4a !important;
     word-break: break-word !important;
+    /* Default to a three-row preview; longer captions scroll instead
+       of stretching the modal downwards. */
+    max-height: 94px !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #c8d3d1 #eef2f1 !important;
+}
+
+#postModal .post-content::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#postModal .post-content::-webkit-scrollbar-track {
+    background: #eef2f1 !important;
+    border-radius: 8px !important;
+}
+
+#postModal .post-content::-webkit-scrollbar-thumb {
+    background: #c8d3d1 !important;
+    border-radius: 8px !important;
 }
 
 #postModal .post-content:empty {

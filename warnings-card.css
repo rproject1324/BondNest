@@ -167,8 +167,12 @@
     font-size: 13.5px !important;
     line-height: 1.5 !important;
     color: #5b4b34 !important;
-    overflow-wrap: break-word !important;
-    word-wrap: break-word !important;
+    /* Preview only — truncate with an ellipsis; the full reason
+       is shown in the details modal. */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
 }
 
 .wrn-item-time {

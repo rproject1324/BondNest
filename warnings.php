@@ -1170,6 +1170,7 @@ if (isset($_GET['notification_id'])) {
 
                 <div class="wpd-media">
                     <?php if (!empty(trim($display_content))): ?>
+                    <div class="wpd-caption-label">Caption</div>
                     <div class="wpd-content"><?php echo nl2br(htmlspecialchars($display_content)); ?></div>
                     <?php endif; ?>
 
@@ -1331,5 +1332,6 @@ if (isset($_GET['notification_id'])) {
         });
     })();
     </script>
+    <script src="notifications-pagination.js"></script>
 </body>
 </html> 

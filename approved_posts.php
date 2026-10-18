@@ -1168,5 +1168,6 @@ if (isset($_GET['notification_id'])) {
             });
         })();
     </script>
+    <script src="notifications-pagination.js"></script>
 </body>
 </html>

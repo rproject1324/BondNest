@@ -44,10 +44,36 @@
     line-height: 1.5 !important;
     color: #33413f !important;
     margin-bottom: 14px !important;
-    max-height: 110px !important;
+    max-height: 94px !important;
     overflow-y: auto !important;
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #eccf92 #faf3e2 !important;
+}
+
+#detailModal .wpd-caption-label {
+    flex: 0 0 auto !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.7px !important;
+    text-transform: uppercase !important;
+    color: #b45309 !important;
+    margin-bottom: 6px !important;
+}
+
+#detailModal .wpd-content::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#detailModal .wpd-content::-webkit-scrollbar-track {
+    background: #faf3e2 !important;
+    border-radius: 8px !important;
+}
+
+#detailModal .wpd-content::-webkit-scrollbar-thumb {
+    background: #eccf92 !important;
+    border-radius: 8px !important;
 }
 
 #detailModal .wpd-media-img {
@@ -220,7 +246,7 @@
     color: #5b4b34 !important;
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
-    max-height: 170px !important;
+    max-height: 94px !important;
     overflow-y: auto !important;
     padding-right: 6px !important;
     scrollbar-width: thin !important;

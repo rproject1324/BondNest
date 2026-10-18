@@ -228,6 +228,25 @@
     color: #33413f !important;
     overflow-wrap: break-word !important;
     word-wrap: break-word !important;
+    /* Show roughly three rows, then scroll instead of growing the modal */
+    max-height: 94px !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #b7ddd6 #eef6f4 !important;
+}
+
+#detailModal .apd-content::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+#detailModal .apd-content::-webkit-scrollbar-track {
+    background: #eef6f4 !important;
+    border-radius: 8px !important;
+}
+
+#detailModal .apd-content::-webkit-scrollbar-thumb {
+    background: #b7ddd6 !important;
+    border-radius: 8px !important;
 }
 
 #detailModal .apd-approved-at {
